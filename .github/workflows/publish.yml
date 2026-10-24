@@ -28,7 +28,7 @@ jobs:
   publish:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.conclusion != 'cancelled' &&
        (github.event.workflow_run.display_title == 'Full build' ||
         github.event.workflow_run.display_title == 'Full build x64'))
     runs-on: ubuntu-24.04
@@ -48,9 +48,12 @@ jobs:
             "Full build x64") arch=x64; abi=x86_64 ;;
             *) echo "Run $RUN_ID is a $title, nothing to publish."; exit 1 ;;
           esac
-          if [ "$conclusion" != "success" ]; then
-            echo "Run $RUN_ID ended in $conclusion, nothing to publish."
-            exit 1
+          apk=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts" \
+            --jq ".artifacts[] | select(.name == \"aerium-full-$arch\" and .expired == false) | .id" | head -n 1)
+          if [ -z "$apk" ]; then
+            echo "Run $RUN_ID ended in $conclusion without an APK, nothing to publish."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
           echo "arch=$arch" >> "$GITHUB_OUTPUT"
           echo "abi=$abi" >> "$GITHUB_OUTPUT"
@@ -59,6 +62,7 @@ jobs:
           echo "sha=$(jq -r '.head_sha' <<<"$info")" >> "$GITHUB_OUTPUT"
 
       - name: Download the APK
+        if: steps.run.outputs.skip != 'true'
         uses: actions/download-artifact@v5
         with:
           name: aerium-full-${{ steps.run.outputs.arch }}
@@ -67,6 +71,7 @@ jobs:
           github-token: ${{ github.token }}
 
       - name: Resolve version
+        if: steps.run.outputs.skip != 'true'
         id: ver
         run: |
           set -euo pipefail
@@ -75,6 +80,7 @@ jobs:
           echo "version=$V" >> "$GITHUB_OUTPUT"
 
       - name: Compute checksum
+        if: steps.run.outputs.skip != 'true'
         run: |
           set -euo pipefail
           cd release
@@ -82,15 +88,36 @@ jobs:
           cat SHA256SUMS.txt
 
       - name: Record build provenance
+        if: steps.run.outputs.skip != 'true'
         uses: actions/attest-build-provenance@v2
         continue-on-error: true
         with:
           subject-path: release/aerium-*.apk
 
       - name: Publish release
+        id: release
+        if: steps.run.outputs.skip != 'true'
+        continue-on-error: true
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.RELEASE_TOKEN || github.token }}
+          tag_name: v${{ steps.ver.outputs.version }}-${{ steps.run.outputs.arch == 'x64' && 'x64-' || '' }}b${{ steps.run.outputs.number }}
+          target_commitish: ${{ steps.run.outputs.sha }}
+          name: Aerium ${{ steps.ver.outputs.version }} (${{ steps.run.outputs.arch }}, build ${{ steps.run.outputs.number }})
+          draft: true
+          prerelease: ${{ steps.run.outputs.arch == 'x64' }}
+          make_latest: ${{ steps.run.outputs.arch == 'x64' && 'false' || 'true' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            release/aerium-*.apk
+            release/SHA256SUMS.txt
+
+      - name: Publish release with the workflow token
+        if: steps.run.outputs.skip != 'true' && steps.release.outcome == 'failure'
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ github.token }}
           tag_name: v${{ steps.ver.outputs.version }}-${{ steps.run.outputs.arch == 'x64' && 'x64-' || '' }}b${{ steps.run.outputs.number }}
           target_commitish: ${{ steps.run.outputs.sha }}
           name: Aerium ${{ steps.ver.outputs.version }} (${{ steps.run.outputs.arch }}, build ${{ steps.run.outputs.number }})
