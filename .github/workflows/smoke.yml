@@ -82,6 +82,7 @@ jobs:
           adb install -r -g "$apk" > out/install.txt 2>&1
           adb root || true
           sleep 3
+          adb wait-for-device
           adb shell "echo '_ --disable-breakpad --disable-crashpad-for-testing --disable-features=WebAssemblyTrapHandler,PartitionAllocMemoryTagging --js-flags=--no-wasm-trap-handler' > /data/local/tmp/chrome-command-line"
           adb shell chmod 644 /data/local/tmp/chrome-command-line
           adb logcat -c
