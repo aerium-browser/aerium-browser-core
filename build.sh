@@ -468,10 +468,24 @@ export ANDROID_HOME=$PWD/third_party/android_sdk/public
 
 mkdir -p $SCRIPT_DIR/release
 set_keys
-UNSIGNED_APK="$(find out/Default/apks -name 'Chrome*.apk' | head -n1)"
+UNSIGNED_APK=out/Default/apks/ChromePublic.apk
+[ -f "$UNSIGNED_APK" ] || { echo "[aerium] FATAL: $UNSIGNED_APK was not built" >&2; exit 1; }
 APK_BASE=${AERIUM_APK_BASE:-aerium-core}
 sign_apk "$UNSIGNED_APK" "$SCRIPT_DIR/release/$APK_BASE-$VERSION-$AERIUM_ABI.apk"
 rm -rf $SCRIPT_DIR/keys
+if [ -n "${AERIUM_UI_DIR:-}" ]; then
+    aapt2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 2>/dev/null | sort -V | tail -n1)
+    badging=$("$aapt2" dump badging "$SCRIPT_DIR/release/$APK_BASE-$VERSION-$AERIUM_ABI.apk" 2>/dev/null || true)
+    grep -q "^package: name='io.dioide.aerium'" <<<"$badging" \
+        || { echo "[aerium] FATAL: the apk is not io.dioide.aerium" >&2; exit 1; }
+    grep -q "^application-label:'Aerium'" <<<"$badging" \
+        || { echo "[aerium] FATAL: the apk is not labelled Aerium" >&2; exit 1; }
+    if grep -q '^io.dioide.aerium.ui.AeriumUiProvider ->' "$UNSIGNED_APK.mapping" 2>/dev/null; then
+        echo "[aerium] apk check: Aerium label, package and UI layer present"
+    else
+        echo "[aerium] WARNING: the UI layer was not found in the R8 mapping"
+    fi
+fi
 
 # --- Archive what a native crash report needs to symbolise (issue #11).
 #
