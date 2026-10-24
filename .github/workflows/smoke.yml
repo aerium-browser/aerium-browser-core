@@ -40,6 +40,14 @@ jobs:
           ls -la release
           unzip -lv "$apk" | awk 'NR>3 && $NF ~ /^(assets|lib)\// {print $2, $1, $NF}' | sort -k3
           echo "assets: $(unzip -l "$apk" | grep -c ' assets/')"
+          mkdir -p dex && unzip -q -o "$apk" 'classes*.dex' -d dex
+          echo "dex files: $(ls dex | tr '\n' ' ')"
+          echo "suffix known to java: $(cat dex/*.dex | grep -a -c '40064988')"
+          echo "plain resources.pak name in java: $(cat dex/*.dex | grep -a -c 'resources\.pak')"
+          echo "stored-locales in java: $(cat dex/*.dex | grep -a -c 'stored-locales')"
+          unzip -p "$apk" lib/arm64-v8a/libchrome.so > libchrome.so
+          echo "native asset paths:"
+          strings -n 8 libchrome.so | grep -E '^assets/[a-z_0-9/%.-]+$' | sort -u | head -20
       - name: Write the test script
         run: |
           mkdir -p out
