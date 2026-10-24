@@ -34,6 +34,12 @@ jobs:
           path: release
           run-id: ${{ inputs.run_id }}
           github-token: ${{ github.token }}
+      - name: List what the APK carries
+        run: |
+          apk=$(ls release/aerium-*.apk | grep -v mapping | head -n1)
+          ls -la release
+          unzip -lv "$apk" | awk 'NR>3 && $NF ~ /^(assets|lib)\// {print $2, $1, $NF}' | sort -k3
+          echo "assets: $(unzip -l "$apk" | grep -c ' assets/')"
       - name: Write the test script
         run: |
           mkdir -p out
