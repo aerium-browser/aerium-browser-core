@@ -23,6 +23,11 @@ on:
           - x64
           - arm64
         default: x64
+      api_level:
+        description: 'Android version of the emulator'
+        type: string
+        required: false
+        default: '34'
 
 permissions:
   contents: read
@@ -101,7 +106,7 @@ jobs:
       - name: Run the APK in an emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: ${{ inputs.api_level }}
           target: google_apis
           arch: x86_64
           ram-size: 4096M
