@@ -61,6 +61,11 @@ on:
           - oracle
           - gcp
         default: oracle
+      jobs:
+        description: 'Parallel compile jobs on the free runners, 1 for light finishing builds'
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -71,6 +76,7 @@ env:
   AERIUM_UI_DIR: ${{ inputs.flavor == 'full' && format('{0}/ui', github.workspace) || '' }}
   AERIUM_APK_BASE: ${{ inputs.flavor == 'full' && 'aerium' || 'aerium-core' }}
   AERIUM_CHECKPOINT_KEY: ${{ inputs.flavor == 'full' && secrets.AERIUM_CHECKPOINT_KEY || '' }}
+  NINJA_JOBS: ${{ inputs.jobs }}
 
 concurrency:
   group: ${{ inputs.flavor || 'core' }}-${{ inputs.arch || 'arm64' }}-build-${{ github.ref }}
