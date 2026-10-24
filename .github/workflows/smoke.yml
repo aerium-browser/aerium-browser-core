@@ -129,6 +129,17 @@ jobs:
           echo "java crash: $(grep -q 'FATAL EXCEPTION' out/crash.txt out/crash2.txt && echo yes || echo no)"
           echo "native crash: $(grep -q '\*\*\* \*\*\* \*\*\*' out/crash.txt out/crash2.txt && echo yes || echo no)"
           exit 0
+      - name: Show the crash without private names
+        run: |
+          set +e
+          for f in out/crash.retraced.txt out/crash2.retraced.txt out/crash.txt; do
+            [ -s "$f" ] || continue
+            awk '/FATAL EXCEPTION/{on=1} on{print} /^\s*$/{if(on)exit}' "$f" \
+              | sed -E 's/^[0-9-]+ [0-9:.]+ +[0-9]+ +[0-9]+ [A-Z] [A-Za-z]+ *: //' \
+              | sed -E 's/io\.dioide\.aerium\.ui\.[A-Za-z0-9_.$]+/[aerium ui]/g' \
+              | head -n 60
+            break
+          done
       - name: Seal the results
         if: always()
         run: |
