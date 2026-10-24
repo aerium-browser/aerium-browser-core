@@ -1,0 +1,97 @@
+# Copyright 2026 Dioide
+# SPDX-License-Identifier: GPL-3.0-only
+
+name: Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Full build run to test'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      AERIUM_CHECKPOINT_KEY: ${{ secrets.AERIUM_CHECKPOINT_KEY }}
+    steps:
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Download the APK
+        uses: actions/download-artifact@v5
+        with:
+          name: aerium-full-arm64
+          path: release
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ github.token }}
+      - name: Write the test script
+        run: |
+          mkdir -p out
+          cat > smoke.sh <<'EOF'
+          set -x
+          apk=$(ls release/aerium-*.apk | grep -v mapping | head -n1)
+          adb shell getprop ro.product.cpu.abilist > out/abilist.txt
+          adb install -r -g "$apk" > out/install.txt 2>&1
+          adb logcat -c
+          adb shell monkey -p io.dioide.aerium -c android.intent.category.LAUNCHER 1 > out/launch.txt 2>&1
+          sleep 60
+          adb shell screencap -p /sdcard/screen1.png && adb pull /sdcard/screen1.png out/screen1.png
+          adb shell pidof io.dioide.aerium > out/pid.txt 2>&1
+          adb logcat -d -v threadtime > out/logcat.txt
+          adb logcat -d -b crash -v threadtime > out/crash.txt
+          adb shell monkey -p io.dioide.aerium -c android.intent.category.LAUNCHER 1 >> out/launch.txt 2>&1
+          sleep 30
+          adb shell screencap -p /sdcard/screen2.png && adb pull /sdcard/screen2.png out/screen2.png
+          adb logcat -d -b crash -v threadtime > out/crash2.txt
+          exit 0
+          EOF
+      - name: Run the APK in an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          ram-size: 4096M
+          disk-size: 8000M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: bash smoke.sh
+      - name: Translate the stack traces
+        run: |
+          set +e
+          mapping=$(ls release/*.apk.mapping | head -n1)
+          curl -sSfL -o r8.jar https://dl.google.com/dl/android/maven2/com/android/tools/r8/8.5.35/r8-8.5.35.jar
+          for f in crash crash2; do
+            java -cp r8.jar com.android.tools.r8.retrace.Retrace "$mapping" "out/$f.txt" > "out/$f.retraced.txt" 2> "out/$f.retrace.log"
+          done
+          grep -E 'AndroidRuntime|FATAL|DEBUG|libc|chromium|cr_' out/logcat.txt > out/logcat.short.txt
+          java -cp r8.jar com.android.tools.r8.retrace.Retrace "$mapping" out/logcat.short.txt > out/logcat.short.retraced.txt 2>/dev/null
+          echo "installed: $(grep -q '^Success' out/install.txt && echo yes || echo no)"
+          echo "running after 60s: $([ -s out/pid.txt ] && grep -q '^[0-9]' out/pid.txt && echo yes || echo no)"
+          echo "java crash: $(grep -q 'FATAL EXCEPTION' out/crash.txt out/crash2.txt && echo yes || echo no)"
+          echo "native crash: $(grep -q '\*\*\* \*\*\* \*\*\*' out/crash.txt out/crash2.txt && echo yes || echo no)"
+          exit 0
+      - name: Seal the results
+        if: always()
+        run: |
+          mkdir -p sealed
+          tar -c -C out . | zstd -q -T0 -19 \
+            | openssl enc -aes-256-ctr -pbkdf2 -salt -pass env:AERIUM_CHECKPOINT_KEY -out sealed/smoke.enc
+          ls -la sealed
+      - name: Upload the results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-results
+          path: sealed/
+          retention-days: 10
