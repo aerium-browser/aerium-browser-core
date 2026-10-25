@@ -95,6 +95,8 @@ jobs:
           sleep 60
           adb shell screencap -p /sdcard/screen1.png && adb pull /sdcard/screen1.png out/screen1.png
           adb shell pidof "$pkg" > out/pid.txt 2>&1
+          adb shell dumpsys activity activities | grep -E 'topResumedActivity|mResumedActivity' > out/activity.txt 2>&1
+          adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1 && adb pull /sdcard/ui.xml out/ui.xml
           adb logcat -d -v threadtime > out/logcat.txt
           adb logcat -d -b crash -v threadtime > out/crash.txt
           adb shell monkey -p "$pkg" -c android.intent.category.LAUNCHER 1 >> out/launch.txt 2>&1
@@ -132,6 +134,12 @@ jobs:
       - name: Show the crash without private names
         run: |
           set +e
+          echo "--- screen in front ---"
+          sed -E 's/^ +//' out/activity.txt 2>/dev/null | head -n 3
+          echo "--- text on screen ---"
+          grep -oE 'text="[^"]+"' out/ui.xml 2>/dev/null | sed 's/^text=//' | head -n 40
+          echo "--- processes with a native crash ---"
+          grep -ohE '>>> [^ ]+ <<<' out/crash.txt out/crash2.txt 2>/dev/null | sort | uniq -c
           for f in out/crash.retraced.txt out/crash2.retraced.txt out/crash.txt; do
             [ -s "$f" ] || continue
             awk '/FATAL EXCEPTION/{on=1} on{print} /^\s*$/{if(on)exit}' "$f" \
