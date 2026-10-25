@@ -99,9 +99,18 @@ jobs:
           adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1 && adb pull /sdcard/ui.xml out/ui.xml
           adb logcat -d -v threadtime > out/logcat.txt
           adb logcat -d -b crash -v threadtime > out/crash.txt
-          adb shell monkey -p "$pkg" -c android.intent.category.LAUNCHER 1 >> out/launch.txt 2>&1
+          skip=$(grep -oE 'text="Skip"[^>]*bounds="[^"]+"' out/ui.xml | grep -oE '\[[0-9]+,[0-9]+\]\[[0-9]+,[0-9]+\]' | head -n1)
+          if [ -n "$skip" ]; then
+            set -- $(echo "$skip" | tr -c '0-9' ' ')
+            adb shell input tap $(( ($1 + $3) / 2 )) $(( ($2 + $4) / 2 ))
+            sleep 10
+          fi
+          adb shell uiautomator dump /sdcard/ui2.xml > /dev/null 2>&1 && adb pull /sdcard/ui2.xml out/ui2.xml
+          adb shell am start -a android.intent.action.VIEW -d https://example.com -p "$pkg" >> out/launch.txt 2>&1
           sleep 30
           adb shell screencap -p /sdcard/screen2.png && adb pull /sdcard/screen2.png out/screen2.png
+          adb shell uiautomator dump /sdcard/ui3.xml > /dev/null 2>&1 && adb pull /sdcard/ui3.xml out/ui3.xml
+          adb shell pidof "$pkg" > out/pid2.txt 2>&1
           adb logcat -d -b crash -v threadtime > out/crash2.txt
           exit 0
           EOF
@@ -138,8 +147,18 @@ jobs:
           sed -E 's/^ +//' out/activity.txt 2>/dev/null | head -n 3
           echo "--- text on screen ---"
           grep -oE 'text="[^"]+"' out/ui.xml 2>/dev/null | sed 's/^text=//' | head -n 40
+          echo "--- text after skip ---"
+          grep -oE 'text="[^"]+"' out/ui2.xml 2>/dev/null | sed 's/^text=//' | head -n 30
+          echo "--- text with a web page open ---"
+          grep -oE 'text="[^"]+"' out/ui3.xml 2>/dev/null | sed 's/^text=//' | head -n 40
+          echo "running at the end: $([ -s out/pid2.txt ] && grep -q '^[0-9]' out/pid2.txt && echo yes || echo no)"
           echo "--- processes with a native crash ---"
-          grep -ohE '>>> [^ ]+ <<<' out/crash.txt out/crash2.txt 2>/dev/null | sort | uniq -c
+          grep -ohE '>>> [^ ]+ <<<' out/crash.txt out/crash2.txt 2>/dev/null | sed -E 's/:[0-9]+ <<</ <<</' | sort | uniq -c
+          echo "--- native crash signal ---"
+          grep -hE 'signal [0-9]+ \(|Abort message|Cause:' out/crash2.txt 2>/dev/null | sed -E 's/^.*(signal [0-9]|Abort message|Cause:)/\1/' | sed -E 's/io\.dioide\.aerium\.ui\.[A-Za-z0-9_.$]+/[aerium ui]/g' | sort | uniq -c | head -n 10
+          echo "--- native crash frames ---"
+          awk '/\*\*\* \*\*\* \*\*\*/{n++} n==1' out/crash2.txt 2>/dev/null | grep -E '#[0-9]+ pc ' \
+            | sed -E 's/^.*(#[0-9]+) pc [0-9a-f]+ +/\1 /; s/ \(BuildId.*//; s#/data/app/[^ ]*/base\.apk#base.apk#' | head -n 16
           for f in out/crash.retraced.txt out/crash2.retraced.txt out/crash.txt; do
             [ -s "$f" ] || continue
             awk '/FATAL EXCEPTION/{on=1} on{print} /^\s*$/{if(on)exit}' "$f" \
