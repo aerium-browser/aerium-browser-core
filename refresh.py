@@ -94,13 +94,18 @@ def rebuild(args, missing, extra, tmp):
             src = os.path.join(args.src, path)
             if os.path.isfile(src):
                 put(src, os.path.join(tb, path))
-        excludes = [f'--exclude={s}' for s in SKIP] + [f'--exclude={p}' for p in extra]
-        for p in reversed(base):
-            r = subprocess.run(['git', 'apply', '-R', '--whitespace=nowarn', *excludes, p],
+        includes = [f'--include={p}' for p in missing if p in bset]
+        for p in reversed(base) if includes else []:
+            r = subprocess.run(['git', 'apply', '-R', '--whitespace=nowarn', *includes, p],
+                               cwd=tb, capture_output=True, text=True, env=git_env(tb))
+            if r.returncode == 0:
+                continue
+            r = subprocess.run(['git', 'apply', '--check', '--whitespace=nowarn', *includes, p],
                                cwd=tb, capture_output=True, text=True, env=git_env(tb))
             if r.returncode:
                 print(f'[aerium] FATAL: {os.path.basename(p)} did not reverse', file=sys.stderr)
                 sys.exit(1)
+            print(f'[aerium] {os.path.basename(p)} is new to this tree')
         for path in missing:
             orig = os.path.join(tb, path) if path in bset else os.path.join(args.src, path)
             if not os.path.isfile(orig):

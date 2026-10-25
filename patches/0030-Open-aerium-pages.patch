@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Open aerium pages
+
+---
+ .../src/org/chromium/chrome/browser/tab/TabImpl.java  |  4 ++++
+ .../chrome_autocomplete_provider_client.cc            | 11 ++++-------
+ .../chrome_autocomplete_scheme_classifier.cc          |  3 +++
+ chrome/common/chrome_content_client.cc                |  1 +
+ components/omnibox/browser/location_bar_model_impl.cc |  5 ++++-
+ 5 files changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
+index e281c3fff960b33baf471e81d5ba0f5eff02277f..2681226e7be40bb5ef9bbd7747275fb8cfdf5b47 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
+@@ -911,6 +911,10 @@ class TabImpl implements Tab, TabInternal {
+     public LoadUrlResult loadUrl(LoadUrlParams params) {
+         try {
+             TraceEvent.begin("Tab.loadUrl");
++            String typedUrl = params.getUrl();
++            if (typedUrl.regionMatches(true, 0, "aerium://", 0, 9)) {
++                params.setUrl("chrome://" + typedUrl.substring(9));
++            }
+             if (maybeHandleBeforeUnload(() -> loadUrl(params))) {
+                 return new LoadUrlResult(
+                         TabLoadStatus.DEFAULT_PAGE_LOAD, /* navigationHandle= */ null);
+diff --git a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
+index 18fc0f61918580c2244f0a4e00fbdff55f613a7f..82c1cd252c544f67d917f71f541af05d55447bbe 100644
+--- a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
++++ b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
+@@ -429,7 +429,7 @@ std::string ChromeAutocompleteProviderClient::GetAcceptLanguages() const {
+ std::string
+ ChromeAutocompleteProviderClient::GetEmbedderRepresentationOfAboutScheme()
+     const {
+-  return content::kChromeUIScheme;
++  return "aerium";
+ }
+ 
+ std::vector<std::u16string> ChromeAutocompleteProviderClient::GetBuiltinURLs() {
+@@ -461,12 +461,9 @@ std::vector<std::u16string> ChromeAutocompleteProviderClient::GetBuiltinURLs() {
+ std::vector<std::u16string>
+ ChromeAutocompleteProviderClient::GetBuiltinsToProvideAsUserTypes() {
+   std::vector<std::u16string> builtins_to_provide;
+-  builtins_to_provide.push_back(chrome::kChromeUIChromeURLsURL16);
+-  builtins_to_provide.push_back(chrome::kChromeUIFlagsURL16);
+-#if !BUILDFLAG(IS_ANDROID)
+-  builtins_to_provide.push_back(chrome::kChromeUISettingsURL16);
+-#endif
+-  builtins_to_provide.push_back(chrome::kChromeUIVersionURL16);
++  builtins_to_provide.push_back(u"aerium://about/");
++  builtins_to_provide.push_back(u"aerium://flags/");
++  builtins_to_provide.push_back(u"aerium://version/");
+   return builtins_to_provide;
+ }
+ 
+diff --git a/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc b/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc
+index 2f7ea50b69a46ee1bfabad3ceeeee8c6fc94a956..d7faf4a2cd9bc1e88c9689dd2ae7444042fb421b 100644
+--- a/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc
++++ b/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc
+@@ -68,6 +68,9 @@ ChromeAutocompleteSchemeClassifier::GetInputTypeForScheme(
+   if (scheme.empty()) {
+     return metrics::OmniboxInputType::EMPTY;
+   }
++  if (base::EqualsCaseInsensitiveASCII(scheme, "aerium")) {
++    return metrics::OmniboxInputType::URL;
++  }
+   if (base::IsStringASCII(scheme) &&
+       (ProfileIOData::IsHandledProtocol(scheme) ||
+        base::EqualsCaseInsensitiveASCII(scheme, content::kViewSourceScheme) ||
+diff --git a/chrome/common/chrome_content_client.cc b/chrome/common/chrome_content_client.cc
+index 8b5f84e0858a1cd6d2902993126572059b8e614e..27e77543c3deaa8e6c80b1824ddc76c9e2517606 100644
+--- a/chrome/common/chrome_content_client.cc
++++ b/chrome/common/chrome_content_client.cc
+@@ -205,6 +205,7 @@ static const char* const kChromeStandardURLSchemes[] = {
+ void ChromeContentClient::AddAdditionalSchemes(Schemes* schemes) {
+   for (auto* standard_scheme : kChromeStandardURLSchemes)
+     schemes->standard_schemes.push_back(standard_scheme);
++  schemes->standard_schemes.push_back("aerium");
+ 
+ #if BUILDFLAG(IS_ANDROID)
+   schemes->referrer_schemes.push_back(content::kAndroidAppScheme);
+diff --git a/components/omnibox/browser/location_bar_model_impl.cc b/components/omnibox/browser/location_bar_model_impl.cc
+index 5445f8e5356969c240ef7c39e72cf064341b2c5b..18e4c0a58876865d29fc5cc25ed2c1767059e4d1 100644
+--- a/components/omnibox/browser/location_bar_model_impl.cc
++++ b/components/omnibox/browser/location_bar_model_impl.cc
+@@ -147,11 +147,14 @@ std::u16string LocationBarModelImpl::GetFormattedURL(
+   // Note that we can't unescape spaces here, because if the user copies this
+   // and pastes it into another program, that program may think the URL ends at
+   // the space.
+-  const std::u16string formatted_text =
++  std::u16string formatted_text =
+       delegate_->FormattedStringWithEquivalentMeaning(
+           url, url_formatter::FormatUrl(url, format_types,
+                                         base::UnescapeRule::NORMAL, nullptr,
+                                         nullptr, nullptr));
++  if (url.SchemeIs("chrome") && formatted_text.starts_with(u"chrome://")) {
++    formatted_text.replace(0, 6, u"aerium");
++  }
+ 
+   // Truncating the URL breaks editing and then pressing enter, but hopefully
+   // people won't try to do much with such enormous URLs anyway. If this becomes
