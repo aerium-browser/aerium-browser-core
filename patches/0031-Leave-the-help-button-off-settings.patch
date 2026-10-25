@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Leave the help button off settings
+
+---
+ .../chromium/chrome/browser/settings/SettingsMenuHelper.java  | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsMenuHelper.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsMenuHelper.java
+index a8ff4cb51d01fdfc312538b815ad8bbb854e13b4..e51b0d75dc74c2a7b2292edac6474d076017a5ea 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsMenuHelper.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsMenuHelper.java
+@@ -102,9 +102,7 @@ public class SettingsMenuHelper {
+      * @param delegate The Delegate to provide the host state.
+      */
+     public static void onPrepareOptionsMenu(Menu menu, Delegate delegate) {
+-        if (delegate.isShownInTab()) {
+-            removeHelpMenuItems(menu);
+-        }
++        removeHelpMenuItems(menu);
+         for (int i = 0; i < menu.size(); i++) {
+             MenuItem item = menu.getItem(i);
+             if (item.getIcon() != null) {
