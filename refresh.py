@@ -160,6 +160,78 @@ def refresh(args):
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def tree_version(src):
+    parts = {}
+    with open(os.path.join(src, 'chrome', 'VERSION')) as f:
+        for line in f:
+            key, _, value = line.strip().partition('=')
+            parts[key] = value
+    return '.'.join(parts[k] for k in ('MAJOR', 'MINOR', 'BUILD', 'PATCH'))
+
+
+def git(args, cwd, **kw):
+    return subprocess.run(['git', *args], cwd=cwd, check=True, **kw)
+
+
+def upstream(args):
+    current = tree_version(args.src)
+    if current == args.version:
+        print(f'[aerium] tree is at {current}')
+        return
+    tmp = tempfile.mkdtemp(prefix='aerium-upstream-')
+    try:
+        git(['init', '-q'], tmp)
+        refs = [f'+refs/tags/{v}:refs/tags/{v}' for v in (current, args.version)]
+        fetched = False
+        for index, source in enumerate(args.source):
+            remote = f'source{index}'
+            git(['remote', 'add', remote, source], tmp)
+            for _ in range(3):
+                r = subprocess.run(['git', 'fetch', '-q', '--depth', '1', '--filter=blob:none',
+                                    remote, *refs], cwd=tmp)
+                if r.returncode == 0:
+                    fetched = True
+                    break
+            if fetched:
+                break
+        if not fetched:
+            print('[aerium] FATAL: upstream tags could not be fetched', file=sys.stderr)
+            sys.exit(1)
+        raw = git(['diff', '--raw', '--no-renames', current, args.version], tmp,
+                  capture_output=True, text=True).stdout.splitlines()
+        files = []
+        for line in raw:
+            meta, _, path = line.partition('\t')
+            modes = meta.split()[:2]
+            if '160000' in (modes[0].lstrip(':'), modes[1]) or path == 'DEPS':
+                print(f'[aerium] FATAL: {current} to {args.version} moves {path}, '
+                      'a fresh build is needed', file=sys.stderr)
+                sys.exit(1)
+            files.append(path)
+        diff = os.path.join(tmp, 'upstream.diff')
+        with open(diff, 'wb') as out:
+            git(['diff', '--binary', '--no-renames', current, args.version], tmp, stdout=out)
+        cache, tree = [], []
+        for path in files:
+            (cache if os.path.isfile(os.path.join(args.cache, path)) else tree).append(path)
+        for root, paths in ((args.cache, cache), (args.src, tree)):
+            if not paths:
+                continue
+            include = [f'--include={p}' for p in paths]
+            r = subprocess.run(['git', 'apply', '--whitespace=nowarn', *include, diff],
+                               cwd=root, capture_output=True, text=True, env=git_env(root))
+            if r.returncode:
+                print('[aerium] FATAL: upstream changes did not apply', file=sys.stderr)
+                sys.exit(1)
+        if tree_version(args.src) != args.version and 'chrome/VERSION' not in cache:
+            print('[aerium] FATAL: the tree is not at the pinned version', file=sys.stderr)
+            sys.exit(1)
+        print(f'[aerium] tree moved from {current} to {args.version}: '
+              f'{len(tree)} files, {len(cache)} pristine copies')
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def copy(args):
     n = 0
     for root, _, names in os.walk(args.from_dir):
@@ -186,12 +258,17 @@ def main():
     r.add_argument('--base', action='append')
     r.add_argument('--skip', action='append')
     r.add_argument('patches', nargs='+')
+    u = sub.add_parser('upstream')
+    u.add_argument('--src', required=True)
+    u.add_argument('--cache', required=True)
+    u.add_argument('--version', required=True)
+    u.add_argument('--source', action='append', required=True)
     c = sub.add_parser('copy')
     c.add_argument('--label', default='files')
     c.add_argument('from_dir')
     c.add_argument('to_dir')
     args = ap.parse_args()
-    {'save': save, 'refresh': refresh, 'copy': copy}[args.cmd](args)
+    {'save': save, 'refresh': refresh, 'copy': copy, 'upstream': upstream}[args.cmd](args)
 
 
 if __name__ == '__main__':

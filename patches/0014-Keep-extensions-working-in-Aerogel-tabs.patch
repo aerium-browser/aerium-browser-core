@@ -1,18 +1,17 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: fatih-gh <me@mehmetfatihyaman.me>
 Date: Thu, 1 Jan 2026 00:00:00 +0000
-Subject: [PATCH] Give extensions their own Aerogel window
+Subject: [PATCH] Keep extensions working in Aerogel tabs
 
 ---
  .../chromium/chrome/browser/ChromeTabbedActivity.java    | 8 +++++---
- .../MinimizeAppAndCloseTabBackPressHandler.java          | 4 ++++
  chrome/browser/extensions/api/tabs/tabs_api.cc           | 3 +++
  .../chrome/browser/incognito/IncognitoUtils.java         | 9 +--------
  chrome/browser/profiles/profile_destroyer.cc             | 5 +++++
  content/browser/web_contents/web_contents_impl.cc        | 9 +++++++++
  content/public/browser/web_contents.h                    | 3 +++
  extensions/browser/process_manager.cc                    | 8 +++++++-
- 8 files changed, 37 insertions(+), 12 deletions(-)
+ 7 files changed, 33 insertions(+), 12 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 index 7381e0dab618830bded7ec49813b4a1454537bc9..d3f291dcd9c8f7d6ad26db393a0cdf7bd1cd410c 100644
@@ -39,21 +38,6 @@ index 7381e0dab618830bded7ec49813b4a1454537bc9..d3f291dcd9c8f7d6ad26db393a0cdf7b
                  || mSupportedProfileType == SupportedProfileType.OFF_THE_RECORD) {
              builder.registerPane(
                      PaneId.INCOGNITO_TAB_SWITCHER,
-diff --git a/chrome/browser/back_press/android/java/src/org/chromium/chrome/browser/back_press/MinimizeAppAndCloseTabBackPressHandler.java b/chrome/browser/back_press/android/java/src/org/chromium/chrome/browser/back_press/MinimizeAppAndCloseTabBackPressHandler.java
-index 2db787ec0edeecc0149799eecce66587678ac34c..e00628aa131ba8f8199933fe29105080f5484849 100644
---- a/chrome/browser/back_press/android/java/src/org/chromium/chrome/browser/back_press/MinimizeAppAndCloseTabBackPressHandler.java
-+++ b/chrome/browser/back_press/android/java/src/org/chromium/chrome/browser/back_press/MinimizeAppAndCloseTabBackPressHandler.java
-@@ -252,6 +252,10 @@ public class MinimizeAppAndCloseTabBackPressHandler
-     }
- 
-     private void onTabChanged(@Nullable Tab tab) {
-+        if (tab != null && tab.isIncognitoBranded()) {
-+            mSystemBackPressSupplier.set(true);
-+            return;
-+        }
-         if (supportCloseTabUponMinimization()) {
-             Pair<Boolean, Boolean> backPressAction = determineBackPressAction(tab);
-             boolean minimizeApp = backPressAction.first;
 diff --git a/chrome/browser/extensions/api/tabs/tabs_api.cc b/chrome/browser/extensions/api/tabs/tabs_api.cc
 index 2a631eb9fc793cbe52e820e86d6434a73caa6fae..f0425028726dbad6a8d46c714d09bd13e9e5a9c0 100644
 --- a/chrome/browser/extensions/api/tabs/tabs_api.cc
@@ -69,7 +53,7 @@ index 2a631eb9fc793cbe52e820e86d6434a73caa6fae..f0425028726dbad6a8d46c714d09bd13
        if (tab_index > -1 && i != tab_index) {
          continue;
 diff --git a/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java b/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java
-index 82919be542dab3d77fbc23a16c66f4b37825fa89..4ecddd966a33a50a4f7a1580519ec6944a9a8ecd 100644
+index 82919be542dab3d77fbc23a16c66f4b37825fa89..a5abe6925fadb1afbc0a13114dc14df643399a0e 100644
 --- a/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java
 +++ b/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java
 @@ -27,7 +27,6 @@ import org.chromium.chrome.browser.profiles.Profile;
@@ -91,7 +75,7 @@ index 82919be542dab3d77fbc23a16c66f4b37825fa89..4ecddd966a33a50a4f7a1580519ec694
 -        }
 -        return DisplayUtil.isGlobalDefaultDisplayWithMinDiagonal(
 -                LARGE_DIAGONAL_DISPLAY_THRESHOLD_INCHES);
-+        return true;
++        return false;
      }
  
      /**

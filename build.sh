@@ -231,6 +231,8 @@ fi
 cd chromium/src
 
 if [ -z "${AERIUM_FRESH:-}" ]; then
+    python3 "$SCRIPT_DIR/refresh.py" upstream --src . --cache out/aerium-pristine --version "$VERSION" \
+        --source "$CHROMIUM_SOURCE" --source https://github.com/chromium/chromium
     for part in api bridge defaults; do
         if [ -d "$SCRIPT_DIR/$part" ]; then
             python3 "$SCRIPT_DIR/refresh.py" copy --label "core $part" "$SCRIPT_DIR/$part" "aerium/$part"

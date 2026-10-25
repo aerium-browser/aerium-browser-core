@@ -10,4 +10,8 @@ public interface MenuHost extends SurfaceHost {
     MenuItem item(int id);
 
     void select(int id);
+
+    default boolean overview() {
+        return false;
+    }
 }

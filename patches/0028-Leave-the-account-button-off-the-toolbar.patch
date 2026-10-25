@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Leave the account button off the toolbar
+
+---
+ .../ui/AdaptiveToolbarUiCoordinator.java      | 19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
+
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java
+index 7ad16149ce4d54ec8e3b4823aad2cc7b0e28216c..9ff345a802b9b231f16c20d80d03c9c9c4b13168 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java
+@@ -31,7 +31,6 @@ import org.chromium.chrome.browser.commerce.coupons.DiscountsBottomSheetContentC
+ import org.chromium.chrome.browser.commerce.coupons.DiscountsButtonController;
+ import org.chromium.chrome.browser.dom_distiller.ReaderModeIphController;
+ import org.chromium.chrome.browser.dom_distiller.ReaderModeToolbarButtonController;
+-import org.chromium.chrome.browser.identity_disc.IdentityDiscController;
+ import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
+ import org.chromium.chrome.browser.omnibox.voice.VoiceRecognitionHandler;
+ import org.chromium.chrome.browser.omnibox.voice.VoiceRecognitionIntentHandler.VoiceInteractionSource;
+@@ -60,7 +59,6 @@ import org.chromium.components.browser_ui.device_lock.DeviceLockActivityLauncher
+ import org.chromium.components.browser_ui.widget.scrim.ScrimManager;
+ import org.chromium.components.commerce.core.CommerceFeatureUtils;
+ import org.chromium.components.feature_engagement.Tracker;
+-import org.chromium.components.signin.SigninFeatureMap;
+ import org.chromium.ui.base.ActivityResultTracker;
+ import org.chromium.ui.base.WindowAndroid;
+ import org.chromium.ui.modaldialog.ModalDialogManager;
+@@ -244,22 +242,7 @@ public class AdaptiveToolbarUiCoordinator {
+         mAdaptiveToolbarButtonController = adaptiveToolbarButtonController;
+         toolbarBehavior.registerPerSurfaceButtons(adaptiveToolbarButtonController, trackerSupplier);
+ 
+-        if (SigninFeatureMap.sSigninLevelUpButton.isEnabled()) {
+-            mButtonDataProviders = List.of(adaptiveToolbarButtonController);
+-        } else {
+-            IdentityDiscController identityDiscController =
+-                    new IdentityDiscController(
+-                            mActivity,
+-                            windowAndroid,
+-                            activityResultTracker,
+-                            deviceLockActivityLauncher,
+-                            profileSupplier,
+-                            bottomSheetController,
+-                            mModalDialogManagerSupplier.get(),
+-                            snackbarManagerSupplier.get(),
+-                            onSigninTapped);
+-            mButtonDataProviders = List.of(identityDiscController, adaptiveToolbarButtonController);
+-        }
++        mButtonDataProviders = List.of(adaptiveToolbarButtonController);
+     }
+ 
+     /**

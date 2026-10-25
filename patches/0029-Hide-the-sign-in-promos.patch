@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Hide the sign in promos
+
+---
+ .../browser/ui/signin/signin_promo/SigninPromoCoordinator.java  | 2 +-
+ .../browser/ui/signin/signin_promo/SigninPromoMediator.java     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoCoordinator.java b/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoCoordinator.java
+index 57eadce73652b553b10ef5889bfc836958f03df8..e426ab02d9d686afef5213dd7014b334ed204b1d 100644
+--- a/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoCoordinator.java
++++ b/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoCoordinator.java
+@@ -135,7 +135,7 @@ public class SigninPromoCoordinator
+ 
+     /** Determines whether the signin promo can be shown. */
+     public boolean canShowPromo() {
+-        return !sPromoDisabledForTesting && mMediator.canShowPromo();
++        return false;
+     }
+ 
+     /** Builds a promo view object for the corresponding access point. */
+diff --git a/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoMediator.java b/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoMediator.java
+index e543af7c6fdf140e3c1179a26fea61349b3cd8ca..6eea91e6aa6f34e2ad5ae46f2aaa1ef2ca80a872 100644
+--- a/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoMediator.java
++++ b/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoMediator.java
+@@ -162,7 +162,7 @@ final class SigninPromoMediator
+             return false;
+         }
+ 
+-        return !mMaxImpressionReached && mPromoDelegate.canShowPromo();
++        return false;
+     }
+ 
+     void onSigninUndone() {

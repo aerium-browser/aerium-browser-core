@@ -4,23 +4,24 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Host the Aerium menu
 
 ---
- .../TabbedAppMenuPropertiesDelegate.java      |  3 ++
+ .../TabbedAppMenuPropertiesDelegate.java      |  4 ++
  chrome/browser/ui/android/appmenu/BUILD.gn    |  1 +
- .../ui/appmenu/AppMenuHandlerImpl.java        | 53 ++++++++++++++++++-
- .../browser/ui/appmenu/AppMenuSheet.java      | 42 +++++++++++++++
- 4 files changed, 98 insertions(+), 1 deletion(-)
+ .../ui/appmenu/AppMenuHandlerImpl.java        | 71 ++++++++++++++++++-
+ .../browser/ui/appmenu/AppMenuSheet.java      | 42 +++++++++++
+ 4 files changed, 117 insertions(+), 1 deletion(-)
  create mode 100644 chrome/browser/ui/android/appmenu/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuSheet.java
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index ea3d8e0c6f39ecc57e1c33ab754f491ac02d9235..10c6663e481820e73617878f297e38aaf2fad383 100644
+index ea3d8e0c6f39ecc57e1c33ab754f491ac02d9235..f58742af0bc94fe8e0dfabeec9f3dd6bb3fa9a3e 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-@@ -298,6 +298,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -298,6 +298,10 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
          } else if (menuGroup == MenuGroup.TABLET_EMPTY_MODE_MENU) {
              populateTabletEmptyModeMenu(modelList);
          }
-+        if (menuGroup == MenuGroup.PAGE_MENU) {
-+            io.dioide.aerium.bridge.MenuSurface.attach(modelList);
++        if (menuGroup == MenuGroup.PAGE_MENU || menuGroup == MenuGroup.OVERVIEW_MODE_MENU) {
++            io.dioide.aerium.bridge.MenuSurface.attach(
++                    modelList, menuGroup == MenuGroup.OVERVIEW_MODE_MENU);
 +        }
          return modelList;
      }
@@ -38,7 +39,7 @@ index 67d0b39999f53544bd138373ed5c358316055882..d55041701cdead2793b556506ac3c02f
      "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuTabGroupItemProperties.java",
      "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuTabItemProperties.java",
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuHandlerImpl.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuHandlerImpl.java
-index 9a1cbc7f512c4a204f6e836fba1abfc55b0f04f4..00a08c0789ea6d059ebf2942acc10ab0546653d9 100644
+index 9a1cbc7f512c4a204f6e836fba1abfc55b0f04f4..6230f1a7629e6e626d929c55379504ffadbb17f4 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuHandlerImpl.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuHandlerImpl.java
 @@ -118,6 +118,29 @@ class AppMenuHandlerImpl
@@ -88,22 +89,40 @@ index 9a1cbc7f512c4a204f6e836fba1abfc55b0f04f4..00a08c0789ea6d059ebf2942acc10ab0
          ContextThemeWrapper wrapper =
                  new ContextThemeWrapper(mContext, R.style.AppMenuThemeOverlay);
  
-@@ -455,9 +488,26 @@ class AppMenuHandlerImpl
+@@ -455,9 +488,44 @@ class AppMenuHandlerImpl
          }
      }
  
 +    private static @Nullable PropertyModel findItem(ModelList list, int id) {
 +        for (int i = 0; i < list.size(); i++) {
-+            PropertyModel model = list.get(i).model;
-+            if (model.containsKey(AppMenuItemProperties.MENU_ITEM_ID)
-+                    && model.get(AppMenuItemProperties.MENU_ITEM_ID) == id) {
-+                return model;
-+            }
-+            if (!model.containsKey(AppMenuItemProperties.ADDITIONAL_ICONS)) continue;
-+            ModelList icons = model.get(AppMenuItemProperties.ADDITIONAL_ICONS);
-+            if (icons == null) continue;
-+            PropertyModel inner = findItem(icons, id);
++            PropertyModel inner = findItemIn(list.get(i).model, id);
 +            if (inner != null) return inner;
++        }
++        return null;
++    }
++
++    private static @Nullable PropertyModel findItemIn(PropertyModel model, int id) {
++        if (model.containsKey(AppMenuItemProperties.MENU_ITEM_ID)
++                && model.get(AppMenuItemProperties.MENU_ITEM_ID) == id) {
++            return model;
++        }
++        if (model.containsKey(AppMenuItemProperties.ADDITIONAL_ICONS)) {
++            ModelList icons = model.get(AppMenuItemProperties.ADDITIONAL_ICONS);
++            if (icons != null) {
++                PropertyModel inner = findItem(icons, id);
++                if (inner != null) return inner;
++            }
++        }
++        if (model.containsKey(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER)) {
++            Supplier<List<ListItem>> submenu =
++                    model.get(AppMenuItemWithSubmenuProperties.SUBMENU_PROVIDER);
++            List<ListItem> children = submenu == null ? null : submenu.get();
++            if (children != null) {
++                for (ListItem child : children) {
++                    PropertyModel inner = findItemIn(child.model, id);
++                    if (inner != null) return inner;
++                }
++            }
 +        }
 +        return null;
 +    }
@@ -116,7 +135,7 @@ index 9a1cbc7f512c4a204f6e836fba1abfc55b0f04f4..00a08c0789ea6d059ebf2942acc10ab0
      }
  
      /**
-@@ -473,6 +523,7 @@ class AppMenuHandlerImpl
+@@ -473,6 +541,7 @@ class AppMenuHandlerImpl
  
      @Override
      public void hideAppMenu() {

@@ -11,6 +11,8 @@ public final class AeriumPrefs {
     public static final String CLOSE_TABS_ON_EXIT = "aerium.close_tabs_on_exit";
     public static final String CROSS_ORIGIN_REFERRER = "aerium.cross_origin_referrer";
     public static final String CROSS_ORIGIN_REFERRER_SWITCH = "aerium-cross-origin-referrer";
+    public static final String FEATURES_OFF = "aerium.features_off";
+    public static final String FEATURES_OFF_SWITCH = "aerium-features-off";
 
     private AeriumPrefs() {}
 
@@ -34,11 +36,24 @@ public final class AeriumPrefs {
         ContextUtils.getAppSharedPreferences().edit().putInt(CROSS_ORIGIN_REFERRER, mode).apply();
     }
 
+    public static String getFeaturesOff() {
+        String value = ContextUtils.getAppSharedPreferences().getString(FEATURES_OFF, "");
+        return value == null ? "" : value;
+    }
+
+    public static void setFeaturesOff(String names) {
+        ContextUtils.getAppSharedPreferences().edit().putString(FEATURES_OFF, names).apply();
+    }
+
     public static void applyToCommandLine() {
         int mode = getCrossOriginReferrer();
         if (mode == 1 || mode == 2) {
             CommandLine.getInstance()
                     .appendSwitchWithValue(CROSS_ORIGIN_REFERRER_SWITCH, Integer.toString(mode));
+        }
+        String off = getFeaturesOff();
+        if (!off.isEmpty()) {
+            CommandLine.getInstance().appendSwitchWithValue(FEATURES_OFF_SWITCH, off);
         }
     }
 }

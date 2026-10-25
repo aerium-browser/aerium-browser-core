@@ -13,6 +13,7 @@
 #include "base/base_switches.h"
 #include "base/command_line.h"
 #include "base/strings/string_split.h"
+#include "base/strings/string_util.h"
 #include "base/values.h"
 #include "chrome/browser/preloading/preloading_prefs.h"
 #include "chrome/common/pref_names.h"
@@ -40,6 +41,7 @@ namespace {
 
 constexpr char kCrossOriginReferrerSwitch[] = "aerium-cross-origin-referrer";
 constexpr char kCrossOriginReferrerFeature[] = "AeriumCrossOriginReferrer";
+constexpr char kFeaturesOffSwitch[] = "aerium-features-off";
 
 constexpr const char* kFeaturesOff[] = {
     "AbusiveOriginNotificationPermissionRevocation",
@@ -63,7 +65,7 @@ constexpr const char* kFeaturesOff[] = {
 constexpr const char* kFeaturesOn[] = {
     "AndroidDevToolsFrontend",
     "CertificateTransparencyAskBeforeEnabling",
-    "GlobalPrivacyControlForce",
+    "GlobalPrivacyControlTest",
     "HstsTopLevelNavigationsOnly",
     "LocalNetworkAccessChecksWebRTC",
     "LocalNetworkAccessChecksWebSockets",
@@ -79,6 +81,8 @@ constexpr const char* kFeaturesOn[] = {
     "StrictOriginIsolation",
     "SubmenusInAppMenu",
     "TaskManagerClank",
+    "UniversalOptOut",
+    "UniversalOptOutSettings",
 };
 
 void CollectNames(const std::string& list, std::set<std::string>* names) {
@@ -89,6 +93,18 @@ void CollectNames(const std::string& list, std::set<std::string>* names) {
     }
     names->insert(std::string(entry.substr(0, entry.find_first_of("<:"))));
   }
+}
+
+bool IsFeatureName(std::string_view name) {
+  if (name.empty() || name.size() > 100) {
+    return false;
+  }
+  for (char c : name) {
+    if (!base::IsAsciiAlphaNumeric(c)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 std::string Extend(std::string list,
@@ -142,6 +158,17 @@ void ApplyFeatureDefaults(base::CommandLine* command_line) {
   std::vector<std::string> on(std::begin(kFeaturesOn), std::end(kFeaturesOn));
   std::vector<std::string> off(std::begin(kFeaturesOff),
                                std::end(kFeaturesOff));
+  const std::string features_off =
+      command_line->GetSwitchValueASCII(kFeaturesOffSwitch);
+  for (std::string_view name : base::SplitStringPiece(
+           features_off, ",", base::TRIM_WHITESPACE,
+           base::SPLIT_WANT_NONEMPTY)) {
+    if (!IsFeatureName(name)) {
+      continue;
+    }
+    std::erase(on, std::string(name));
+    off.emplace_back(name);
+  }
   const std::string referrer_mode =
       command_line->GetSwitchValueASCII(kCrossOriginReferrerSwitch);
   if (referrer_mode == "1" || referrer_mode == "2") {
@@ -168,6 +195,7 @@ void RegisterProfileDefaults(user_prefs::PrefRegistrySyncable* registry) {
   SetDefault(registry, prefs::kViewSourceLineWrappingEnabled,
              base::Value(true));
   SetDefault(registry, prefs::kEnableDoNotTrack, base::Value(true));
+  SetDefault(registry, "universal_optout.enabled", base::Value(true));
   SetDefault(registry, prefs::kHttpsOnlyModeEnabled, base::Value(true));
   SetDefault(registry, prefs::kHttpsFirstBalancedMode, base::Value(true));
   SetDefault(registry, prefs::kWebRTCIPHandlingPolicy,
