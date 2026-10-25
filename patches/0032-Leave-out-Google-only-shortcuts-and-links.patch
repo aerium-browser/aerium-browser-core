@@ -1,0 +1,124 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Leave out Google only shortcuts and links
+
+---
+ .../res/xml/legal_information_preferences.xml | 12 ------
+ .../browser/ntp/IncognitoDescriptionView.java | 42 ++-----------------
+ .../ImageDescriptionsController.java          |  3 +-
+ .../omnibox/omnibox_pedal_implementations.cc  |  5 ---
+ 4 files changed, 5 insertions(+), 57 deletions(-)
+
+diff --git a/chrome/android/java/res/xml/legal_information_preferences.xml b/chrome/android/java/res/xml/legal_information_preferences.xml
+index 32067c19d4f7a37a229d9437847c7809b7c30df0..8998689617e278fc0dda63a960e7f4c031b6f16b 100644
+--- a/chrome/android/java/res/xml/legal_information_preferences.xml
++++ b/chrome/android/java/res/xml/legal_information_preferences.xml
+@@ -12,16 +12,4 @@ found in the LICENSE file.
+         android:key="open_source_license"
+         android:title="@string/open_source_license_title"
+         app:url="@string/open_source_license_url" />
+-    <org.chromium.chrome.browser.about_settings.HyperlinkPreference
+-        android:key="google_terms_of_service"
+-        android:title="@string/google_terms_of_service_title"
+-        app:url="@string/google_terms_of_service_url" />
+-    <org.chromium.chrome.browser.about_settings.HyperlinkPreference
+-        android:key="chrome_additional_terms_of_service"
+-        android:title="@string/chrome_additional_terms_of_service_title"
+-        app:url="@string/chrome_additional_terms_of_service_url" />
+-    <org.chromium.chrome.browser.about_settings.HyperlinkPreference
+-        android:key="privacy_policy"
+-        android:title="@string/privacy_policy_title"
+-        app:url="@string/google_privacy_policy_url" />
+ </PreferenceScreen>
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/IncognitoDescriptionView.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/IncognitoDescriptionView.java
+index d76fc6eedd75def3d10001aff6bc67365520e5ae..b4384228621c8df784559390b20cb4e83f06b542 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/IncognitoDescriptionView.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/IncognitoDescriptionView.java
+@@ -417,44 +417,10 @@ public class IncognitoDescriptionView extends LinearLayout {
+ 
+     /** Adjust the "Learn More" link. */
+     private void adjustLearnMore() {
+-        final String subtitleText =
+-                getContext().getString(R.string.new_tab_otr_subtitle_with_reading_list);
+-
+-        final ChromeClickableSpan learnMoreSpan =
+-                new ChromeClickableSpan(mLearnMore.getSpanColor(), (_) -> mLearnMore.callOnClick());
+-
+-        boolean learnMoreInSubtitle = mWidthDp > WIDE_LAYOUT_THRESHOLD_DP;
+-        mLearnMore.setVisibility(learnMoreInSubtitle ? View.GONE : View.VISIBLE);
+-
+-        if (!learnMoreInSubtitle) {
+-            // Format the "Learn more" link.
+-            SpannableString learnMoreLink =
+-                    new SpannableString(getContext().getString(R.string.learn_more));
+-            learnMoreLink.setSpan(learnMoreSpan, 0, learnMoreLink.length(), /* flags= */ 0);
+-            mLearnMore.setText(learnMoreLink);
+-
+-            // Revert to the original text.
+-            mSubtitle.setText(subtitleText);
+-            mSubtitle.setMovementMethod(null);
+-            mSubtitle.setOnSpanLongClickListener(/* listener= */ null);
+-            return;
+-        }
+-
+-        // Concatenate the original text with a clickable "Learn more" link.
+-        StringBuilder concatenatedText = new StringBuilder();
+-        concatenatedText.append(subtitleText);
+-        concatenatedText.append(" ");
+-        concatenatedText.append(getContext().getString(R.string.learn_more));
+-        SpannableString textWithLearnMoreLink = new SpannableString(concatenatedText.toString());
+-
+-        textWithLearnMoreLink.setSpan(
+-                learnMoreSpan,
+-                subtitleText.length() + 1,
+-                textWithLearnMoreLink.length(),
+-                /* flags= */ 0);
+-        mSubtitle.setText(textWithLearnMoreLink);
+-        mSubtitle.setMovementMethod(LinkMovementMethod.getInstance());
+-        mSubtitle.setOnSpanLongClickListener(v -> showContextMenu(v, LEARN_MORE_URL));
++        mLearnMore.setVisibility(View.GONE);
++        mSubtitle.setText(getContext().getString(R.string.new_tab_otr_subtitle_with_reading_list));
++        mSubtitle.setMovementMethod(null);
++        mSubtitle.setOnSpanLongClickListener(/* listener= */ null);
+     }
+ 
+     /** Adjust the Cookie Controls Card. */
+diff --git a/chrome/browser/image_descriptions/android/java/src/org/chromium/chrome/browser/image_descriptions/ImageDescriptionsController.java b/chrome/browser/image_descriptions/android/java/src/org/chromium/chrome/browser/image_descriptions/ImageDescriptionsController.java
+index 52b2351edec8c265447e9542cd5bbb97bb46ad32..de7309b453a34afaa96c921d0a03d3b53d6641f2 100644
+--- a/chrome/browser/image_descriptions/android/java/src/org/chromium/chrome/browser/image_descriptions/ImageDescriptionsController.java
++++ b/chrome/browser/image_descriptions/android/java/src/org/chromium/chrome/browser/image_descriptions/ImageDescriptionsController.java
+@@ -21,7 +21,6 @@ import org.chromium.components.prefs.PrefService;
+ import org.chromium.components.user_prefs.UserPrefs;
+ import org.chromium.content_public.browser.WebContents;
+ import org.chromium.net.ConnectionType;
+-import org.chromium.ui.accessibility.AccessibilityState;
+ import org.chromium.ui.modaldialog.ModalDialogManager;
+ import org.chromium.ui.widget.Toast;
+ 
+@@ -176,7 +175,7 @@ public class ImageDescriptionsController {
+     }
+ 
+     public boolean shouldShowImageDescriptionsMenuItem() {
+-        return AccessibilityState.isKnownScreenReaderEnabled();
++        return false;
+     }
+ 
+     public boolean imageDescriptionsEnabled(Profile profile) {
+diff --git a/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc b/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
+index 2b253bcc6c549723844b146283cace194bfc686a..7a16394d956e8e963febd8933bf6e85cefb10150 100644
+--- a/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
++++ b/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
+@@ -2060,12 +2060,7 @@ GetPedalImplementations(OmniboxPedalProfileType profile_type,
+   if (!otr && !guest) {
+     add(new OmniboxPedalClearBrowsingData(/*incognito=*/false));
+   }
+-  add(new OmniboxPedalManagePasswords());
+-  add(new OmniboxPedalUpdateCreditCard());
+   add(new OmniboxPedalLaunchIncognito(otr_type));
+-  if (!base::android::device_info::is_automotive()) {
+-    add(new OmniboxPedalRunChromeSafetyCheck());
+-  }
+   add(new OmniboxPedalPlayChromeDinoGame());
+   add(new OmniboxPedalManageSiteSettings());
+   add(new OmniboxPedalManageChromeSettings());
