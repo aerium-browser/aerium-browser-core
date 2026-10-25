@@ -27,7 +27,14 @@ on:
         description: 'Android version of the emulator'
         type: string
         required: false
-        default: '34'
+        default: '36'
+      flow:
+        description: 'What to try after launch'
+        type: choice
+        options:
+          - launch
+          - onboarding
+        default: launch
 
 permissions:
   contents: read
@@ -99,12 +106,34 @@ jobs:
           adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1 && adb pull /sdcard/ui.xml out/ui.xml
           adb logcat -d -v threadtime > out/logcat.txt
           adb logcat -d -b crash -v threadtime > out/crash.txt
-          skip=$(grep -oE 'text="Skip"[^>]*bounds="[^"]+"' out/ui.xml | grep -oE '\[[0-9]+,[0-9]+\]\[[0-9]+,[0-9]+\]' | head -n1)
-          if [ -n "$skip" ]; then
-            set -- $(echo "$skip" | tr -c '0-9' ' ')
+          tap() {
+            adb shell uiautomator dump /sdcard/tap.xml > /dev/null 2>&1 && adb pull /sdcard/tap.xml out/tap.xml > /dev/null 2>&1
+            b=$(grep -oE "$1[^>]*bounds=\"[^\"]+\"" out/tap.xml | grep -oE '\[[0-9]+,[0-9]+\]\[[0-9]+,[0-9]+\]' | head -n1)
+            [ -n "$b" ] || { echo "not found: $1" >> out/flow.txt; return 1; }
+            set -- $(echo "$b" | tr -c '0-9' ' ')
             adb shell input tap $(( ($1 + $3) / 2 )) $(( ($2 + $4) / 2 ))
-            sleep 10
+            sleep 4
+          }
+          if [ "$FLOW" = onboarding ]; then
+            tap 'text="Get started"'
+            tap 'text="Continue"'
+            tap 'text="Continue"'
+            tap 'text="Continue"'
+            tap 'text="uBlock Origin"'
+            tap 'text="floccus"'
+            adb shell uiautomator dump /sdcard/ui_ext.xml > /dev/null 2>&1 && adb pull /sdcard/ui_ext.xml out/ui_ext.xml
+            tap 'text="Install [0-9]+"'
+            for i in $(seq 1 18); do
+              sleep 10
+              adb shell "cat /data/data/$pkg/shared_prefs/${pkg}_preferences.xml" 2>/dev/null | grep -oE 'aerium_extension_install_progress">[^<]*' >> out/progress.txt
+            done
+            adb shell uiautomator dump /sdcard/ui_ready.xml > /dev/null 2>&1 && adb pull /sdcard/ui_ready.xml out/ui_ready.xml
+            adb shell screencap -p /sdcard/ready.png && adb pull /sdcard/ready.png out/ready.png
+            adb shell "ls /data/data/$pkg/app_chrome/Default/Extensions" > out/extdirs.txt 2>&1
+            adb logcat -d -v threadtime > out/logcat_flow.txt
           fi
+          tap 'text="Skip"' || true
+          sleep 6
           adb shell uiautomator dump /sdcard/ui2.xml > /dev/null 2>&1 && adb pull /sdcard/ui2.xml out/ui2.xml
           adb shell am start -a android.intent.action.VIEW -d https://example.com -p "$pkg" >> out/launch.txt 2>&1
           sleep 30
@@ -114,8 +143,15 @@ jobs:
           adb logcat -d -b crash -v threadtime > out/crash2.txt
           exit 0
           EOF
+      - name: Check the extension sources from the runner
+        if: ${{ inputs.flow == 'onboarding' }}
+        run: |
+          curl -sS -o /dev/null -w 'web store: %{http_code} %{redirect_url}\n' -A Aerium 'https://clients2.google.com/service/update2/crx?response=redirect&prodversion=156.0.8078.48&acceptformat=crx3&x=id%3Dfnaicdffflnofjppbagibeoednhnbjhg%26uc' | cut -c1-160 || true
+          curl -sS -o /dev/null -w 'github: %{http_code}\n' -A Aerium -H 'Accept: application/vnd.github+json' https://api.github.com/repos/gorhill/uBlock/releases/latest || true
       - name: Run the APK in an emulator
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          FLOW: ${{ inputs.flow }}
         with:
           api-level: ${{ inputs.api_level }}
           target: google_apis
@@ -147,6 +183,21 @@ jobs:
           sed -E 's/^ +//' out/activity.txt 2>/dev/null | head -n 3
           echo "--- text on screen ---"
           grep -oE 'text="[^"]+"' out/ui.xml 2>/dev/null | sed 's/^text=//' | head -n 40
+          if [ -s out/flow.txt ] || [ -s out/progress.txt ]; then
+            echo "--- onboarding taps ---"
+            cat out/flow.txt 2>/dev/null
+            echo "--- extensions offered ---"
+            grep -oE 'text="[^"]+"' out/ui_ext.xml 2>/dev/null | sed 's/^text=//' | head -n 40
+            echo "--- install progress (done,failed,total,finished) ---"
+            sed 's/.*">//' out/progress.txt 2>/dev/null | uniq
+            echo "--- ready screen ---"
+            grep -oE 'text="[^"]+"' out/ui_ready.xml 2>/dev/null | sed 's/^text=//' | head -n 30
+            echo "--- extension folders ---"
+            cat out/extdirs.txt 2>/dev/null
+            echo "--- extension log lines ---"
+            grep -iE 'crx|extension|unpack|install' out/logcat_flow.txt 2>/dev/null | grep -iE 'chromium|cr_' \
+              | sed -E 's/^[0-9-]+ [0-9:.]+ +[0-9]+ +[0-9]+ //; s/io\.dioide\.aerium\.ui\.[A-Za-z0-9_.$]+/[aerium ui]/g' | head -n 60
+          fi
           echo "--- text after skip ---"
           grep -oE 'text="[^"]+"' out/ui2.xml 2>/dev/null | sed 's/^text=//' | head -n 30
           echo "--- text with a web page open ---"
