@@ -6,11 +6,11 @@ Subject: [PATCH] Keep the phone layout for the omnibox and accessibility
 ---
  ...tateBrowserControlsVisibilityDelegate.java |  5 +++--
  chrome/browser/flag-metadata.json             | 22 +++++++++----------
- .../magic_stack/HomeModulesConfigManager.java |  4 +++-
+ .../magic_stack/HomeModulesConfigManager.java |  2 +-
  .../ui/messages/snackbar/SnackbarManager.java |  3 ++-
  .../omnibox/browser/autocomplete_result.cc    |  2 +-
  .../zero_suggest_verbatim_match_provider.cc   |  2 +-
- 6 files changed, 21 insertions(+), 17 deletions(-)
+ 6 files changed, 19 insertions(+), 17 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java
 index aca2c0f617170073aa2b6c97df80959c897060bb..c2168a2daa8c8e2b7f6df793cb5790b1d9a8065e 100644
@@ -146,17 +146,15 @@ index c13a2b3ccacdaef04a7ac1fe774560fafcdcc924..4430e30afe3168e348790a9e3a83ce26
    {
      "name": "use-fullscreen-insets-api-on-automotive",
 diff --git a/chrome/browser/magic_stack/android/java/src/org/chromium/chrome/browser/magic_stack/HomeModulesConfigManager.java b/chrome/browser/magic_stack/android/java/src/org/chromium/chrome/browser/magic_stack/HomeModulesConfigManager.java
-index 0d80babfbdfb850f6f18c11e995bb3c5be839491..8123a925fe5461691518f208c2a2f6558fcbfbfe 100644
+index 0d80babfbdfb850f6f18c11e995bb3c5be839491..a21b3e3266364f77c9f44b3f4b51d6592269913e 100644
 --- a/chrome/browser/magic_stack/android/java/src/org/chromium/chrome/browser/magic_stack/HomeModulesConfigManager.java
 +++ b/chrome/browser/magic_stack/android/java/src/org/chromium/chrome/browser/magic_stack/HomeModulesConfigManager.java
-@@ -86,7 +86,9 @@ public class HomeModulesConfigManager {
+@@ -86,7 +86,7 @@ public class HomeModulesConfigManager {
       * @param moduleType {@link ModuleType} needed to be notified to the listeners.
       */
      public boolean getPrefModuleTypeEnabled(@ModuleType int moduleType) {
 -        return mSharedPreferencesManager.readBoolean(getSettingsPreferenceKey(moduleType), true);
-+        return mSharedPreferencesManager.readBoolean(
-+                getSettingsPreferenceKey(moduleType),
-+                !HomeModulesUtils.belongsToEducationalTipModule(moduleType));
++        return mSharedPreferencesManager.readBoolean(getSettingsPreferenceKey(moduleType), false);
      }
  
      /**

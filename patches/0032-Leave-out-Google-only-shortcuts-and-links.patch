@@ -5,10 +5,13 @@ Subject: [PATCH] Leave out Google only shortcuts and links
 
 ---
  .../res/xml/legal_information_preferences.xml | 12 ------
+ .../feedback/HelpAndFeedbackLauncherImpl.java |  3 +-
  .../browser/ntp/IncognitoDescriptionView.java | 42 ++-----------------
+ ...llbackHelpAndFeedbackLauncherDelegate.java |  8 +---
+ .../HelpAndFeedbackLauncherDelegate.java      |  2 +-
  .../ImageDescriptionsController.java          |  3 +-
  .../omnibox/omnibox_pedal_implementations.cc  |  5 ---
- 4 files changed, 5 insertions(+), 57 deletions(-)
+ 7 files changed, 8 insertions(+), 67 deletions(-)
 
 diff --git a/chrome/android/java/res/xml/legal_information_preferences.xml b/chrome/android/java/res/xml/legal_information_preferences.xml
 index 32067c19d4f7a37a229d9437847c7809b7c30df0..8998689617e278fc0dda63a960e7f4c031b6f16b 100644
@@ -31,6 +34,20 @@ index 32067c19d4f7a37a229d9437847c7809b7c30df0..8998689617e278fc0dda63a960e7f4c0
 -        android:title="@string/privacy_policy_title"
 -        app:url="@string/google_privacy_policy_url" />
  </PreferenceScreen>
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java
+index b2efe1f4727f29e96c95da3033f9f9069769cd9d..c0f82810591fe736d94d650a7c2dbf46c2f8a17c 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java
+@@ -38,8 +38,7 @@ import java.util.Map;
+  */
+ @NullMarked
+ public class HelpAndFeedbackLauncherImpl implements HelpAndFeedbackLauncher {
+-    protected static final String FALLBACK_SUPPORT_URL =
+-            "https://support.google.com/chrome/topic/6069782";
++    protected static final String FALLBACK_SUPPORT_URL = "https://aerium-browser.github.io/";
+ 
+     private static @Nullable ProfileKeyedMap<HelpAndFeedbackLauncher> sProfileToLauncherMap;
+     private final HelpAndFeedbackLauncherDelegate mDelegate;
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/IncognitoDescriptionView.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/IncognitoDescriptionView.java
 index d76fc6eedd75def3d10001aff6bc67365520e5ae..b4384228621c8df784559390b20cb4e83f06b542 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/IncognitoDescriptionView.java
@@ -84,6 +101,45 @@ index d76fc6eedd75def3d10001aff6bc67365520e5ae..b4384228621c8df784559390b20cb4e8
      }
  
      /** Adjust the Cookie Controls Card. */
+diff --git a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java
+index 75434944628628f4d2aff5e31600af2baa831a11..13a41ef605b8d762d042321a7300cd2b3e8b85ab 100644
+--- a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java
++++ b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java
+@@ -8,7 +8,6 @@ import android.app.Activity;
+ 
+ import org.chromium.base.Log;
+ import org.chromium.build.annotations.NullMarked;
+-import org.chromium.chrome.browser.flags.ChromeFeatureList;
+ 
+ /**
+  * Basic implementation for displaying help support for Chrome.
+@@ -22,12 +21,7 @@ public class FallbackHelpAndFeedbackLauncherDelegate implements HelpAndFeedbackL
+     @Override
+     public void show(Activity activity, String helpContext, FeedbackCollector collector) {
+         Log.d(TAG, "Feedback data: %s", collector.getBundle());
+-        if (ChromeFeatureList.isEnabled(ChromeFeatureList.USE_P_LINK_IN_HELP)) {
+-            HelpAndFeedbackLauncherDelegate.launchFallbackSupportUri(
+-                    activity, HelpAndFeedbackLauncherDelegate.getPLinkHelpUrl(helpContext));
+-        } else {
+-            HelpAndFeedbackLauncherDelegate.launchFallbackSupportUri(activity, /* url= */ null);
+-        }
++        HelpAndFeedbackLauncherDelegate.launchFallbackSupportUri(activity, /* url= */ null);
+     }
+ 
+     @Override
+diff --git a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java
+index 6d2020a781dc18d35c3ed8694ab9b721377db8f2..bf6bec8f627ca9a58fce8463611d854c4cab0256 100644
+--- a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java
++++ b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java
+@@ -17,7 +17,7 @@ import org.chromium.build.annotations.Nullable;
+ /** Delegate that handles the display of the HelpAndFeedback flows. */
+ @NullMarked
+ public interface HelpAndFeedbackLauncherDelegate {
+-    String FALLBACK_SUPPORT_URL = "https://support.google.com/chrome/topic/6069782";
++    String FALLBACK_SUPPORT_URL = "https://aerium-browser.github.io/";
+     String P_LINK_URL_PREFIX = "https://support.google.com/chrome/?p=";
+ 
+     /**
 diff --git a/chrome/browser/image_descriptions/android/java/src/org/chromium/chrome/browser/image_descriptions/ImageDescriptionsController.java b/chrome/browser/image_descriptions/android/java/src/org/chromium/chrome/browser/image_descriptions/ImageDescriptionsController.java
 index 52b2351edec8c265447e9542cd5bbb97bb46ad32..de7309b453a34afaa96c921d0a03d3b53d6641f2 100644
 --- a/chrome/browser/image_descriptions/android/java/src/org/chromium/chrome/browser/image_descriptions/ImageDescriptionsController.java

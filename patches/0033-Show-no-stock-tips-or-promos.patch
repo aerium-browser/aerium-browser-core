@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Show no stock tips or promos
+
+---
+ components/feature_engagement/internal/tracker_impl.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/components/feature_engagement/internal/tracker_impl.cc b/components/feature_engagement/internal/tracker_impl.cc
+index a7542d390d72e6ab9f7717f4cb56b870ae94e62e..62dc04924aa95785f54757e0900218db647ba4c0 100644
+--- a/components/feature_engagement/internal/tracker_impl.cc
++++ b/components/feature_engagement/internal/tracker_impl.cc
+@@ -343,7 +343,7 @@ TrackerImpl::TriggerDetails TrackerImpl::ShouldTriggerHelpUIWithSnooze(
+   if (session_controller_ && session_controller_->ShouldResetSession()) {
+     condition_validator_->ResetSession();
+   }
+-  if (IsFeatureBlockedByTest(feature)) {
++  if (IsFeatureBlockedByTest(feature) || BUILDFLAG(IS_ANDROID)) {
+     return TriggerDetails(false, false);
+   }
+ 
+@@ -406,7 +406,7 @@ bool TrackerImpl::WouldTriggerHelpUI(const base::Feature& feature) const {
+     condition_validator_->ResetSession();
+   }
+ 
+-  if (IsFeatureBlockedByTest(feature)) {
++  if (IsFeatureBlockedByTest(feature) || BUILDFLAG(IS_ANDROID)) {
+     return false;
+   }
+ 
