@@ -79,6 +79,54 @@ def git_env(tmp):
     return env
 
 
+def upstream_sources():
+    out = []
+    for source in (os.environ.get('CHROMIUM_SOURCE', ''), 'https://github.com/chromium/chromium'):
+        if source and source not in out:
+            out.append(source)
+    return out
+
+
+def fetch_upstream(src, paths, targets):
+    got = set()
+    if not paths:
+        return got
+    version = tree_version(src)
+    tmp = tempfile.mkdtemp(prefix='aerium-pristine-')
+    try:
+        env = git_env(tmp)
+        subprocess.run(['git', 'init', '-q'], cwd=tmp, check=True, env=env)
+        ref = f'+refs/tags/{version}:refs/tags/{version}'
+        fetched = False
+        for index, source in enumerate(upstream_sources()):
+            remote = f'source{index}'
+            subprocess.run(['git', 'remote', 'add', remote, source], cwd=tmp, check=True, env=env)
+            for _ in range(3):
+                r = subprocess.run(['git', 'fetch', '-q', '--depth', '1', '--filter=blob:none',
+                                    remote, ref], cwd=tmp, env=env)
+                if r.returncode == 0:
+                    fetched = True
+                    break
+            if fetched:
+                break
+        if not fetched:
+            return got
+        for path in paths:
+            r = subprocess.run(['git', 'show', f'{version}:{path}'], cwd=tmp,
+                               capture_output=True, env=env)
+            if r.returncode:
+                continue
+            for target in targets:
+                full = os.path.join(target, path)
+                os.makedirs(os.path.dirname(full) or '.', exist_ok=True)
+                with open(full, 'wb') as f:
+                    f.write(r.stdout)
+            got.add(path)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+    return got
+
+
 def rebuild(args, missing, extra, tmp):
     if not args.base:
         print('[aerium] FATAL: no pristine copies and no base patches', file=sys.stderr)
@@ -133,6 +181,11 @@ def refresh(args):
                 put(cached, os.path.join(tmp, path))
             else:
                 missing.append(path)
+        if missing:
+            got = fetch_upstream(args.src, missing, [tmp, args.cache])
+            if got:
+                print(f'[aerium] pristine copies fetched: {len(got)}')
+            missing = [p for p in missing if p not in got]
         if missing:
             rebuild(args, missing, extra, tmp)
         excludes = [f'--exclude={s}' for s in SKIP] + [f'--exclude={p}' for p in extra]
