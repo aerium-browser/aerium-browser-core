@@ -4,28 +4,39 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Show no stock tips or promos
 
 ---
- components/feature_engagement/internal/tracker_impl.cc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ components/feature_engagement/internal/tracker_impl.cc | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/components/feature_engagement/internal/tracker_impl.cc b/components/feature_engagement/internal/tracker_impl.cc
-index a7542d390d72e6ab9f7717f4cb56b870ae94e62e..62dc04924aa95785f54757e0900218db647ba4c0 100644
+index a7542d390d72e6ab9f7717f4cb56b870ae94e62e..00fda11cf4b9400b73d07d21cc71fc5dd13fd17c 100644
 --- a/components/feature_engagement/internal/tracker_impl.cc
 +++ b/components/feature_engagement/internal/tracker_impl.cc
-@@ -343,7 +343,7 @@ TrackerImpl::TriggerDetails TrackerImpl::ShouldTriggerHelpUIWithSnooze(
+@@ -63,6 +63,10 @@ namespace {
+ const char kEventDBName[] = "EventDB";
+ const char kAvailabilityDBName[] = "AvailabilityDB";
+ 
++bool HidesStockHelp() {
++  return BUILDFLAG(IS_ANDROID);
++}
++
+ #if !BUILDFLAG(IS_ANDROID)
+ 
+ // Reads event data from `config` and - if valid - places it into `result` along
+@@ -343,7 +347,7 @@ TrackerImpl::TriggerDetails TrackerImpl::ShouldTriggerHelpUIWithSnooze(
    if (session_controller_ && session_controller_->ShouldResetSession()) {
      condition_validator_->ResetSession();
    }
 -  if (IsFeatureBlockedByTest(feature)) {
-+  if (IsFeatureBlockedByTest(feature) || BUILDFLAG(IS_ANDROID)) {
++  if (IsFeatureBlockedByTest(feature) || HidesStockHelp()) {
      return TriggerDetails(false, false);
    }
  
-@@ -406,7 +406,7 @@ bool TrackerImpl::WouldTriggerHelpUI(const base::Feature& feature) const {
+@@ -406,7 +410,7 @@ bool TrackerImpl::WouldTriggerHelpUI(const base::Feature& feature) const {
      condition_validator_->ResetSession();
    }
  
 -  if (IsFeatureBlockedByTest(feature)) {
-+  if (IsFeatureBlockedByTest(feature) || BUILDFLAG(IS_ANDROID)) {
++  if (IsFeatureBlockedByTest(feature) || HidesStockHelp()) {
      return false;
    }
  
