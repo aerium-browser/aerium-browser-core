@@ -17,7 +17,7 @@ uBlock Origin in full, Manifest V2 included, on current Chromium.
 [**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aerium-browser.github.io) &nbsp;&nbsp;|&nbsp;&nbsp; [Get it with Obtainium](https://aerium-browser.github.io/obtainium/)
 
 <a href="https://alternativeto.net/software/aerium-browser/about/?utm_source=badge&utm_medium=referral"><img src="https://alternativeto.net/static/badges/badge-compact-color.svg" height="48" alt="Aerium on AlternativeTo"></a>&nbsp;
-<a href="https://www.androidauthority.com/google-chrome-alternatives-android-based-on-chromium-3726016/"><img src="badges/android-authority.svg" height="48" alt="Featured in Android Authority"></a>
+<a href="https://www.androidauthority.com/google-chrome-alternatives-android-based-on-chromium-3726016/#:~:text=Honorable%20mentions"><img src="badges/android-authority.svg" height="48" alt="Featured in Android Authority"></a>
 
 <br>
 
