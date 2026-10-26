@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="212" height="48" viewBox="0 0 212 48" role="img" aria-label="Featured in Android Authority">
+  <title>Featured in Android Authority</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1B2C5E"/>
+      <stop offset="1" stop-color="#0F1A3D"/>
+    </linearGradient>
+  </defs>
+  <rect width="212" height="48" rx="10" fill="url(#g)"/>
+  <rect x="0.5" y="0.5" width="211" height="47" rx="9.5" fill="none" stroke="#3B4F8F" stroke-opacity="0.7"/>
+  <text x="16" y="18" fill="#9AA9D6" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="9" font-weight="600" letter-spacing="1.6">FEATURED IN</text>
+  <rect x="15" y="23.5" width="82" height="17" rx="2.5" fill="#E9EDF7"/>
+  <text x="56" y="37" text-anchor="middle" fill="#14214A" font-family="Roboto Condensed, Arial Narrow, Helvetica Neue, Arial, sans-serif" font-stretch="condensed" font-size="15" font-weight="700" textLength="72" lengthAdjust="spacingAndGlyphs">ANDROID</text>
+  <text x="103" y="37" fill="#FFFFFF" font-family="Roboto Condensed, Arial Narrow, Helvetica Neue, Arial, sans-serif" font-stretch="condensed" font-size="15" font-weight="700" textLength="93" lengthAdjust="spacingAndGlyphs">AUTHORITY</text>
+</svg>
