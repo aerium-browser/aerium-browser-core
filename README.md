@@ -29,6 +29,12 @@ uBlock Origin in full, Manifest V2 included, on current Chromium.
 
 <br>
 
+## What's changed
+
+Aerium is no longer based on Vanadium or any of its forks. It's now built on pure Chromium, straight from the source, with nothing in between.
+
+The whole interface has been redesigned too. Until it becomes stable, new releases will take a bit longer while we build, fix bugs and polish everything. Thanks for your patience.
+
 ## Why Aerium
 
 Most Android browsers can't run extensions. The few that could stopped following Chromium updates. Aerium does both.
