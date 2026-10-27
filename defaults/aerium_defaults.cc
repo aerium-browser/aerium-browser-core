@@ -211,6 +211,7 @@ void RegisterProfileDefaults(user_prefs::PrefRegistrySyncable* registry) {
   SetDefault(registry, prefs::kPrivacySandboxRelatedWebsiteSetsEnabled,
              base::Value(false));
   SetDefault(registry, payments::kCanMakePaymentEnabled, base::Value(false));
+  SetDefault(registry, "extensions.ui.developer_mode", base::Value(true));
   SetDefault(registry, "ntp_snippets.enable", base::Value(false));
   SetDefault(registry, "ntp_snippets.list_visible", base::Value(false));
   SetDefault(registry, "ntp_snippets_by_dse.enable", base::Value(false));
