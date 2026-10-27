@@ -38,8 +38,6 @@ The whole interface has been redesigned too. Until it becomes stable, new releas
 
 Follow [Announcements](https://github.com/aerium-browser/aerium-browser-core/discussions/categories/announcements) to stay up to date.
 
-Follow [Announcements](https://github.com/aerium-browser/aerium-browser-core/discussions/categories/announcements) to stay up to date.
-
 ## Why Aerium
 
 Most Android browsers can't run extensions. The few that could stopped following Chromium updates. Aerium does both.
