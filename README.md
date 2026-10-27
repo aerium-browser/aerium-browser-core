@@ -36,6 +36,8 @@ Aerium is no longer based on Vanadium or any of its forks. It's now built on pur
 
 The whole interface has been redesigned too. Until it becomes stable, new releases will take a bit longer while we build, fix bugs and polish everything. Thanks for your patience.
 
+Follow [Announcements](https://github.com/aerium-browser/aerium-browser-android/discussions/categories/announcements) to stay up to date.
+
 ## Why Aerium
 
 Most Android browsers can't run extensions. The few that could stopped following Chromium updates. Aerium does both.
@@ -80,6 +82,10 @@ build.sh     fetch, patch, compile
 ```
 
 Fork it and run the **Build** workflow, it builds on GitHub runners and resumes on its own. Or run `./build.sh` on Linux.
+
+## Community
+
+Questions, ideas, bug reports or just want to say what you think? Head to [Discussions](https://github.com/aerium-browser/aerium-browser-android/discussions). It's the best place to reach us and other Aerium users, and it's where we post news about upcoming releases. Before opening an issue, take a quick look there, your question may already be answered.
 
 ## Support
 
