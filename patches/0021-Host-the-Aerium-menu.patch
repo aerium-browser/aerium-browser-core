@@ -12,7 +12,7 @@ Subject: [PATCH] Host the Aerium menu
  create mode 100644 chrome/browser/ui/android/appmenu/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuSheet.java
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index ea3d8e0c6f39ecc57e1c33ab754f491ac02d9235..f58742af0bc94fe8e0dfabeec9f3dd6bb3fa9a3e 100644
+index ea3d8e0c6f39ecc57e1c33ab754f491ac02d9235..24c3ba52b31129c6eb9ead2a30a33f00627d9ea9 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 @@ -298,6 +298,10 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
@@ -20,7 +20,7 @@ index ea3d8e0c6f39ecc57e1c33ab754f491ac02d9235..f58742af0bc94fe8e0dfabeec9f3dd6b
              populateTabletEmptyModeMenu(modelList);
          }
 +        if (menuGroup == MenuGroup.PAGE_MENU || menuGroup == MenuGroup.OVERVIEW_MODE_MENU) {
-+            io.dioide.aerium.bridge.MenuSurface.attach(
++            com.aeriumbrowser.bridge.MenuSurface.attach(
 +                    modelList, menuGroup == MenuGroup.OVERVIEW_MODE_MENU);
 +        }
          return modelList;

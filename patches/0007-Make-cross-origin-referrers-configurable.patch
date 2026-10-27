@@ -14,18 +14,18 @@ Subject: [PATCH] Make cross origin referrers configurable
  7 files changed, 52 insertions(+), 6 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/init/ChromeBrowserInitializer.java b/chrome/android/java/src/org/chromium/chrome/browser/init/ChromeBrowserInitializer.java
-index b772e336566191e805686bac80081a4fb5ea45bb..49951669d2146223be46913baad2efbc9551e1f5 100644
+index b772e336566191e805686bac80081a4fb5ea45bb..aae0d48222b29f3091c8828fd6d86355dd64d5b7 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/init/ChromeBrowserInitializer.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/init/ChromeBrowserInitializer.java
-@@ -22,6 +22,8 @@ import org.chromium.components.background_task_scheduler.BackgroundTaskScheduler
- import org.chromium.content_public.browser.BrowserStartupController;
- import org.chromium.content_public.browser.BrowserStartupController.StartupMetrics;
+@@ -6,6 +6,8 @@ package org.chromium.chrome.browser.init;
  
-+import io.dioide.aerium.bridge.AeriumPrefs;
+ import android.os.StrictMode;
+ 
++import com.aeriumbrowser.bridge.AeriumPrefs;
 +
- import java.util.ArrayList;
- import java.util.List;
- 
+ import org.chromium.base.CommandLine;
+ import org.chromium.base.ResettersForTesting;
+ import org.chromium.base.SysUtils;
 @@ -108,6 +110,7 @@ public class ChromeBrowserInitializer {
          ThreadUtils.checkUiThread();
          if (parts.isActivityFinishingOrDestroyed()) return;

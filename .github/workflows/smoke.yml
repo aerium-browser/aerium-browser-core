@@ -207,7 +207,7 @@ jobs:
             cat out/extdirs.txt 2>/dev/null
             echo "--- extension log lines ---"
             grep -iE 'crx|extension|unpack|install' out/logcat_flow.txt 2>/dev/null | grep -iE 'chromium|cr_' \
-              | sed -E 's/^[0-9-]+ [0-9:.]+ +[0-9]+ +[0-9]+ //; s/io\.dioide\.aerium\.ui\.[A-Za-z0-9_.$]+/[aerium ui]/g' | head -n 60
+              | sed -E 's/^[0-9-]+ [0-9:.]+ +[0-9]+ +[0-9]+ //; s/com\.aeriumbrowser\.ui\.[A-Za-z0-9_.$]+/[aerium ui]/g' | head -n 60
           fi
           echo "--- text after skip ---"
           grep -oE 'text="[^"]+"' out/ui2.xml 2>/dev/null | sed 's/^text=//' | head -n 30
@@ -217,7 +217,7 @@ jobs:
           echo "--- processes with a native crash ---"
           grep -ohE '>>> [^ ]+ <<<' out/crash.txt out/crash2.txt 2>/dev/null | sed -E 's/:[0-9]+ <<</ <<</' | sort | uniq -c
           echo "--- native crash signal ---"
-          grep -hE 'signal [0-9]+ \(|Abort message|Cause:' out/crash2.txt 2>/dev/null | sed -E 's/^.*(signal [0-9]|Abort message|Cause:)/\1/' | sed -E 's/io\.dioide\.aerium\.ui\.[A-Za-z0-9_.$]+/[aerium ui]/g' | sort | uniq -c | head -n 10
+          grep -hE 'signal [0-9]+ \(|Abort message|Cause:' out/crash2.txt 2>/dev/null | sed -E 's/^.*(signal [0-9]|Abort message|Cause:)/\1/' | sed -E 's/com\.aeriumbrowser\.ui\.[A-Za-z0-9_.$]+/[aerium ui]/g' | sort | uniq -c | head -n 10
           echo "--- native crash frames ---"
           awk '/\*\*\* \*\*\* \*\*\*/{n++} n==1' out/crash2.txt 2>/dev/null | grep -E '#[0-9]+ pc ' \
             | sed -E 's/^.*(#[0-9]+) pc [0-9a-f]+ +/\1 /; s/ \(BuildId.*//; s#/data/app/[^ ]*/base\.apk#base.apk#' | head -n 16
@@ -225,7 +225,7 @@ jobs:
             [ -s "$f" ] || continue
             awk '/FATAL EXCEPTION/{on=1} on{print} /^\s*$/{if(on)exit}' "$f" \
               | sed -E 's/^[0-9-]+ [0-9:.]+ +[0-9]+ +[0-9]+ [A-Z] [A-Za-z]+ *: //' \
-              | sed -E 's/io\.dioide\.aerium\.ui\.[A-Za-z0-9_.$]+/[aerium ui]/g' \
+              | sed -E 's/com\.aeriumbrowser\.ui\.[A-Za-z0-9_.$]+/[aerium ui]/g' \
               | head -n 60
             break
           done
