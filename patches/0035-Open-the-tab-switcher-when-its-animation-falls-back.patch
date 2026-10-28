@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Open the tab switcher when its animation falls back
+
+---
+ .../hub/ShrinkExpandHubLayoutAnimatorProvider.java   | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/ShrinkExpandHubLayoutAnimatorProvider.java b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/ShrinkExpandHubLayoutAnimatorProvider.java
+index 9ee6b8c66d3eafea09bae051eae94cfb27856c4d..14b8d9d29ad98b178a9dd6c4a37df0125a7c98e5 100644
+--- a/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/ShrinkExpandHubLayoutAnimatorProvider.java
++++ b/chrome/browser/hub/internal/android/java/src/org/chromium/chrome/browser/hub/ShrinkExpandHubLayoutAnimatorProvider.java
+@@ -469,15 +469,23 @@ public class ShrinkExpandHubLayoutAnimatorProvider implements HubLayoutAnimatorP
+      */
+     private void resetState() {
+         assumeNonNull(mShrinkExpandImageView);
+-        mHubContainerView.removeView(mShrinkExpandImageView);
++        removeFromHub(mShrinkExpandImageView);
+         mShrinkExpandImageView.setImageBitmap(null);
+         mShrinkExpandImageView = null;
+         if (mFakeBottomControlsView != null) {
+-            mHubContainerView.removeView(mFakeBottomControlsView);
++            removeFromHub(mFakeBottomControlsView);
+             mFakeBottomControlsView = null;
+         }
+     }
+ 
++    private void removeFromHub(View view) {
++        if (mHubContainerView.isInLayout()) {
++            mHubContainerView.post(() -> mHubContainerView.removeView(view));
++        } else {
++            mHubContainerView.removeView(view);
++        }
++    }
++
+     private static Interpolator getInterpolator(@HubLayoutAnimationType int animationType) {
+         if (animationType == HubLayoutAnimationType.EXPAND_NEW_TAB) {
+             return Interpolators.STANDARD_INTERPOLATOR;
