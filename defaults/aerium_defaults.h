@@ -1,4 +1,4 @@
-// Copyright 2026 Dioide
+// Copyright 2026 Aerium Browser
 // SPDX-License-Identifier: GPL-3.0-only
 
 #ifndef AERIUM_DEFAULTS_AERIUM_DEFAULTS_H_

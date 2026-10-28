@@ -144,7 +144,7 @@ index 0000000000000000000000000000000000000000..a32032a12d118ce0c30a2f00b4afd4f4
 --- /dev/null
 +++ b/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
 @@ -0,0 +1,107 @@
-+// Copyright 2026 Dioide
++// Copyright 2026 Aerium Browser
 +// SPDX-License-Identifier: GPL-3.0-only
 +
 +#include "third_party/blink/renderer/platform/graphics/fingerprint_noise.h"
@@ -257,7 +257,7 @@ index 0000000000000000000000000000000000000000..94d745d4381163305c71b5a7d48bdfbc
 --- /dev/null
 +++ b/third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 @@ -0,0 +1,32 @@
-+// Copyright 2026 Dioide
++// Copyright 2026 Aerium Browser
 +// SPDX-License-Identifier: GPL-3.0-only
 +
 +#ifndef THIRD_PARTY_BLINK_RENDERER_PLATFORM_GRAPHICS_FINGERPRINT_NOISE_H_

@@ -100,7 +100,7 @@ index 0000000000000000000000000000000000000000..d9cb680d900a6066371cec4b02e4c422
 --- /dev/null
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LinkCleaner.java
 @@ -0,0 +1,28 @@
-+// Copyright 2026 Dioide
++// Copyright 2026 Aerium Browser
 +// SPDX-License-Identifier: GPL-3.0-only
 +
 +package org.chromium.chrome.browser.omnibox;

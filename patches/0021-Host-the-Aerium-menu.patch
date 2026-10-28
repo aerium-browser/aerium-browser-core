@@ -149,7 +149,7 @@ index 0000000000000000000000000000000000000000..40afd1d78087f08818002201ba036999
 --- /dev/null
 +++ b/chrome/browser/ui/android/appmenu/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuSheet.java
 @@ -0,0 +1,42 @@
-+// Copyright 2026 Dioide
++// Copyright 2026 Aerium Browser
 +// SPDX-License-Identifier: GPL-3.0-only
 +
 +package org.chromium.chrome.browser.ui.appmenu;

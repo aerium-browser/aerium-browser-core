@@ -97,4 +97,4 @@ No ads, no investors, no data sales. If Aerium is useful to you, consider a dona
 
 ## License
 
-[GPLv3](LICENSE). Chromium keeps its BSD license. The Aerium name and logo are trademarks of Dioide, see [NOTICE](NOTICE). Security reports go through [SECURITY.md](SECURITY.md).
+[GPLv3](LICENSE). Chromium keeps its BSD license. The Aerium name and logo are trademarks of Aerium Browser, see [NOTICE](NOTICE). Security reports go through [SECURITY.md](SECURITY.md).
