@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Leave the search button off the JavaScript optimization page
+
+---
+ .../browser_ui/site_settings/SingleCategorySettings.java      | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleCategorySettings.java b/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleCategorySettings.java
+index 9575bc80e41ec719770493a5051246093c1a569b..508659356b0452bd8aa206bf9c5404c8d384463e 100644
+--- a/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleCategorySettings.java
++++ b/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleCategorySettings.java
+@@ -593,6 +593,10 @@ public class SingleCategorySettings extends BaseSiteSettingsFragment
+                 getActivity(),
+                 assumeNonNull(mSearchViewObserver),
+                 this::onSearchQueryChanged);
++        if (mSearchItem != null
++                && mCategory.getType() == SiteSettingsCategory.Type.JAVASCRIPT_OPTIMIZER) {
++            mSearchItem.setVisible(false);
++        }
+ 
+         if (getSiteSettingsDelegate().isHelpAndFeedbackEnabled()) {
+             MenuItem help =
