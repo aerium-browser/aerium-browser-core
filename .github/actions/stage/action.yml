@@ -438,8 +438,13 @@ runs:
         retention-days: 10
         overwrite: true
 
+    - name: Send the beta to Telegram
+      if: inputs.finished != 'true' && steps.pack.outputs.packed == 'finished' && env.AERIUM_FLAVOR == 'full' && env.AERIUM_KIND != 'release'
+      shell: bash
+      run: bash ./.github/scripts/telegram-beta.sh
+
     - name: Upload final APK
-      if: inputs.finished != 'true' && steps.pack.outputs.packed == 'finished'
+      if: inputs.finished != 'true' && steps.pack.outputs.packed == 'finished' && (env.AERIUM_FLAVOR != 'full' || env.AERIUM_KIND == 'release')
       uses: actions/upload-artifact@v7
       with:
         name: ${{ env.AERIUM_FLAVOR == 'full' && 'aerium-full' || 'aerium-android' }}-${{ inputs.arch }}

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 name: Build
-run-name: ${{ inputs.flavor == 'full' && (inputs.arch == 'x64' && 'Full build x64' || 'Full build') || (inputs.arch == 'x64' && 'Build x64' || '') }}
+run-name: ${{ inputs.flavor == 'full' && format('{0}{1}', inputs.kind == 'release' && 'Release build' || 'Full build', inputs.arch == 'x64' && ' x64' || '') || (inputs.arch == 'x64' && 'Build x64' || '') }}
 
 on:
   push:
@@ -45,23 +45,13 @@ on:
           - arm64
           - x64
         default: arm64
-      machine:
-        description: 'Machine type for the build, empty for the default'
-        type: string
-        required: false
-        default: ''
-      vm:
-        description: 'Build in one go on the aerium machine'
-        type: boolean
-        required: false
-        default: false
-      cloud:
-        description: 'Where the aerium machine runs'
+      kind:
+        description: 'beta goes only to the private Telegram channel, release publishes a draft release'
         type: choice
         options:
-          - oracle
-          - gcp
-        default: oracle
+          - beta
+          - release
+        default: beta
       jobs:
         description: 'Parallel compile jobs on the free runners, 1 for light finishing builds'
         type: string
@@ -78,276 +68,18 @@ env:
   AERIUM_APK_BASE: ${{ inputs.flavor == 'full' && 'aerium' || 'aerium-core' }}
   AERIUM_CHECKPOINT_KEY: ${{ inputs.flavor == 'full' && secrets.AERIUM_CHECKPOINT_KEY || '' }}
   NINJA_JOBS: ${{ inputs.jobs }}
+  AERIUM_KIND: ${{ inputs.kind || 'beta' }}
+  TELEGRAM_BOT_TOKEN: ${{ inputs.flavor == 'full' && inputs.kind != 'release' && secrets.TELEGRAM_BOT_TOKEN || '' }}
+  TELEGRAM_CHAT_ID: ${{ inputs.flavor == 'full' && inputs.kind != 'release' && secrets.TELEGRAM_CHAT_ID || '' }}
+  TELEGRAM_API_ID: ${{ inputs.flavor == 'full' && inputs.kind != 'release' && secrets.TELEGRAM_API_ID || '' }}
+  TELEGRAM_API_HASH: ${{ inputs.flavor == 'full' && inputs.kind != 'release' && secrets.TELEGRAM_API_HASH || '' }}
 
 concurrency:
   group: ${{ inputs.flavor || 'core' }}-${{ inputs.arch || 'arm64' }}-build-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
-  machine-up:
-    if: ${{ inputs.vm == true && inputs.cloud == 'gcp' }}
-    runs-on: ubuntu-24.04
-    outputs:
-      name: ${{ steps.up.outputs.name }}
-    steps:
-      - uses: google-github-actions/auth@v3
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-      - uses: google-github-actions/setup-gcloud@v3
-      - name: Start the build machine
-        id: up
-        env:
-          GH_TOKEN: ${{ secrets.RUNNER_PAT }}
-          NAME: aerium-${{ github.run_id }}
-          ZONE: ${{ vars.GCP_ZONE || 'europe-west1-b' }}
-          MACHINE: ${{ inputs.machine || vars.GCP_MACHINE || 'c3-standard-44' }}
-        run: |
-          set -euo pipefail
-          token=$(gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runners/registration-token" --jq .token)
-          echo "::add-mask::$token"
-          ver=$(gh api repos/actions/runner/releases/latest --jq .tag_name | sed 's/^v//')
-          cat > "$RUNNER_TEMP/startup.sh" <<EOF
-          #!/bin/bash
-          set -e
-          id runner >/dev/null 2>&1 || useradd -m -s /bin/bash runner
-          echo 'runner ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/runner
-          cd /home/runner
-          [ -f config.sh ] && exit 0
-          curl -sL https://github.com/actions/runner/releases/download/v$ver/actions-runner-linux-x64-$ver.tar.gz | sudo -u runner tar xz
-          ./bin/installdependencies.sh || true
-          sudo -u runner ./config.sh --unattended --ephemeral --url https://github.com/$GITHUB_REPOSITORY --token $token --labels $NAME --name $NAME
-          sudo -u runner nohup ./run.sh > /home/runner/run.log 2>&1 &
-          EOF
-          gcloud compute instances create "$NAME" \
-            --zone "$ZONE" \
-            --machine-type "$MACHINE" \
-            --image-family ubuntu-2404-lts-amd64 \
-            --image-project ubuntu-os-cloud \
-            --boot-disk-size 300GB \
-            --boot-disk-type "${{ vars.GCP_DISK || 'pd-ssd' }}" \
-            --max-run-duration 30h \
-            --instance-termination-action DELETE \
-            --metadata-from-file startup-script="$RUNNER_TEMP/startup.sh" \
-            --quiet
-          rm -f "$RUNNER_TEMP/startup.sh"
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
-
-  oracle-up:
-    if: ${{ inputs.vm == true && inputs.cloud == 'oracle' }}
-    runs-on: ubuntu-24.04
-    outputs:
-      id: ${{ steps.up.outputs.id }}
-    env:
-      OCI_CLI_USER: ${{ secrets.OCI_USER }}
-      OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY }}
-      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
-      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_KEY }}
-      OCI_CLI_REGION: ${{ vars.OCI_REGION }}
-      OCI_CLI_SUPPRESS_FILE_PERMISSIONS_WARNING: 'True'
-    steps:
-      - name: Install the Oracle CLI
-        run: |
-          set -euo pipefail
-          pipx install oci-cli >/dev/null
-          mkdir -p ~/.oci
-          printf '%s\n' "$OCI_CLI_KEY_CONTENT" > ~/.oci/key.pem
-          chmod 600 ~/.oci/key.pem
-          printf '[DEFAULT]\nuser=%s\nfingerprint=%s\ntenancy=%s\nregion=%s\nkey_file=%s\n' \
-            "$OCI_CLI_USER" "$OCI_CLI_FINGERPRINT" "$OCI_CLI_TENANCY" "$OCI_CLI_REGION" "$HOME/.oci/key.pem" > ~/.oci/config
-          chmod 600 ~/.oci/config
-      - name: Start the build machine
-        id: up
-        env:
-          GH_TOKEN: ${{ secrets.RUNNER_PAT }}
-          NAME: aerium-${{ github.run_id }}
-          SHAPE: ${{ inputs.machine || vars.OCI_SHAPE || 'VM.Standard.E5.Flex' }}
-          OCPUS: ${{ vars.OCI_OCPUS || '16' }}
-          MEMORY: ${{ vars.OCI_MEMORY || '96' }}
-          SUBNET: ${{ vars.OCI_SUBNET }}
-          COMPARTMENT: ${{ vars.OCI_COMPARTMENT || secrets.OCI_TENANCY }}
-        run: |
-          set -euo pipefail
-          token=$(gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runners/registration-token" --jq .token)
-          echo "::add-mask::$token"
-          ver=$(gh api repos/actions/runner/releases/latest --jq .tag_name | sed 's/^v//')
-          cat > "$RUNNER_TEMP/startup.sh" <<EOF
-          #!/bin/bash
-          set -e
-          shutdown -h +1800 || true
-          id runner >/dev/null 2>&1 || useradd -m -s /bin/bash runner
-          echo 'runner ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/runner
-          cd /home/runner
-          [ -f config.sh ] && exit 0
-          curl -sL https://github.com/actions/runner/releases/download/v$ver/actions-runner-linux-x64-$ver.tar.gz | sudo -u runner tar xz
-          ./bin/installdependencies.sh || true
-          sudo -u runner ./config.sh --unattended --ephemeral --url https://github.com/$GITHUB_REPOSITORY --token $token --labels $NAME --name $NAME
-          sudo -u runner nohup ./run.sh > /home/runner/run.log 2>&1 &
-          EOF
-          ad=$(oci iam availability-domain list --compartment-id "$COMPARTMENT" --query 'data[0].name' --raw-output)
-          image=$(oci compute image list --compartment-id "$COMPARTMENT" \
-            --operating-system 'Canonical Ubuntu' --operating-system-version '24.04' --shape "$SHAPE" \
-            --sort-by TIMECREATED --sort-order DESC --all \
-            --query "data[?!contains(\"display-name\", 'Minimal') && !contains(\"display-name\", 'aarch64')] | [0].id" --raw-output)
-          id=$(oci compute instance launch \
-            --availability-domain "$ad" \
-            --compartment-id "$COMPARTMENT" \
-            --display-name "$NAME" \
-            --shape "$SHAPE" \
-            --shape-config "{\"ocpus\": $OCPUS, \"memoryInGBs\": $MEMORY}" \
-            --image-id "$image" \
-            --subnet-id "$SUBNET" \
-            --assign-public-ip true \
-            --boot-volume-size-in-gbs 300 \
-            --user-data-file "$RUNNER_TEMP/startup.sh" \
-            --query 'data.id' --raw-output)
-          rm -f "$RUNNER_TEMP/startup.sh"
-          echo "id=$id" >> "$GITHUB_OUTPUT"
-
-  vm:
-    needs: [machine-up, oracle-up]
-    if: ${{ always() && inputs.vm == true && (needs.machine-up.result == 'success' || needs.oracle-up.result == 'success') }}
-    runs-on: [self-hosted, "aerium-${{ github.run_id }}"]
-    timeout-minutes: 2880
-    env:
-      CACHE_BUCKET: ${{ inputs.cloud == 'gcp' && (vars.SCCACHE_BUCKET || secrets.SCCACHE_BUCKET) || '' }}
-    steps:
-      - name: Install base tools
-        run: |
-          echo 'DPkg::Lock::Timeout "1800";' | sudo tee /etc/apt/apt.conf.d/90aerium-wait >/dev/null
-          sudo apt-get update -q
-          sudo apt-get install -y -q git curl python3 lsb-release zstd openssl xz-utils file unzip bzip2 patch rsync ca-certificates tar gzip perl procps pkg-config
-      - uses: actions/checkout@v5
-        with:
-          submodules: false
-          clean: false
-      - name: Check out the Aerium layer
-        if: ${{ env.AERIUM_FLAVOR == 'full' }}
-        uses: actions/checkout@v5
-        with:
-          repository: aerium-browser/aerium-browser-ui
-          ssh-key: ${{ secrets.AERIUM_UI_KEY }}
-          path: ui
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: google-github-actions/auth@v3
-        if: ${{ env.CACHE_BUCKET != '' }}
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-      - name: Install sccache
-        if: ${{ env.CACHE_BUCKET != '' }}
-        run: |
-          v=v0.10.0
-          curl -sL "https://github.com/mozilla/sccache/releases/download/$v/sccache-$v-x86_64-unknown-linux-musl.tar.gz" | tar xz -C "$RUNNER_TEMP"
-          sudo install "$RUNNER_TEMP/sccache-$v-x86_64-unknown-linux-musl/sccache" /usr/local/bin/sccache
-          echo "SCCACHE_GCS_BUCKET=$CACHE_BUCKET" >> "$GITHUB_ENV"
-          echo "SCCACHE_GCS_RW_MODE=READ_WRITE" >> "$GITHUB_ENV"
-          echo "SCCACHE_GCS_KEY_PATH=$GOOGLE_APPLICATION_CREDENTIALS" >> "$GITHUB_ENV"
-          echo "SCCACHE_ERROR_LOG=$RUNNER_TEMP/sccache.log" >> "$GITHUB_ENV"
-          echo "SCCACHE_LOG=warn" >> "$GITHUB_ENV"
-          printf 'AERIUM_EXTRA_ARGS<<EOF\ncc_wrapper = "sccache"\nenable_precompiled_headers = false\nuse_clang_modules = false\nEOF\n' >> "$GITHUB_ENV"
-      - name: Build
-        env:
-          AERIUM_TARGET_CPU: ${{ inputs.arch || 'arm64' }}
-          LOCAL_TEST_JKS: ${{ secrets.LOCAL_TEST_JKS }}
-          STORE_TEST_JKS: ${{ secrets.STORE_TEST_JKS }}
-        run: |
-          export NINJA_JOBS=$(nproc) NINJA_KEEP_GOING=0
-          cd "$GITHUB_WORKSPACE"
-          rm -rf release stage-status chromium/src chromium/.gclient chromium/.gclient_entries chromium/.gclient_previous_sync_commits chromium/.cipd
-          chmod +x ./*.sh
-          df -h "$GITHUB_WORKSPACE"
-          if [ -n "${AERIUM_UI_DIR:-}" ]; then
-            set +e
-            ./build.sh > vm-build.log 2>&1
-            code=$?
-            set -e
-            if [ $code -ne 0 ]; then
-              mkdir -p stage-status d
-              tail -n 3000 vm-build.log > d/build-tail.txt
-              cp gn_gen.log d/ 2>/dev/null || true
-              cp chromium/src/out/Default/siso_output d/siso_output.txt 2>/dev/null || true
-              cp chromium/src/out/Default/.siso_failed_targets d/failed-targets.txt 2>/dev/null || true
-              tar -c -C d . | zstd -q -T0 -19 \
-                | openssl enc -aes-256-ctr -pbkdf2 -salt -pass env:AERIUM_CHECKPOINT_KEY \
-                    -out stage-status/details.enc
-              rm -rf d
-              echo "build failed, the details are in the encrypted failure marker"
-            fi
-            rm -f vm-build.log
-            exit $code
-          fi
-          ./build.sh
-      - name: Cache stats
-        if: ${{ always() && env.CACHE_BUCKET != '' }}
-        run: |
-          sccache --show-stats || true
-          grep -v -i "aerium" "$RUNNER_TEMP/sccache.log" 2>/dev/null | sort | uniq -c | sort -rn | head -20 || true
-      - name: Upload failure marker
-        if: ${{ failure() && env.AERIUM_FLAVOR == 'full' }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: build-error-aerium-${{ inputs.arch || 'arm64' }}
-          path: ${{ github.workspace }}/stage-status/
-          retention-days: 10
-          overwrite: true
-      - name: Upload final APK
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ env.AERIUM_FLAVOR == 'full' && 'aerium-full' || 'aerium-android' }}-${{ inputs.arch || 'arm64' }}
-          path: ${{ github.workspace }}/release/
-          retention-days: 30
-          compression-level: 0
-          overwrite: true
-
-  machine-down:
-    needs: [machine-up, vm]
-    if: ${{ always() && needs.machine-up.result == 'success' }}
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: google-github-actions/auth@v3
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-      - uses: google-github-actions/setup-gcloud@v3
-      - name: Delete the build machine
-        env:
-          NAME: ${{ needs.machine-up.outputs.name }}
-          ZONE: ${{ vars.GCP_ZONE || 'europe-west1-b' }}
-        run: gcloud compute instances delete "$NAME" --zone "$ZONE" --quiet || true
-
-  oracle-down:
-    needs: [oracle-up, vm]
-    if: ${{ always() && needs.oracle-up.result == 'success' }}
-    runs-on: ubuntu-24.04
-    env:
-      OCI_CLI_USER: ${{ secrets.OCI_USER }}
-      OCI_CLI_TENANCY: ${{ secrets.OCI_TENANCY }}
-      OCI_CLI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
-      OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_KEY }}
-      OCI_CLI_REGION: ${{ vars.OCI_REGION }}
-      OCI_CLI_SUPPRESS_FILE_PERMISSIONS_WARNING: 'True'
-    steps:
-      - name: Install the Oracle CLI
-        run: |
-          set -euo pipefail
-          pipx install oci-cli >/dev/null
-          mkdir -p ~/.oci
-          printf '%s\n' "$OCI_CLI_KEY_CONTENT" > ~/.oci/key.pem
-          chmod 600 ~/.oci/key.pem
-          printf '[DEFAULT]\nuser=%s\nfingerprint=%s\ntenancy=%s\nregion=%s\nkey_file=%s\n' \
-            "$OCI_CLI_USER" "$OCI_CLI_FINGERPRINT" "$OCI_CLI_TENANCY" "$OCI_CLI_REGION" "$HOME/.oci/key.pem" > ~/.oci/config
-          chmod 600 ~/.oci/config
-      - name: Delete the build machine
-        env:
-          ID: ${{ needs.oracle-up.outputs.id }}
-        run: |
-          for attempt in 1 2 3; do
-            oci compute instance terminate --instance-id "$ID" --preserve-boot-volume false --force && exit 0
-            sleep 30
-          done
-          exit 1
-
   build-1:
-    if: ${{ inputs.vm != true }}
     runs-on: ubuntu-24.04
     timeout-minutes: 350
     outputs:
@@ -1163,7 +895,7 @@ jobs:
   check-completion:
     runs-on: ubuntu-24.04
     needs: build-24
-    if: ${{ !cancelled() && inputs.vm != true }}
+    if: ${{ !cancelled() }}
     steps:
       - name: Verify build finished
         run: |
@@ -1172,7 +904,11 @@ jobs:
             exit 1
           fi
           if [ "${{ env.AERIUM_FLAVOR }}" = full ]; then
-            echo "Full build finished. The APK is in the aerium-full-${{ inputs.arch || 'arm64' }} artifact."
+            if [ "${{ env.AERIUM_KIND }}" = release ]; then
+              echo "Release build finished. The APK goes to a draft release."
+            else
+              echo "Beta build finished. The APK was sent to the Telegram channel."
+            fi
           else
             echo "Core build finished. The APK is in the aerium-android-${{ inputs.arch || 'arm64' }} artifact."
           fi

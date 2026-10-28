@@ -29,8 +29,8 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion != 'cancelled' &&
-       (github.event.workflow_run.display_title == 'Full build' ||
-        github.event.workflow_run.display_title == 'Full build x64'))
+       (github.event.workflow_run.display_title == 'Release build' ||
+        github.event.workflow_run.display_title == 'Release build x64'))
     runs-on: ubuntu-24.04
     steps:
       - name: Find the build
@@ -44,8 +44,8 @@ jobs:
           title=$(jq -r '.display_title' <<<"$info")
           conclusion=$(jq -r '.conclusion' <<<"$info")
           case "$title" in
-            "Full build") arch=arm64; abi=arm64-v8a ;;
-            "Full build x64") arch=x64; abi=x86_64 ;;
+            "Release build") arch=arm64; abi=arm64-v8a ;;
+            "Release build x64") arch=x64; abi=x86_64 ;;
             *) echo "Run $RUN_ID is a $title, nothing to publish."; exit 1 ;;
           esac
           apk=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts" \

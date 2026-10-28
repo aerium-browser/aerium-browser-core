@@ -29,6 +29,7 @@ jobs:
           BRANCH: 'main'
           BUILD_WORKFLOW: 'build.yml'
           FULL_TITLE: 'Full build'
+          RELEASE_TITLE: 'Release build'
           PROGRESS_JOB_PATTERN: ''
           COMPLETION_JOB: 'check-completion'
           ATTEMPT_CAP: '5'
@@ -50,9 +51,9 @@ jobs:
 
           of_flavor() {
             if [ "$1" = full ]; then
-              jq --arg t "$FULL_TITLE" '{workflow_runs: [.workflow_runs[] | select(.display_title == $t)]}'
+              jq --arg t "$FULL_TITLE" --arg r "$RELEASE_TITLE" '{workflow_runs: [.workflow_runs[] | select(.display_title == $t or .display_title == $r)]}'
             else
-              jq --arg t "$FULL_TITLE" '{workflow_runs: [.workflow_runs[] | select(.display_title != $t)]}'
+              jq --arg t "$FULL_TITLE" --arg r "$RELEASE_TITLE" '{workflow_runs: [.workflow_runs[] | select(.display_title != $t and .display_title != $r)]}'
             fi
           }
 
@@ -219,8 +220,16 @@ jobs:
             fi
 
             echo "Dispatching resume of run $RUN_ID as a $label (auto-attempt $((attempts + 1)))"
-            gh api -X POST "repos/$REPO/actions/workflows/$BUILD_WORKFLOW/dispatches" \
-              -f ref="$BRANCH" -f "inputs[resume_run_id]=$RUN_ID" -f "inputs[flavor]=$flavor"
+            if [ "$flavor" = full ]; then
+              kind=beta
+              title=$(jq -r --argjson id "$RUN_ID" '.workflow_runs[] | select(.id == $id) | .display_title' <<<"$flavor_json")
+              [ "$title" = "$RELEASE_TITLE" ] && kind=release
+              gh api -X POST "repos/$REPO/actions/workflows/$BUILD_WORKFLOW/dispatches" \
+                -f ref="$BRANCH" -f "inputs[resume_run_id]=$RUN_ID" -f "inputs[flavor]=$flavor" -f "inputs[kind]=$kind"
+            else
+              gh api -X POST "repos/$REPO/actions/workflows/$BUILD_WORKFLOW/dispatches" \
+                -f ref="$BRANCH" -f "inputs[resume_run_id]=$RUN_ID" -f "inputs[flavor]=$flavor"
+            fi
           }
 
           resume_flavor core
