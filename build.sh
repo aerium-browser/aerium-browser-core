@@ -478,8 +478,8 @@ rm -rf $SCRIPT_DIR/keys
 if [ -n "${AERIUM_UI_DIR:-}" ]; then
     aapt2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 2>/dev/null | sort -V | tail -n1)
     badging=$("$aapt2" dump badging "$SCRIPT_DIR/release/$APK_BASE-$VERSION-$AERIUM_ABI.apk" 2>/dev/null || true)
-    grep -q "^package: name='com.aeriumbrowser'" <<<"$badging" \
-        || { echo "[aerium] FATAL: the apk is not com.aeriumbrowser" >&2; exit 1; }
+    grep -q "^package: name='com.aeriumbrowser.android'" <<<"$badging" \
+        || { echo "[aerium] FATAL: the apk is not com.aeriumbrowser.android" >&2; exit 1; }
     grep -q "^application-label:'Aerium'" <<<"$badging" \
         || { echo "[aerium] FATAL: the apk is not labelled Aerium" >&2; exit 1; }
     if grep -q '^com.aeriumbrowser.ui.AeriumUiProvider ->' "$UNSIGNED_APK.mapping" 2>/dev/null; then
