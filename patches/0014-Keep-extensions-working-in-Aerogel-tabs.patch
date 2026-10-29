@@ -14,7 +14,7 @@ Subject: [PATCH] Keep extensions working in Aerogel tabs
  7 files changed, 33 insertions(+), 12 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 2a0d76df202fbb678f71f45c7070628dd72b7048..75182a71600692f8d8943286ab9808f26bce706a 100644
+index 93a99e55529546178b97fffc1cac82d75ba28fd8..aa5a78af0dfb977831b3e546edbe713d97701e97 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -1285,15 +1285,17 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt

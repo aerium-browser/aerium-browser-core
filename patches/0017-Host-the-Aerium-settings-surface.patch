@@ -8,7 +8,7 @@ Subject: [PATCH] Host the Aerium settings surface
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java
-index c8ad42fa1d113cc33297ac8a9db6d9ab1f9415b7..ad569390bbf55429ba207b9574379c462cd0e6a6 100644
+index c8ad42fa1d113cc33297ac8a9db6d9ab1f9415b7..978706674e2830eabe854bcd05f01e64acd45314 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java
 @@ -566,10 +566,18 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
@@ -17,12 +17,12 @@ index c8ad42fa1d113cc33297ac8a9db6d9ab1f9415b7..ad569390bbf55429ba207b9574379c46
          String fragmentName = intent.getStringExtra(EXTRA_SHOW_FRAGMENT);
 +        Bundle arguments = intent.getBundleExtra(EXTRA_SHOW_FRAGMENT_ARGUMENTS);
 +        if (fragmentName == null
-+                && com.aeriumbrowser.bridge.AeriumUi.surface(com.aeriumbrowser.api.Slot.SETTINGS)
++                && com.aeriumbrowser.android.bridge.AeriumUi.surface(com.aeriumbrowser.android.api.Slot.SETTINGS)
 +                        != null) {
-+            fragmentName = com.aeriumbrowser.bridge.SurfaceFragment.class.getName();
++            fragmentName = com.aeriumbrowser.android.bridge.SurfaceFragment.class.getName();
 +            arguments =
-+                    com.aeriumbrowser.bridge.SurfaceFragment.arguments(
-+                            com.aeriumbrowser.api.Slot.SETTINGS);
++                    com.aeriumbrowser.android.bridge.SurfaceFragment.arguments(
++                            com.aeriumbrowser.android.api.Slot.SETTINGS);
 +        }
          if (fragmentName == null) {
              fragmentName = MainSettings.class.getName();

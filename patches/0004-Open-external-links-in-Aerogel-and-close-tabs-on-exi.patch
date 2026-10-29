@@ -9,14 +9,14 @@ Subject: [PATCH] Open external links in Aerogel and close tabs on exit
  2 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index af106d0a96ec69cd4ed511e2158888c47e19e578..2a0d76df202fbb678f71f45c7070628dd72b7048 100644
+index af106d0a96ec69cd4ed511e2158888c47e19e578..93a99e55529546178b97fffc1cac82d75ba28fd8 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -50,6 +50,8 @@ import androidx.lifecycle.Lifecycle;
  import androidx.lifecycle.LifecycleObserver;
  import androidx.lifecycle.LifecycleRegistry;
  
-+import com.aeriumbrowser.bridge.AeriumPrefs;
++import com.aeriumbrowser.android.bridge.AeriumPrefs;
 +
  import org.chromium.base.ActivityState;
  import org.chromium.base.ApkInfo;
@@ -32,14 +32,14 @@ index af106d0a96ec69cd4ed511e2158888c47e19e578..2a0d76df202fbb678f71f45c7070628d
              final AtomicBoolean isActiveUrlNtp = new AtomicBoolean(false);
              if (noRestoreState) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java b/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
-index 4af87e7ab6380e7602d1496aaa3224ef98d70422..5d900fbdc2d925e2870409146341c126e4743d62 100644
+index 4af87e7ab6380e7602d1496aaa3224ef98d70422..b5001eb8f70f4cc85efcba7ec58cadda5f1fbb95 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
 @@ -21,6 +21,8 @@ import androidx.browser.customtabs.CustomTabsIntent;
  import androidx.browser.customtabs.TrustedWebUtils;
  import androidx.core.os.BuildCompat;
  
-+import com.aeriumbrowser.bridge.AeriumPrefs;
++import com.aeriumbrowser.android.bridge.AeriumPrefs;
 +
  import org.chromium.base.ApiCompatibilityUtils;
  import org.chromium.base.ApplicationStatus;

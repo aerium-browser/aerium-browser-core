@@ -10,7 +10,7 @@ Subject: [PATCH] Add core build targets
  3 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
-index 6ed792010ee90f07562ce80b34afe5fe722df299..ea6f41ade67e3c95b486aa1b424833e111d5bd33 100644
+index 6ed792010ee90f07562ce80b34afe5fe722df299..f02b13d39ca5dc05e4fab6cb13642237f9b83e76 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
 @@ -8,6 +8,7 @@ import("//build/toolchain/gcc_toolchain.gni")
@@ -44,7 +44,7 @@ index 6ed792010ee90f07562ce80b34afe5fe722df299..ea6f41ade67e3c95b486aa1b424833e1
  
    generate_jni("chrome_jni_headers") {
      sources = [
-+      "//aerium/bridge/java/src/com/aeriumbrowser/bridge/ExtensionsImpl.java",
++      "//aerium/bridge/java/src/com/aeriumbrowser/android/bridge/ExtensionsImpl.java",
        "../browser/share/android/java/src/org/chromium/chrome/browser/share/BitmapDownloadRequest.java",
        "../browser/share/android/java/src/org/chromium/chrome/browser/share/link_to_text/LinkToTextBridge.java",
        "../browser/share/android/java/src/org/chromium/chrome/browser/share/long_screenshots/bitmap_generation/LongScreenshotsTabService.java",

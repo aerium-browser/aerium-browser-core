@@ -96,7 +96,7 @@ index 58630d984997b17fbc91bfd3cadc6d59a34da20b..96291a4f15d242c19f21f56d91dbd373
      "java/src/org/chromium/chrome/browser/omnibox/LocationBarCoordinator.java",
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LinkCleaner.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LinkCleaner.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..d9cb680d900a6066371cec4b02e4c4227688d6a3
+index 0000000000000000000000000000000000000000..07db4d39d6113091711f258e2960d7d6978f0f17
 --- /dev/null
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LinkCleaner.java
 @@ -0,0 +1,28 @@

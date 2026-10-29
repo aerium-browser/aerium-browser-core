@@ -1,0 +1,17 @@
+// Copyright 2026 Aerium Browser
+// SPDX-License-Identifier: GPL-3.0-only
+
+package com.aeriumbrowser.android.api;
+
+import androidx.annotation.Nullable;
+
+public interface MenuHost extends SurfaceHost {
+    @Nullable
+    MenuItem item(int id);
+
+    void select(int id);
+
+    default boolean overview() {
+        return false;
+    }
+}

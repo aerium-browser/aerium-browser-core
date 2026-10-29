@@ -8,7 +8,7 @@ Subject: [PATCH] Host the Aerium onboarding
  1 file changed, 4 insertions(+)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 75182a71600692f8d8943286ab9808f26bce706a..cb86f55011eea71e9d4fe549f917dc1e6bb82e55 100644
+index aa5a78af0dfb977831b3e546edbe713d97701e97..a570fad4cb66d60e554e99d8a97984be7ea11b8d 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -1654,6 +1654,10 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
@@ -16,8 +16,8 @@ index 75182a71600692f8d8943286ab9808f26bce706a..cb86f55011eea71e9d4fe549f917dc1e
              new NavigationPredictorBridge(
                      originalProfile, getLifecycleDispatcher(), this::isWarmOnResume);
 +            if (!isIncognitoWindow()) {
-+                com.aeriumbrowser.bridge.SurfaceDialog.show(
-+                        this, com.aeriumbrowser.api.Slot.ONBOARDING, getLifecycleDispatcher());
++                com.aeriumbrowser.android.bridge.SurfaceDialog.show(
++                        this, com.aeriumbrowser.android.api.Slot.ONBOARDING, getLifecycleDispatcher());
 +            }
  
              if (NtpCustomizationUtils.isNtpThemeCustomizationEnabled() && !isIncognitoWindow()) {

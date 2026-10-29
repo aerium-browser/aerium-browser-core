@@ -482,7 +482,7 @@ if [ -n "${AERIUM_UI_DIR:-}" ]; then
         || { echo "[aerium] FATAL: the apk is not com.aeriumbrowser.android" >&2; exit 1; }
     grep -q "^application-label:'Aerium'" <<<"$badging" \
         || { echo "[aerium] FATAL: the apk is not labelled Aerium" >&2; exit 1; }
-    if grep -q '^com.aeriumbrowser.ui.AeriumUiProvider ->' "$UNSIGNED_APK.mapping" 2>/dev/null; then
+    if grep -q '^com.aeriumbrowser.android.ui.AeriumUiProvider ->' "$UNSIGNED_APK.mapping" 2>/dev/null; then
         echo "[aerium] apk check: Aerium label, package and UI layer present"
     else
         echo "[aerium] WARNING: the UI layer was not found in the R8 mapping"

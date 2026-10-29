@@ -140,7 +140,7 @@ index 6101076273a181fea07fe49ade81946eca6a9b69..523907b935850a1a72c40a36933bd237
      "graphics/flush_reason.h",
 diff --git a/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc b/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
 new file mode 100644
-index 0000000000000000000000000000000000000000..a32032a12d118ce0c30a2f00b4afd4f4f250b2a5
+index 0000000000000000000000000000000000000000..4bb532599b9b1f0df193a42c2a3d23df839d0720
 --- /dev/null
 +++ b/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
 @@ -0,0 +1,107 @@
@@ -253,7 +253,7 @@ index 0000000000000000000000000000000000000000..a32032a12d118ce0c30a2f00b4afd4f4
 +}  // namespace blink
 diff --git a/third_party/blink/renderer/platform/graphics/fingerprint_noise.h b/third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..94d745d4381163305c71b5a7d48bdfbcd000da39
+index 0000000000000000000000000000000000000000..c547e869c56311b785270ac681d954a2b4e5db09
 --- /dev/null
 +++ b/third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 @@ -0,0 +1,32 @@

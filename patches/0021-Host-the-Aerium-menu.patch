@@ -12,7 +12,7 @@ Subject: [PATCH] Host the Aerium menu
  create mode 100644 chrome/browser/ui/android/appmenu/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuSheet.java
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index ea3d8e0c6f39ecc57e1c33ab754f491ac02d9235..24c3ba52b31129c6eb9ead2a30a33f00627d9ea9 100644
+index ea3d8e0c6f39ecc57e1c33ab754f491ac02d9235..e8cc9b7451f7e943695ccd66b741b76b83807f4a 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 @@ -298,6 +298,10 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
@@ -20,7 +20,7 @@ index ea3d8e0c6f39ecc57e1c33ab754f491ac02d9235..24c3ba52b31129c6eb9ead2a30a33f00
              populateTabletEmptyModeMenu(modelList);
          }
 +        if (menuGroup == MenuGroup.PAGE_MENU || menuGroup == MenuGroup.OVERVIEW_MODE_MENU) {
-+            com.aeriumbrowser.bridge.MenuSurface.attach(
++            com.aeriumbrowser.android.bridge.MenuSurface.attach(
 +                    modelList, menuGroup == MenuGroup.OVERVIEW_MODE_MENU);
 +        }
          return modelList;
@@ -145,7 +145,7 @@ index 9a1cbc7f512c4a204f6e836fba1abfc55b0f04f4..6230f1a7629e6e626d929c55379504ff
          }
 diff --git a/chrome/browser/ui/android/appmenu/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuSheet.java b/chrome/browser/ui/android/appmenu/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuSheet.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..40afd1d78087f08818002201ba0369993cde0067
+index 0000000000000000000000000000000000000000..8d79060908ef0b387e72fade864f0effb204a490
 --- /dev/null
 +++ b/chrome/browser/ui/android/appmenu/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuSheet.java
 @@ -0,0 +1,42 @@

@@ -14,14 +14,14 @@ Subject: [PATCH] Make cross origin referrers configurable
  7 files changed, 52 insertions(+), 6 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/init/ChromeBrowserInitializer.java b/chrome/android/java/src/org/chromium/chrome/browser/init/ChromeBrowserInitializer.java
-index b772e336566191e805686bac80081a4fb5ea45bb..aae0d48222b29f3091c8828fd6d86355dd64d5b7 100644
+index b772e336566191e805686bac80081a4fb5ea45bb..d26f3cfe0292f9d24d922c2b2a0ef5f2e4116de5 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/init/ChromeBrowserInitializer.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/init/ChromeBrowserInitializer.java
 @@ -6,6 +6,8 @@ package org.chromium.chrome.browser.init;
  
  import android.os.StrictMode;
  
-+import com.aeriumbrowser.bridge.AeriumPrefs;
++import com.aeriumbrowser.android.bridge.AeriumPrefs;
 +
  import org.chromium.base.CommandLine;
  import org.chromium.base.ResettersForTesting;
