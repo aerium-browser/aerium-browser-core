@@ -10,8 +10,9 @@ Subject: [PATCH] Leave out Google only shortcuts and links
  ...llbackHelpAndFeedbackLauncherDelegate.java |  8 +---
  .../HelpAndFeedbackLauncherDelegate.java      |  2 +-
  .../ImageDescriptionsController.java          |  3 +-
+ .../browser/lens/LensSupportStatusHelper.java |  3 +-
  .../omnibox/omnibox_pedal_implementations.cc  |  5 ---
- 7 files changed, 8 insertions(+), 67 deletions(-)
+ 8 files changed, 10 insertions(+), 68 deletions(-)
 
 diff --git a/chrome/android/java/res/xml/legal_information_preferences.xml b/chrome/android/java/res/xml/legal_information_preferences.xml
 index 32067c19d4f7a37a229d9437847c7809b7c30df0..8998689617e278fc0dda63a960e7f4c031b6f16b 100644
@@ -161,6 +162,27 @@ index 52b2351edec8c265447e9542cd5bbb97bb46ad32..de7309b453a34afaa96c921d0a03d3b5
      }
  
      public boolean imageDescriptionsEnabled(Profile profile) {
+diff --git a/chrome/browser/lens/java/src/org/chromium/chrome/browser/lens/LensSupportStatusHelper.java b/chrome/browser/lens/java/src/org/chromium/chrome/browser/lens/LensSupportStatusHelper.java
+index 887dc4583050a740cad85c200b9141d5bd5a6824..cfda3356b8e0fffae46a6121b09b263f1c9c73a2 100644
+--- a/chrome/browser/lens/java/src/org/chromium/chrome/browser/lens/LensSupportStatusHelper.java
++++ b/chrome/browser/lens/java/src/org/chromium/chrome/browser/lens/LensSupportStatusHelper.java
+@@ -24,6 +24,7 @@ public class LensSupportStatusHelper {
+     public static final String LENS_OVERLAY_IMPL_WEBUI = "webui";
+ 
+     private static final String MIN_AGSA_VERSION_NAME_FOR_LENS_POSTCAPTURE = "10.65";
++    private static final boolean LENS_AVAILABLE = false;
+ 
+     /**
+      * Returns the Lens support status based on a set of application compatibility checks.
+@@ -35,7 +36,7 @@ public class LensSupportStatusHelper {
+      */
+     public static @Nullable @LensMetrics.LensSupportStatus Integer getLensSupportStatus(
+             @Nullable Profile profile, boolean isIncognito) {
+-        if (isIncognito || profile == null) {
++        if (!LENS_AVAILABLE || isIncognito || profile == null) {
+             return null;
+         }
+ 
 diff --git a/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc b/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
 index 2b253bcc6c549723844b146283cace194bfc686a..7a16394d956e8e963febd8933bf6e85cefb10150 100644
 --- a/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
