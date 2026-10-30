@@ -18,10 +18,10 @@ Subject: [PATCH] Show the extensions toolbar and popups on phones
  11 files changed, 71 insertions(+), 10 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-index 774d76e8da1ab8af60c8ba6eb031ce1155bda97a..4d7491c354160de781b3333ddf8bd59e6b4f6b24 100644
+index a6e265da6e007857cea8a1ccaea3abfc16fd5459..80d95ef5dde4d409f7188773c3b2a416213f241d 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-@@ -2779,7 +2779,7 @@ public class ToolbarManager
+@@ -2782,7 +2782,7 @@ public class ToolbarManager
                                                          mActivityTabProvider.asObservable(),
                                                          mTabCreatorManager.getTabCreator(false),
                                                          getBrowsingModeThemeColorProvider(),
@@ -95,18 +95,18 @@ index bc5311b8ec5c1aa4b38213331d20179bfbf4336a..d59786d4a18c3d6ef4d5b1250c7ba4ac
  
  input {
 diff --git a/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc b/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc
-index f04766838b356898425f6a1fe7b8b2ce30dd02c0..007fdc60d3b884b52865b2aaf8311fe85e90ced4 100644
+index d3b2b4b48d3e1948432423903ab2167d8f84033f..eba7b5ddee48148cb4c016659608d83284e00848 100644
 --- a/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc
 +++ b/chrome/browser/ui/android/extensions/extension_action_popup_contents.cc
-@@ -17,6 +17,7 @@
- #include "extensions/browser/extension_action.h"
+@@ -18,6 +18,7 @@
  #include "extensions/browser/extension_action_manager.h"
  #include "extensions/browser/extension_registry.h"
+ #include "third_party/jni_zero/jni_zero.h"
 +#include "ui/base/device_form_factor.h"
  
  // Must come after all headers that specialize FromJniType() / ToJniType().
  #include "chrome/browser/ui/android/extensions/jni_headers/ExtensionActionPopupContents_jni.h"
-@@ -35,6 +36,11 @@ namespace {
+@@ -36,6 +37,11 @@ namespace {
  // https://developer.chrome.com/docs/extensions/reference/api/action#popup
  constexpr gfx::Size kMinSize = {25, 25};
  constexpr gfx::Size kMaxSize = {800, 600};
@@ -118,7 +118,7 @@ index f04766838b356898425f6a1fe7b8b2ce30dd02c0..007fdc60d3b884b52865b2aaf8311fe8
  
  }  // namespace
  
-@@ -130,6 +136,11 @@ void ExtensionActionPopupContents::OnLoaded() {
+@@ -145,6 +151,11 @@ void ExtensionActionPopupContents::OnLoaded() {
    }
    Java_ExtensionActionPopupContents_onLoaded(AttachCurrentThread(),
                                               java_object_);
@@ -129,8 +129,8 @@ index f04766838b356898425f6a1fe7b8b2ce30dd02c0..007fdc60d3b884b52865b2aaf8311fe8
 +  }
  }
  
- void ExtensionActionPopupContents::Destroy(JNIEnv* env) {
-@@ -142,6 +153,9 @@ void ExtensionActionPopupContents::LoadInitialPage(JNIEnv* env) {
+ void ExtensionActionPopupContents::LoadInitialPage() {
+@@ -153,6 +164,9 @@ void ExtensionActionPopupContents::LoadInitialPage() {
  
  void ExtensionActionPopupContents::SetUpNewMainFrame(
      RenderFrameHost* render_frame_host) {
@@ -158,10 +158,10 @@ index 9e1f21d5a0c8ec9cdf75ca8a24c30adadd16af0c..dfbf25b97e1d5dd5c34c93eac5585b2d
              android:id="@+id/signin_button_stub"
              android:layout="@layout/signin_button_view"
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionActionListCoordinator.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionActionListCoordinator.java
-index d9da4869f7e8bbea49d5263b0103f08fcaf6ba61..37cb25ef6900a2fbdc43b368f99a129260e6eb57 100644
+index 348709b581dc786f7096f26c80ee91705d934c9c..ce18c7157ba4f28f4a0d423f4b244798c3ee02cf 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionActionListCoordinator.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionActionListCoordinator.java
-@@ -225,6 +225,10 @@ public class ExtensionActionListCoordinator implements Destroyable {
+@@ -227,6 +227,10 @@ public class ExtensionActionListCoordinator implements Destroyable {
      }
  
      public class RecyclerViewDelegate {
@@ -173,10 +173,10 @@ index d9da4869f7e8bbea49d5263b0103f08fcaf6ba61..37cb25ef6900a2fbdc43b368f99a1292
           * Retrieves the view representing the button for a specific extension action.
           *
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionActionListMediator.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionActionListMediator.java
-index 2740f9c91e4191f4d985975e381bf18b87d5fbf0..d2c864efdb59459e3ee43cbce197364403b05ee3 100644
+index 5b5292633b3878f01995b3f4cf4c1f47fb3733bd..8457a3056128793f7afadcac160cce8408c0ad58 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionActionListMediator.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/extensions/ExtensionActionListMediator.java
-@@ -707,12 +707,8 @@ class ExtensionActionListMediator implements Destroyable {
+@@ -711,12 +711,8 @@ class ExtensionActionListMediator implements Destroyable {
  
          ListMenuButton buttonView =
                  (ListMenuButton) mRecyclerViewDelegate.getButtonViewForId(actionId);
@@ -191,7 +191,7 @@ index 2740f9c91e4191f4d985975e381bf18b87d5fbf0..d2c864efdb59459e3ee43cbce1973644
  
          Activity activity = mWindowAndroid.getActivity().get();
          if (activity == null) {
-@@ -725,13 +721,15 @@ class ExtensionActionListMediator implements Destroyable {
+@@ -729,13 +725,15 @@ class ExtensionActionListMediator implements Destroyable {
          // the "pressed" look while loading the action popup too. For context menu {@link
          // ListMenuButton} already handles this, but not for popup where we show the window
          // ourselves.
@@ -234,10 +234,10 @@ index 157f6a21a919023ea9aa73819c28218a28bbef4e..5964e7c94aec7ad75cfbe8bb0cd47cda
                  new ActivityWindowAndroid(
                          activity,
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
-index efb5b0b4bb31f44a41da2934170d259d7aadbdc9..9ac9eccf73cdbd7017c3d1fd5d620ad148bc6297 100644
+index 1d744eaafd802ec2120d74a49c05063d2a95c308..57f5cd8c29af78a1e69657c5cba881d89a9fbf33 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
-@@ -1686,6 +1686,8 @@ public class ToolbarPhone extends ToolbarLayout
+@@ -1698,6 +1698,8 @@ public class ToolbarPhone extends ToolbarLayout
              canvas.restore();
          }
  
@@ -246,7 +246,7 @@ index efb5b0b4bb31f44a41da2934170d259d7aadbdc9..9ac9eccf73cdbd7017c3d1fd5d620ad1
          // Draw the signin button if visible.
          if (mSigninButtonCoordinator != null && mSigninButtonCoordinator.isVisible()) {
              View signinButtonView = mSigninButtonCoordinator.getViewForDrawing();
-@@ -1829,6 +1831,19 @@ public class ToolbarPhone extends ToolbarLayout
+@@ -1841,6 +1843,19 @@ public class ToolbarPhone extends ToolbarLayout
          return new Rect(left, top, right, bottom);
      }
  

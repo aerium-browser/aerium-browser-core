@@ -4,22 +4,27 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Show no suggested sites on the new tab page
 
 ---
- chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.cc | 4 ----
- 1 file changed, 4 deletions(-)
+ .../ntp_tiles/chrome_most_visited_sites_factory.cc       | 9 ---------
+ 1 file changed, 9 deletions(-)
 
 diff --git a/chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.cc b/chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.cc
-index 4b4132f9dfebed2bc97868492313d33f6ec4760a..c86be70f77564b42c2c64b3765cb7018b50439fe 100644
+index e97af3e79ba5d63ad3f07c6848181eec86d737ba..4182888c44b7cb8652ea5c5630f29dc26673a97b 100644
 --- a/chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.cc
 +++ b/chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.cc
-@@ -85,11 +85,7 @@ ChromeMostVisitedSitesFactory::NewForProfile(Profile* profile) {
-       supervised_user::SupervisedUserUrlFilteringServiceFactory::GetForProfile(
-           profile),
-       TopSitesFactory::GetForProfile(profile),
+@@ -37,16 +37,7 @@
+ namespace {
+ 
+ bool ShouldCreatePopularSites(Profile* profile) {
 -#if BUILDFLAG(IS_ANDROID)
--      ChromePopularSitesFactory::NewForProfile(profile),
+-  if (search::IsWebUiNtpEnabledForDesktopAndroid() &&
+-      base::FeatureList::IsEnabled(chrome::android::kUseWebUiNtp3PDSE)) {
+-    // TODO(crbug.com/572038495): Remove Popular Sites for 1P NTPs.
+-    return search::DefaultSearchProviderIsGoogle(profile);
+-  }
+-  return true;
 -#else
-       nullptr,
+   return false;
 -#endif
-       ShouldCreateCustomLinksManager()
-           ? ChromeCustomLinksManagerFactory::NewForProfile(profile)
-           : nullptr,
+ }
+ 
+ bool ShouldCreateCustomLinksManager() {

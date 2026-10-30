@@ -154,7 +154,7 @@ jobs:
       - name: Check the extension sources from the runner
         if: ${{ inputs.flow == 'onboarding' }}
         run: |
-          curl -sS -o /dev/null -w 'web store: %{http_code} %{redirect_url}\n' -A Aerium 'https://clients2.google.com/service/update2/crx?response=redirect&prodversion=156.0.8078.79&acceptformat=crx3&x=id%3Dfnaicdffflnofjppbagibeoednhnbjhg%26uc' | cut -c1-160 || true
+          curl -sS -o /dev/null -w 'web store: %{http_code} %{redirect_url}\n' -A Aerium 'https://clients2.google.com/service/update2/crx?response=redirect&prodversion=157.0.8103.30&acceptformat=crx3&x=id%3Dfnaicdffflnofjppbagibeoednhnbjhg%26uc' | cut -c1-160 || true
           curl -sS -o /dev/null -w 'github: %{http_code}\n' -A Aerium -H 'Accept: application/vnd.github+json' https://api.github.com/repos/gorhill/uBlock/releases/latest || true
       - name: Run the APK in an emulator
         if: ${{ inputs.flow != 'inspect' }}

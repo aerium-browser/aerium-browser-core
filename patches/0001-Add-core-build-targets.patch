@@ -10,7 +10,7 @@ Subject: [PATCH] Add core build targets
  3 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
-index 6ed792010ee90f07562ce80b34afe5fe722df299..f02b13d39ca5dc05e4fab6cb13642237f9b83e76 100644
+index 271801af5323ad07e60e701d575e3f16b7d2f58f..4461a27684f886bbd97f3665976f317cf81f56ad 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
 @@ -8,6 +8,7 @@ import("//build/toolchain/gcc_toolchain.gni")
@@ -21,7 +21,7 @@ index 6ed792010ee90f07562ce80b34afe5fe722df299..f02b13d39ca5dc05e4fab6cb13642237
  import("//components/supervised_user/buildflags.gni")
  
  assert(!is_cronet_build)
-@@ -310,6 +311,7 @@ if (_is_default_toolchain) {
+@@ -312,6 +313,7 @@ if (_is_default_toolchain) {
  
    android_library("chrome_java") {
      deps = [
@@ -29,7 +29,7 @@ index 6ed792010ee90f07562ce80b34afe5fe722df299..f02b13d39ca5dc05e4fab6cb13642237
        ":base_module_java",
        ":chrome_app_java_resources",
        ":chrome_public_apk_template_resources",
-@@ -893,6 +895,10 @@ if (_is_default_toolchain) {
+@@ -905,6 +907,10 @@ if (_is_default_toolchain) {
  
      # From java_sources.gni.
      sources = chrome_java_sources
@@ -40,7 +40,7 @@ index 6ed792010ee90f07562ce80b34afe5fe722df299..f02b13d39ca5dc05e4fab6cb13642237
  
      # Include sources from feed_java_sources.gni.
      sources += feed_java_sources
-@@ -3014,6 +3020,7 @@ if (_is_default_toolchain) {
+@@ -2954,6 +2960,7 @@ if (_is_default_toolchain) {
  
    generate_jni("chrome_jni_headers") {
      sources = [
@@ -49,10 +49,10 @@ index 6ed792010ee90f07562ce80b34afe5fe722df299..f02b13d39ca5dc05e4fab6cb13642237
        "../browser/share/android/java/src/org/chromium/chrome/browser/share/link_to_text/LinkToTextBridge.java",
        "../browser/share/android/java/src/org/chromium/chrome/browser/share/long_screenshots/bitmap_generation/LongScreenshotsTabService.java",
 diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
-index 5aa5b0447d68508bd5224b84ec040617c9a136ac..fd724115831c3fdf1ea6a3d91a330078c7abdaf8 100644
+index 814b9d649a31646c7bc072d882a5e11b70d5d6d6..93cc3934c732fd4d60ca2f1b114d7ed9888de76b 100644
 --- a/chrome/browser/BUILD.gn
 +++ b/chrome/browser/BUILD.gn
-@@ -3286,7 +3286,10 @@ source_set("browser") {
+@@ -3593,7 +3593,10 @@ source_set("browser") {
    # TODO(https://crbug.com/356905053): Add more dependencies here and merge this
    # block with the `enable_extensions` block above.
    if (enable_desktop_android_extensions) {
@@ -65,12 +65,12 @@ index 5aa5b0447d68508bd5224b84ec040617c9a136ac..fd724115831c3fdf1ea6a3d91a330078
  
    if (enable_library_cdms) {
 diff --git a/chrome/browser/prefs/BUILD.gn b/chrome/browser/prefs/BUILD.gn
-index 831aaa964eab5ee4d7fb40c60a101dcb4083478d..1a41f426fbea9af79f129ad084c491505df3ed26 100644
+index 66f9c0d285f331355dd808c821307c0467933a4f..279865a0ae9a1c3c44e9ac2844c71aeb932d0179 100644
 --- a/chrome/browser/prefs/BUILD.gn
 +++ b/chrome/browser/prefs/BUILD.gn
-@@ -48,6 +48,8 @@ source_set("impl") {
-   public_deps = [ "//chrome/browser:browser_public_dependencies" ]
+@@ -47,6 +47,8 @@ source_set("prefs") {
  
+ source_set("impl") {
    sources = [
 +    "//aerium/defaults/aerium_defaults.cc",
 +    "//aerium/defaults/aerium_defaults.h",

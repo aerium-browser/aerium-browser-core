@@ -13,10 +13,10 @@ Subject: [PATCH] Keep the phone layout for the omnibox and accessibility
  6 files changed, 19 insertions(+), 17 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java
-index aca2c0f617170073aa2b6c97df80959c897060bb..c2168a2daa8c8e2b7f6df793cb5790b1d9a8065e 100644
+index bdaa622f5c276be0da0be0c22dbf6ec76056dc1b..6514edc0234b2675756e53976aebd81a2c58b4dd 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java
-@@ -21,7 +21,6 @@ import org.chromium.build.annotations.Nullable;
+@@ -23,7 +23,6 @@ import org.chromium.build.annotations.Nullable;
  import org.chromium.cc.input.BrowserControlsState;
  import org.chromium.chrome.browser.device.DeviceClassManager;
  import org.chromium.chrome.browser.flags.ChromeFeatureList;
@@ -24,7 +24,7 @@ index aca2c0f617170073aa2b6c97df80959c897060bb..c2168a2daa8c8e2b7f6df793cb5790b1
  import org.chromium.components.browser_ui.util.BrowserControlsVisibilityDelegate;
  import org.chromium.components.dom_distiller.core.DomDistillerUrlUtils;
  import org.chromium.components.embedder_support.util.UrlUtilities;
-@@ -30,6 +29,7 @@ import org.chromium.content_public.browser.ImeAdapter;
+@@ -32,6 +31,7 @@ import org.chromium.content_public.browser.ImeAdapter;
  import org.chromium.content_public.browser.ImeEventObserver;
  import org.chromium.content_public.browser.NavigationHandle;
  import org.chromium.content_public.browser.WebContents;
@@ -43,10 +43,10 @@ index aca2c0f617170073aa2b6c97df80959c897060bb..c2168a2daa8c8e2b7f6df793cb5790b1
              flags |= (1 << (int) LockReason.A11Y_ENABLED);
          }
 diff --git a/chrome/browser/flag-metadata.json b/chrome/browser/flag-metadata.json
-index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a40b51f738 100644
+index df0e08278055e8f7ba66652615b59225cf0facd0..c22a8b10767ce8670a5e2dbba82eeb5e5a77ee02 100644
 --- a/chrome/browser/flag-metadata.json
 +++ b/chrome/browser/flag-metadata.json
-@@ -223,7 +223,7 @@
+@@ -236,7 +236,7 @@
      "owners": [
        "etiennep@google.com", "fdoray@google.com"
      ],
@@ -55,7 +55,7 @@ index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a4
    },
    {
      "name": "allow-all-sites-to-initiate-mirroring",
-@@ -350,7 +350,7 @@
+@@ -363,7 +363,7 @@
    {
      "name": "android-bottom-bar",
      "owners": [ "polardz@google.com", "ckitagawa@chromium.com", "clank-tab-dev@google.com" ],
@@ -64,7 +64,7 @@ index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a4
    },
    {
      "name": "android-bricks-native-page",
-@@ -1812,7 +1812,7 @@
+@@ -1860,7 +1860,7 @@
    {
      "name": "cct-open-in-browser-button-if-allowed-by-embedder",
      "owners": ["kamalchoudhury@google.com", "edmundw@google.com"],
@@ -73,7 +73,7 @@ index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a4
    },
    {
      "name": "cct-open-in-browser-button-if-enabled-by-embedder",
-@@ -2613,7 +2613,7 @@
+@@ -2706,7 +2706,7 @@
    {
      "name": "darken-websites-checkbox-in-themes-setting",
      "owners": [ "nemco@google.com", "wenyufu@google.com", "twellington@chromium.org" ],
@@ -82,7 +82,7 @@ index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a4
    },
    {
      "name": "data-controls-search-with",
-@@ -3296,7 +3296,7 @@
+@@ -3374,7 +3374,7 @@
    {
      "name": "enable-accessibility-sequential-focus",
      "owners": [ "jocelyntran@google.com", "//ui/accessibility/OWNERS" ],
@@ -91,16 +91,16 @@ index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a4
    },
    {
      "name": "enable-accessibility-set-selectable-on-all-nodes-with-text",
-@@ -4856,7 +4856,7 @@
+@@ -4901,7 +4901,7 @@
    {
      "name": "enforce-incognito-isolation",
      "owners": [ "shuyng@google.com", "clank-large-form-factors@google.com" ],
--    "expiry_milestone": 152
+-    "expiry_milestone": 162
 +    "expiry_milestone": -1
    },
    {
-     "name": "enforce-management-disclaimer",
-@@ -6362,7 +6362,7 @@
+     "name": "enforce-mono-audio-capture",
+@@ -6334,7 +6334,7 @@
    {
      "name": "inline-pdf-v2",
      "owners": [ "rathomas@google.com", "clank-large-form-factors@google.com" ],
@@ -109,7 +109,7 @@ index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a4
    },
    {
      "name": "inline-pdf-v2-incognito",
-@@ -6665,7 +6665,7 @@
+@@ -6634,7 +6634,7 @@
    {
      "name": "jump-start-omnibox",
      "owners": [ "ender@google.com", "chrome-mobile-search@google.com" ],
@@ -117,8 +117,8 @@ index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a4
 +    "expiry_milestone": -1
    },
    {
-     "name": "jupiter-screensaver",
-@@ -6919,7 +6919,7 @@
+     "name": "launcher-local-image-search",
+@@ -6861,7 +6861,7 @@
        "twellington@chromium.org",
        "skavuluru@google.com"
      ],
@@ -127,7 +127,7 @@ index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a4
    },
    {
      "name": "long-screenshots-lenient-memory-check",
-@@ -7552,7 +7552,7 @@
+@@ -7487,7 +7487,7 @@
    {
      "name": "offline-auto-fetch",
      "owners": [ "tbansal@google.com" ],
@@ -136,7 +136,7 @@ index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a4
    },
    {
      "name": "omaha-min-sdk-version-android",
-@@ -10000,7 +10000,7 @@
+@@ -9974,7 +9974,7 @@
    {
      "name": "use-fullscreen-insets-api",
      "owners": [ "clhager@google.com"],
@@ -173,7 +173,7 @@ index a255312f65554016510ffb50bb3f787c153185b5..c5ebb8368dec5e35f04b5f1b03cf7c74
                          : durationMs;
  
 diff --git a/components/omnibox/browser/autocomplete_result.cc b/components/omnibox/browser/autocomplete_result.cc
-index 0ec4c826bf222e697f792c639c6651f666570373..fbedd81ecbcf28c238e717d21db2c3961d1acaf7 100644
+index eed55cfbe1693235f8f41f70b419af90a2da61ce..dd392563c516a4afbfa424b740021798a32d378a 100644
 --- a/components/omnibox/browser/autocomplete_result.cc
 +++ b/components/omnibox/browser/autocomplete_result.cc
 @@ -79,7 +79,7 @@ using AutocompleteMatchType = omnibox::AutocompleteMatchType;

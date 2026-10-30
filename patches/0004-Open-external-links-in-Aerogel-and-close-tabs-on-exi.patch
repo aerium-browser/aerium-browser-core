@@ -9,7 +9,7 @@ Subject: [PATCH] Open external links in Aerogel and close tabs on exit
  2 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index af106d0a96ec69cd4ed511e2158888c47e19e578..93a99e55529546178b97fffc1cac82d75ba28fd8 100644
+index 10fca9f85ad296ad836e55f5a420667d32c50181..0e926865ba33954b799318e2ae0e0b5d9a2f606c 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -50,6 +50,8 @@ import androidx.lifecycle.Lifecycle;
@@ -21,7 +21,7 @@ index af106d0a96ec69cd4ed511e2158888c47e19e578..93a99e55529546178b97fffc1cac82d7
  import org.chromium.base.ActivityState;
  import org.chromium.base.ApkInfo;
  import org.chromium.base.ApplicationStatus;
-@@ -2509,7 +2511,8 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -2548,7 +2550,8 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
              }
  
              boolean noRestoreState =
@@ -32,7 +32,7 @@ index af106d0a96ec69cd4ed511e2158888c47e19e578..93a99e55529546178b97fffc1cac82d7
              final AtomicBoolean isActiveUrlNtp = new AtomicBoolean(false);
              if (noRestoreState) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java b/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
-index 4af87e7ab6380e7602d1496aaa3224ef98d70422..b5001eb8f70f4cc85efcba7ec58cadda5f1fbb95 100644
+index ea32404141e7529bf0f76ccc2f1a1a1c103bb4f1..dc6566626f93e664fe98d1885ee932b811b03720 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
 @@ -21,6 +21,8 @@ import androidx.browser.customtabs.CustomTabsIntent;
@@ -54,8 +54,8 @@ index 4af87e7ab6380e7602d1496aaa3224ef98d70422..b5001eb8f70f4cc85efcba7ec58cadda
          if (shouldOverrideAlwaysOpenInBrowser(dispatcher.mIntent)) {
              RecordUserAction.record("CustomTabs.AlwaysOpenInBrowserOverride");
              return dispatcher.dispatchToTabbedActivity();
-@@ -294,6 +299,12 @@ public class LaunchIntentDispatcher {
-         mIntent = assertNonNull(IntentUtils.sanitizeIntent(intent, unparcelFds));
+@@ -293,6 +298,12 @@ public class LaunchIntentDispatcher {
+         mIntent = assertNonNull(IntentUtils.sanitizeIntent(intent));
      }
  
 +    private static boolean isWebUrl(@Nullable String url) {
@@ -67,7 +67,7 @@ index 4af87e7ab6380e7602d1496aaa3224ef98d70422..b5001eb8f70f4cc85efcba7ec58cadda
      /** When started with an intent, maybe pre-resolve the domain. */
      private void maybePrefetchDnsInBackground() {
          if (Intent.ACTION_VIEW.equals(mIntent.getAction())) {
-@@ -560,6 +571,11 @@ public class LaunchIntentDispatcher {
+@@ -556,6 +567,11 @@ public class LaunchIntentDispatcher {
              if (!chromeTabbedTaskExists(mActivity)) {
                  newIntent.putExtra(IntentHandler.EXTRA_STARTED_TABBED_CHROME_TASK, true);
              }

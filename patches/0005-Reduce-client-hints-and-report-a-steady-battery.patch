@@ -9,10 +9,10 @@ Subject: [PATCH] Reduce client hints and report a steady battery
  2 files changed, 27 insertions(+), 6 deletions(-)
 
 diff --git a/components/embedder_support/user_agent_utils.cc b/components/embedder_support/user_agent_utils.cc
-index e699a6a394fd7a41b441ff6edeb1a17bfe51bc85..99824935edad896bf4c93f12de526a2eb91806e8 100644
+index bf4a8960a0d6cd2268b5a497edcdd761a1b67360..ed1228f02b93ecf1a3b173c36c730a9c6019c67d 100644
 --- a/components/embedder_support/user_agent_utils.cc
 +++ b/components/embedder_support/user_agent_utils.cc
-@@ -56,6 +56,10 @@
+@@ -52,6 +52,10 @@
  
  namespace embedder_support {
  
@@ -23,7 +23,7 @@ index e699a6a394fd7a41b441ff6edeb1a17bfe51bc85..99824935edad896bf4c93f12de526a2e
  namespace {
  
  #if BUILDFLAG(IS_WIN)
-@@ -166,6 +170,9 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
+@@ -162,6 +166,9 @@ const blink::UserAgentBrandList GetUserAgentBrandList(
  #if !BUILDFLAG(CHROMIUM_BRANDING)
    brand = version_info::GetProductName();
  #endif
@@ -33,7 +33,7 @@ index e699a6a394fd7a41b441ff6edeb1a17bfe51bc85..99824935edad896bf4c93f12de526a2e
  
    std::string brand_version =
        output_version_type == blink::UserAgentBrandVersionType::kFullVersion
-@@ -696,6 +703,21 @@ blink::UserAgentMetadata GetUserAgentMetadata(bool only_low_entropy_ch) {
+@@ -668,6 +675,21 @@ blink::UserAgentMetadata GetUserAgentMetadata(bool only_low_entropy_ch) {
    metadata.bitness = GetCpuBitness();
    metadata.wow64 = IsWoW64();
    metadata.platform_version = GetPlatformVersion();

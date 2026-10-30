@@ -8,7 +8,7 @@ Subject: [PATCH] Show no stock tips or promos
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/components/feature_engagement/internal/tracker_impl.cc b/components/feature_engagement/internal/tracker_impl.cc
-index a7542d390d72e6ab9f7717f4cb56b870ae94e62e..00fda11cf4b9400b73d07d21cc71fc5dd13fd17c 100644
+index 48bff18c643e1becb68b0650ae78bd215f509a3c..eb364be6bcfc98b953eea7886e72cdd86ee91ac8 100644
 --- a/components/feature_engagement/internal/tracker_impl.cc
 +++ b/components/feature_engagement/internal/tracker_impl.cc
 @@ -63,6 +63,10 @@ namespace {

@@ -12,19 +12,19 @@ Subject: [PATCH] Bring DevTools to phones
  5 files changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java
-index f6aacb92ed93e1a103e625f46e8ad3e82fa9450f..88070621df68e742aeb79256dda2390c6929e8c5 100644
+index 7ec43d454a6c9dc2e8278de9643f34756786181c..5aadb357551aedec514f80c723a7b684f622ede7 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java
-@@ -488,6 +488,9 @@ public abstract class BaseCustomTabActivity extends ChromeActivity {
-             protected OtrProfileId createOffTheRecordProfileId() {
-                 switch (getIntentDataProvider().getCustomTabMode()) {
+@@ -519,6 +519,9 @@ public abstract class BaseCustomTabActivity extends ChromeActivity {
+                 assumeNonNull(mIntentDataProvider);
+                 switch (mIntentDataProvider.getCustomTabMode()) {
                      case CustomTabProfileType.INCOGNITO:
 +                        if (getIntentDataProvider().getActivityType() == ActivityType.DEV_TOOLS) {
 +                            return null;
 +                        }
                          // If an incognito popup is being created by Chrome, this should use
                          // the same primary OTR profile associated with the requester's profile.
-                         if (getIntentDataProvider().getUiType() == CustomTabsUiType.POPUP) {
+                         if (mIntentDataProvider.getUiType() == CustomTabsUiType.POPUP) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/devtools/DevToolsActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/devtools/DevToolsActivity.java
 index dc0fd3076ff9efd4cdfd179c06d6f9c6384cd1f9..2e4056b0131252f6777281cab11d110c9662982d 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/devtools/DevToolsActivity.java
@@ -83,7 +83,7 @@ index 6b03859660fb2fa2df8a6c6d77e51024a1264711..7768e0038e74a72e457ee945cb31a5a9
      public Intent getIntent() {
          return mIntent;
 diff --git a/chrome/browser/devtools/android/java/src/org/chromium/chrome/browser/devtools/DevToolsWindowAndroid.java b/chrome/browser/devtools/android/java/src/org/chromium/chrome/browser/devtools/DevToolsWindowAndroid.java
-index c96056e2843a418022181202d62588688b76fd54..0e634a6a66b4b022c555c472674d5ff2090f474f 100644
+index 4b6e043626a02ee68b408726e8f7c4faf112eb3f..2a0fab35c2ee1a2e2a150daf45bd21bf106350d6 100644
 --- a/chrome/browser/devtools/android/java/src/org/chromium/chrome/browser/devtools/DevToolsWindowAndroid.java
 +++ b/chrome/browser/devtools/android/java/src/org/chromium/chrome/browser/devtools/DevToolsWindowAndroid.java
 @@ -14,7 +14,6 @@ import org.chromium.chrome.browser.profiles.Profile;

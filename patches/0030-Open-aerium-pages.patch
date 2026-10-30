@@ -12,10 +12,10 @@ Subject: [PATCH] Open aerium pages
  5 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
-index e281c3fff960b33baf471e81d5ba0f5eff02277f..2681226e7be40bb5ef9bbd7747275fb8cfdf5b47 100644
+index 90ea0196dbf5c91dfc2d9f04a5c65d23cbcedd36..f4ea8bdc6e9a03d1ebbd568138bbf9a2c418606f 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
-@@ -911,6 +911,10 @@ class TabImpl implements Tab, TabInternal {
+@@ -1046,6 +1046,10 @@ class TabImpl implements Tab, TabInternal {
      public LoadUrlResult loadUrl(LoadUrlParams params) {
          try {
              TraceEvent.begin("Tab.loadUrl");
@@ -27,7 +27,7 @@ index e281c3fff960b33baf471e81d5ba0f5eff02277f..2681226e7be40bb5ef9bbd7747275fb8
                  return new LoadUrlResult(
                          TabLoadStatus.DEFAULT_PAGE_LOAD, /* navigationHandle= */ null);
 diff --git a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
-index 18fc0f61918580c2244f0a4e00fbdff55f613a7f..82c1cd252c544f67d917f71f541af05d55447bbe 100644
+index 868d7421ef7e194244e1849a487cb03511c8224e..47a9d59176c267f6f6564e899f7c034f8b6707af 100644
 --- a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
 +++ b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
 @@ -429,7 +429,7 @@ std::string ChromeAutocompleteProviderClient::GetAcceptLanguages() const {
@@ -56,7 +56,7 @@ index 18fc0f61918580c2244f0a4e00fbdff55f613a7f..82c1cd252c544f67d917f71f541af05d
  }
  
 diff --git a/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc b/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc
-index 2f7ea50b69a46ee1bfabad3ceeeee8c6fc94a956..d7faf4a2cd9bc1e88c9689dd2ae7444042fb421b 100644
+index e0402ff520d50a0826a7803e214a9d8648bd2c2a..3791500a862ca68998d6be1216c17bf3ea97a4cd 100644
 --- a/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc
 +++ b/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc
 @@ -68,6 +68,9 @@ ChromeAutocompleteSchemeClassifier::GetInputTypeForScheme(
@@ -70,7 +70,7 @@ index 2f7ea50b69a46ee1bfabad3ceeeee8c6fc94a956..d7faf4a2cd9bc1e88c9689dd2ae74440
        (ProfileIOData::IsHandledProtocol(scheme) ||
         base::EqualsCaseInsensitiveASCII(scheme, content::kViewSourceScheme) ||
 diff --git a/chrome/common/chrome_content_client.cc b/chrome/common/chrome_content_client.cc
-index 8b5f84e0858a1cd6d2902993126572059b8e614e..27e77543c3deaa8e6c80b1824ddc76c9e2517606 100644
+index 601ff3ce617e212d57e59aa24e023a8a506da6f9..5a5e045871a87736e998375ce5d7bca5c4c65544 100644
 --- a/chrome/common/chrome_content_client.cc
 +++ b/chrome/common/chrome_content_client.cc
 @@ -205,6 +205,7 @@ static const char* const kChromeStandardURLSchemes[] = {

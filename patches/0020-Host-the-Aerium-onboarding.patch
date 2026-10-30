@@ -8,10 +8,10 @@ Subject: [PATCH] Host the Aerium onboarding
  1 file changed, 4 insertions(+)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index aa5a78af0dfb977831b3e546edbe713d97701e97..a570fad4cb66d60e554e99d8a97984be7ea11b8d 100644
+index 5478da5109f3397c031e7a015e5b25d58b4ff33a..7a8821a7cece78b16972d639294c73152c8b8560 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -1654,6 +1654,10 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -1673,6 +1673,10 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
              var originalProfile = profileProvider.getOriginalProfile();
              new NavigationPredictorBridge(
                      originalProfile, getLifecycleDispatcher(), this::isWarmOnResume);

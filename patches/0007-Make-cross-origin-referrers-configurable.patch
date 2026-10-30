@@ -71,10 +71,10 @@ index e5258679dd876490012a756f7e10cfb64541cbe6..a4a8e6717dab2d724780e12adc32b190
  }
  
 diff --git a/net/base/features.cc b/net/base/features.cc
-index 2876df4285aa69236208e784991f3240cec3ded9..a1146f08de3276dfbe11e4faeeee305505ce3a15 100644
+index 59c6ac9e179062a6438434602dc40c8fa0c1a2af..f9de15974ca714b87cc73e4fd191a769817a25cd 100644
 --- a/net/base/features.cc
 +++ b/net/base/features.cc
-@@ -1076,5 +1076,12 @@ BASE_FEATURE_PARAM(int,
+@@ -1086,5 +1086,12 @@ BASE_FEATURE_PARAM(int,
                     &kQuicSocketSendBufferSize,
                     -1);
  
@@ -88,10 +88,10 @@ index 2876df4285aa69236208e784991f3240cec3ded9..a1146f08de3276dfbe11e4faeeee3055
  }  // namespace net::features
  
 diff --git a/net/base/features.h b/net/base/features.h
-index 96c005fd5295c2439134171561e140081dd8682c..4eaf60bca508366f2511d8e240c291dc65247055 100644
+index 377ae9e8fc3ce6ba8f83dd640c427d6fdfbbf855..48a880487e7fb78434bd4e77684fe9ca915e88c7 100644
 --- a/net/base/features.h
 +++ b/net/base/features.h
-@@ -1064,6 +1064,9 @@ NET_EXPORT BASE_DECLARE_FEATURE(kEnableWindowsTcpLoopbackFastFail);
+@@ -1075,6 +1075,9 @@ NET_EXPORT BASE_DECLARE_FEATURE(kEnableWindowsTcpLoopbackFastFail);
  NET_EXPORT BASE_DECLARE_FEATURE(kQuicSocketSendBufferSize);
  NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int, kQuicSocketSendBufferSizeParam);
  

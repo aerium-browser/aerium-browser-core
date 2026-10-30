@@ -9,18 +9,18 @@ Subject: [PATCH] Apply core feature and pref defaults
  2 files changed, 7 insertions(+)
 
 diff --git a/chrome/browser/metrics/chrome_feature_list_creator.cc b/chrome/browser/metrics/chrome_feature_list_creator.cc
-index 90e572fe4efe1baa00ca8218dbcb3a5d0ad36ddb..02e4f7e5bb847c8325151fec1ce08f53ec061433 100644
+index f45f66f62c3a0bf6dfd27ae06269e08b2713fb36..6dfa082e223f66d1a571ca7d414d944f39cc6b62 100644
 --- a/chrome/browser/metrics/chrome_feature_list_creator.cc
 +++ b/chrome/browser/metrics/chrome_feature_list_creator.cc
-@@ -6,6 +6,7 @@
- 
+@@ -8,6 +8,7 @@
+ #include <utility>
  #include <vector>
  
 +#include "aerium/defaults/aerium_defaults.h"
+ #include "base/base64.h"
  #include "base/command_line.h"
  #include "base/files/file_path.h"
- #include "base/memory/scoped_refptr.h"
-@@ -63,6 +64,7 @@ ChromeFeatureListCreator::~ChromeFeatureListCreator() = default;
+@@ -69,6 +70,7 @@ ChromeFeatureListCreator::~ChromeFeatureListCreator() = default;
  void ChromeFeatureListCreator::CreateFeatureList() {
    CreatePrefService();
    ConvertFlagsToSwitches();
@@ -29,7 +29,7 @@ index 90e572fe4efe1baa00ca8218dbcb3a5d0ad36ddb..02e4f7e5bb847c8325151fec1ce08f53
    SetupInitialPrefs();
    SetUpFieldTrials();
 diff --git a/chrome/browser/prefs/browser_prefs.cc b/chrome/browser/prefs/browser_prefs.cc
-index 35b02686a1d21b4311b222b85f2041a2c2cd5949..e832e772ef056f32709a3b028fabc013c9fff880 100644
+index 334da9ad62b59013c44ba6335072e433157f40d6..ca8e7bf8938e2638a42944f23e352a4aed5b3bd8 100644
 --- a/chrome/browser/prefs/browser_prefs.cc
 +++ b/chrome/browser/prefs/browser_prefs.cc
 @@ -9,6 +9,7 @@
@@ -40,7 +40,7 @@ index 35b02686a1d21b4311b222b85f2041a2c2cd5949..e832e772ef056f32709a3b028fabc013
  #include "ash/constants/ash_login_pref_names.h"
  #include "base/files/file_path.h"
  #include "base/files/file_util.h"
-@@ -1846,6 +1847,8 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
+@@ -1985,6 +1986,8 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
        policy::policy_prefs::kLocalNetworkAccessPermissionsPolicyDefaultEnabled,
        false);
  
@@ -49,7 +49,7 @@ index 35b02686a1d21b4311b222b85f2041a2c2cd5949..e832e772ef056f32709a3b028fabc013
    // This is intentionally last.
    RegisterLocalStatePrefsForMigration(registry);
  }
-@@ -2401,6 +2404,8 @@ void RegisterUserProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
+@@ -2543,6 +2546,8 @@ void RegisterUserProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
    ash::LegacyTokenHandleFetcher::RegisterPrefs(registry);
    ash::TokenHandleStoreImpl::RegisterPrefs(registry);
  #endif

@@ -8,10 +8,10 @@ Subject: [PATCH] Host the Aerium settings surface
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java
-index c8ad42fa1d113cc33297ac8a9db6d9ab1f9415b7..978706674e2830eabe854bcd05f01e64acd45314 100644
+index 2a29455c8de8367b6f54bf9ca0aefd04c306781f..6eb47932f427b22f37f4c05de8f74d26906501db 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java
-@@ -566,10 +566,18 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
+@@ -536,10 +536,18 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
  
      private Fragment instantiateMainFragment(Intent intent) {
          String fragmentName = intent.getStringExtra(EXTRA_SHOW_FRAGMENT);

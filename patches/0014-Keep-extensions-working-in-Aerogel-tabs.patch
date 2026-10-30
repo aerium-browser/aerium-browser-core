@@ -14,13 +14,13 @@ Subject: [PATCH] Keep extensions working in Aerogel tabs
  7 files changed, 33 insertions(+), 12 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 93a99e55529546178b97fffc1cac82d75ba28fd8..aa5a78af0dfb977831b3e546edbe713d97701e97 100644
+index 0e926865ba33954b799318e2ae0e0b5d9a2f606c..5478da5109f3397c031e7a015e5b25d58b4ff33a 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -1285,15 +1285,17 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -1292,15 +1292,17 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
                          defaultPaneId);
          // TODO(crbug.com/444024982): Preserve default pane via PaneListBuilder.
-         var builder = mHubProvider.getPaneListBuilder();
+         var builder = hubProvider.getPaneListBuilder();
 -        if (!IncognitoUtils.shouldOpenIncognitoAsWindow()
 -                || mSupportedProfileType == SupportedProfileType.REGULAR) {
 +        boolean singleProfileWindow =
@@ -39,10 +39,10 @@ index 93a99e55529546178b97fffc1cac82d75ba28fd8..aa5a78af0dfb977831b3e546edbe713d
              builder.registerPane(
                      PaneId.INCOGNITO_TAB_SWITCHER,
 diff --git a/chrome/browser/extensions/api/tabs/tabs_api.cc b/chrome/browser/extensions/api/tabs/tabs_api.cc
-index 2a631eb9fc793cbe52e820e86d6434a73caa6fae..f0425028726dbad6a8d46c714d09bd13e9e5a9c0 100644
+index e9ffa4e9b622730762408e30a7c7cb1eaab28b44..e687a6006589a1eb54990d7f54a35a77e11c19ea 100644
 --- a/chrome/browser/extensions/api/tabs/tabs_api.cc
 +++ b/chrome/browser/extensions/api/tabs/tabs_api.cc
-@@ -1918,6 +1918,9 @@ base::ListValue TabsQueryFunction::BuildTabList(
+@@ -632,6 +632,9 @@ base::ListValue TabsQueryFunction::BuildTabList(
      }
  
      TabListInterface* tab_list = TabListInterface::From(browser);
@@ -53,10 +53,10 @@ index 2a631eb9fc793cbe52e820e86d6434a73caa6fae..f0425028726dbad6a8d46c714d09bd13
        if (tab_index > -1 && i != tab_index) {
          continue;
 diff --git a/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java b/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java
-index 82919be542dab3d77fbc23a16c66f4b37825fa89..a5abe6925fadb1afbc0a13114dc14df643399a0e 100644
+index 363eb2dc2d2f2a56a0a70af64416425b022874b2..e510f52c6035ffe04d8dc0030bb7f07ac934ec29 100644
 --- a/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java
 +++ b/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java
-@@ -27,7 +27,6 @@ import org.chromium.chrome.browser.profiles.Profile;
+@@ -29,7 +29,6 @@ import org.chromium.chrome.browser.profiles.Profile;
  import org.chromium.chrome.browser.profiles.ProfileKey;
  import org.chromium.chrome.browser.profiles.ProfileKeyUtil;
  import org.chromium.chrome.browser.profiles.ProfileManager;
@@ -64,7 +64,7 @@ index 82919be542dab3d77fbc23a16c66f4b37825fa89..a5abe6925fadb1afbc0a13114dc14df6
  import org.chromium.ui.display.DisplayUtil;
  
  /** Utilities for working with incognito tabs spread across multiple activities. */
-@@ -134,13 +133,7 @@ public class IncognitoUtils {
+@@ -139,13 +138,7 @@ public class IncognitoUtils {
          if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
              return false;
          }
@@ -103,10 +103,10 @@ index d08378d6b30fe4d91ec847e77a3ed92a5bd4e9c2..b4db68a6018cb22ea073908262edbbed
                "ProfileDestroyer::DestroyOTRProfileWhenAppropriateWithTimeout",
                [&](perfetto::EventContext ctx) {
 diff --git a/content/browser/web_contents/web_contents_impl.cc b/content/browser/web_contents/web_contents_impl.cc
-index f038e08ea02c4f60ccad698018fa7505b3dc10bd..e01d1cac5d35e34a2a046b3441824913bf89dd08 100644
+index 9cef52109c698811042ff7deaee38a295b47d9aa..abed27f57548bf9d4559e73bcd6dd695b264c340 100644
 --- a/content/browser/web_contents/web_contents_impl.cc
 +++ b/content/browser/web_contents/web_contents_impl.cc
-@@ -837,6 +837,15 @@ WebContents* WebContents::FromRenderViewHost(RenderViewHost* rvh) {
+@@ -835,6 +835,15 @@ WebContents* WebContents::FromRenderViewHost(RenderViewHost* rvh) {
        static_cast<RenderViewHostImpl*>(rvh)->GetDelegate());
  }
  
@@ -123,7 +123,7 @@ index f038e08ea02c4f60ccad698018fa7505b3dc10bd..e01d1cac5d35e34a2a046b3441824913
    OPTIONAL_TRACE_EVENT1(TRACE_DISABLED_BY_DEFAULT("content.verbose"),
                          "WebContents::FromRenderFrameHost", "render_frame_host",
 diff --git a/content/public/browser/web_contents.h b/content/public/browser/web_contents.h
-index 29358322a5dc5983109cb0350ef3914e36efcf9f..4a5e06555dde2c344e223aace1e03c6f6b0b811a 100644
+index fde5f306d77d8614dbc8d9a1a1710e3ab38ac01c..9fad749a1bd09edf7a007371cbf9360705a110bf 100644
 --- a/content/public/browser/web_contents.h
 +++ b/content/public/browser/web_contents.h
 @@ -447,6 +447,9 @@ class WebContents : public PageNavigator, public base::SupportsUserData {

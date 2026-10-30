@@ -9,10 +9,10 @@ Subject: [PATCH] Build the omnibox without VR icons
  2 files changed, 8 insertions(+)
 
 diff --git a/chrome/browser/ui/omnibox/omnibox_edit_model.cc b/chrome/browser/ui/omnibox/omnibox_edit_model.cc
-index e1d5a40954aeebee8449a3a0617b7c39c7c87ded..53fa543f16936652ee8b3552a22c1ea3acac6bdb 100644
+index 7c03135dc2f3f5dadeae92d6de0add61e062471f..8f90769732f2a15b92d75bfb07f2fdc6c1c5d8f1 100644
 --- a/chrome/browser/ui/omnibox/omnibox_edit_model.cc
 +++ b/chrome/browser/ui/omnibox/omnibox_edit_model.cc
-@@ -1996,11 +1996,15 @@ gfx::Image OmniboxEditModel::GetMatchIcon(const AutocompleteMatch& match,
+@@ -2005,11 +2005,15 @@ gfx::Image OmniboxEditModel::GetMatchIcon(const AutocompleteMatch& match,
      }
    }
  
@@ -29,10 +29,10 @@ index e1d5a40954aeebee8449a3a0617b7c39c7c87ded..53fa543f16936652ee8b3552a22c1ea3
  
  gfx::Image OmniboxEditModel::GetMatchIconIfExtension(
 diff --git a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
-index dc0975fd520ff89f405ed2e13bf1fdcefcd1c88c..7261bd40e01cea0d133a75a02f122c37630cb205 100644
+index d817230d7e0456e488f0f5ce25315fb04f4f6a96..e0bb661f71fb8fe0a586988cb50091ad222ce233 100644
 --- a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
 +++ b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
-@@ -1000,6 +1000,7 @@ SearchboxHandler::CreateAutocompleteMatch(
+@@ -1007,6 +1007,7 @@ SearchboxHandler::CreateAutocompleteMatch(
    mojom_match->destination_url = match.destination_url;
    mojom_match->suggestion_group_id =
        match.suggestion_group_id.value_or(omnibox::GROUP_INVALID);
@@ -40,7 +40,7 @@ index dc0975fd520ff89f405ed2e13bf1fdcefcd1c88c..7261bd40e01cea0d133a75a02f122c37
    const bool is_bookmarked =
        bookmark_model->IsBookmarked(match.destination_url);
    // For starter pack suggestions, use template url to generate proper vector
-@@ -1010,6 +1011,7 @@ SearchboxHandler::CreateAutocompleteMatch(
+@@ -1017,6 +1018,7 @@ SearchboxHandler::CreateAutocompleteMatch(
            : turl_service->GetTemplateURLForKeyword(match.associated_keyword);
    mojom_match->icon_path = AutocompleteIconToResourceName(
        match.GetVectorIcon(is_bookmarked, associated_keyword_turl));
@@ -48,7 +48,7 @@ index dc0975fd520ff89f405ed2e13bf1fdcefcd1c88c..7261bd40e01cea0d133a75a02f122c37
    OverrideIconPaths(match, mojom_match.get());
    mojom_match->icon_url = match.icon_url;
    // For featured enterprise search suggestions, use template url to generate
-@@ -1057,7 +1059,9 @@ SearchboxHandler::CreateAutocompleteMatch(
+@@ -1050,7 +1052,9 @@ SearchboxHandler::CreateAutocompleteMatch(
  #endif
        std::string icon_path;
        if (action->GetIconImage().IsEmpty()) {

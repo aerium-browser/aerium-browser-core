@@ -53,10 +53,10 @@ index 7a440c9893ae493a243211f7dc4f67f4256e86f7..6bc1be4f78be92c6dcfe0b541d0af39a
          if (mRelativePath.isEmpty()) return new String[0];
          return mRelativePath.split("/");
 diff --git a/extensions/browser/unpacked_installer.cc b/extensions/browser/unpacked_installer.cc
-index c3626959e73aeabd49e1e1d546062d48779a417b..ccb5619fbcf5f9ed43bb321d7f831aee135948a4 100644
+index 91814e1612bdc2795f285234df2e8b359b0def61..f45f96974ff7599b468e1743e42d0e544cf3b0b5 100644
 --- a/extensions/browser/unpacked_installer.cc
 +++ b/extensions/browser/unpacked_installer.cc
-@@ -324,9 +324,17 @@ bool UnpackedInstaller::LoadExtension(mojom::ManifestLocation location,
+@@ -317,9 +317,17 @@ bool UnpackedInstaller::LoadExtension(mojom::ManifestLocation location,
    extension_ =
        file_util::LoadExtension(extension_path_, location, flags, error);
  
