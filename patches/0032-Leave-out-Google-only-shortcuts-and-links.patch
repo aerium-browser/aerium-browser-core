@@ -7,12 +7,13 @@ Subject: [PATCH] Leave out Google only shortcuts and links
  .../res/xml/legal_information_preferences.xml | 12 ------
  .../feedback/HelpAndFeedbackLauncherImpl.java |  3 +-
  .../browser/ntp/IncognitoDescriptionView.java | 42 ++-----------------
+ .../SettingsCustomTabLauncherImpl.java        |  6 ++-
  ...llbackHelpAndFeedbackLauncherDelegate.java |  8 +---
  .../HelpAndFeedbackLauncherDelegate.java      |  2 +-
  .../ImageDescriptionsController.java          |  3 +-
  .../browser/lens/LensSupportStatusHelper.java |  3 +-
  .../omnibox/omnibox_pedal_implementations.cc  |  5 ---
- 8 files changed, 10 insertions(+), 68 deletions(-)
+ 9 files changed, 15 insertions(+), 69 deletions(-)
 
 diff --git a/chrome/android/java/res/xml/legal_information_preferences.xml b/chrome/android/java/res/xml/legal_information_preferences.xml
 index 32067c19d4f7a37a229d9437847c7809b7c30df0..8998689617e278fc0dda63a960e7f4c031b6f16b 100644
@@ -102,6 +103,23 @@ index d76fc6eedd75def3d10001aff6bc67365520e5ae..b4384228621c8df784559390b20cb4e8
      }
  
      /** Adjust the Cookie Controls Card. */
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsCustomTabLauncherImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsCustomTabLauncherImpl.java
+index 75b4d46a5cfc356ed1139ce72c6296fcbb877a43..7cb40492d279ecae91be3353ac695f99d33d1738 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsCustomTabLauncherImpl.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsCustomTabLauncherImpl.java
+@@ -22,7 +22,11 @@ public class SettingsCustomTabLauncherImpl implements SettingsCustomTabLauncher
+     public void openUrlInCct(Context context, String url) {
+         CustomTabsIntent customTabIntent =
+                 new CustomTabsIntent.Builder().setShowTitle(true).build();
+-        customTabIntent.intent.setData(Uri.parse(url));
++        String target =
++                url.startsWith("https://support.google.com/")
++                        ? "https://aerium-browser.github.io/"
++                        : url;
++        customTabIntent.intent.setData(Uri.parse(target));
+         Intent intent =
+                 LaunchIntentDispatcher.createCustomTabActivityIntent(
+                         context, customTabIntent.intent);
 diff --git a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java
 index 75434944628628f4d2aff5e31600af2baa831a11..13a41ef605b8d762d042321a7300cd2b3e8b85ab 100644
 --- a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java
