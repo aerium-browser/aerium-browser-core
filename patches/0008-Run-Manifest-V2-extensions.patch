@@ -4,15 +4,33 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Run Manifest V2 extensions
 
 ---
+ chrome/browser/extensions/extension_management.cc          | 4 +---
  chrome/common/extensions/api/_api_features.json            | 1 +
  chrome/common/extensions/api/_manifest_features.json       | 2 +-
  chrome/common/extensions/api/api_sources.gni               | 7 ++-----
  .../browser/api/webstore_private/webstore_private_api.cc   | 4 +++-
  extensions/browser/manifest_v2_handler.cc                  | 4 +++-
+ extensions/browser/manifest_v2_util.cc                     | 4 +---
+ extensions/common/extension.cc                             | 6 ------
  extensions/common/extension_features.cc                    | 2 ++
  extensions/common/extension_features.h                     | 2 ++
- 7 files changed, 14 insertions(+), 8 deletions(-)
+ 10 files changed, 16 insertions(+), 20 deletions(-)
 
+diff --git a/chrome/browser/extensions/extension_management.cc b/chrome/browser/extensions/extension_management.cc
+index b15e80f839ac5b9a791e86c403cb33915b43c580..b33d39494ab22f02edac68dca7134bdb94eececb 100644
+--- a/chrome/browser/extensions/extension_management.cc
++++ b/chrome/browser/extensions/extension_management.cc
+@@ -468,9 +468,7 @@ bool ExtensionManagement::IsAllowedByUnpackedDeveloperModePolicy(
+     return true;
+   }
+ 
+-  bool in_developer_mode =
+-      profile_->GetPrefs()->GetBoolean(prefs::kExtensionsUIDeveloperMode);
+-  return in_developer_mode;
++  return true;
+ }
+ 
+ // static
 diff --git a/chrome/common/extensions/api/_api_features.json b/chrome/common/extensions/api/_api_features.json
 index 340a5e03acf188fde1469511ef43e080baf4bde5..ba52cd5a88140e2064838583c836a6b025084749 100644
 --- a/chrome/common/extensions/api/_api_features.json
@@ -110,6 +128,38 @@ index 5841d3dfbc88884916629485c70b7c2671a6bc6b..631c3c0430275fd28be5b6966f4c6494
  }
  
  }  // namespace
+diff --git a/extensions/browser/manifest_v2_util.cc b/extensions/browser/manifest_v2_util.cc
+index 08d7786b3bb06f38ba37cf821295d0f8ef347cca..5aee0f90f338356f24fb4c0d7db43902947709fa 100644
+--- a/extensions/browser/manifest_v2_util.cc
++++ b/extensions/browser/manifest_v2_util.cc
+@@ -39,9 +39,7 @@ bool IsExtensionAffected(int manifest_version,
+     return false;
+   }
+ 
+-  // The extension is an MV2 (or lower) extension; we should warn the user
+-  // about it.
+-  return true;
++  return false;
+ }
+ 
+ }  // namespace extensions::manifest_v2_util
+diff --git a/extensions/common/extension.cc b/extensions/common/extension.cc
+index 28a3cac3756c7dab50819987ab0a924678042a43..538a937aca01e41dc6f40c96dd02f6d77ed1388c 100644
+--- a/extensions/common/extension.cc
++++ b/extensions/common/extension.cc
+@@ -97,12 +97,6 @@ bool IsManifestSupported(int manifest_version,
+   // Supported versions are always safe.
+   if (manifest_version >= kMinimumSupportedManifestVersion &&
+       manifest_version <= kMaximumSupportedManifestVersion) {
+-    // Emit a warning for unpacked extensions on Manifest V2 warning that
+-    // MV2 is deprecated.
+-    if (type == Manifest::Type::kExtension && manifest_version == 2 &&
+-        Manifest::IsUnpackedLocation(location)) {
+-      *warning = errors::kManifestV2IsDeprecatedWarning;
+-    }
+     return true;
+   }
+ 
 diff --git a/extensions/common/extension_features.cc b/extensions/common/extension_features.cc
 index 9652d229fb1e836445e74c3e19a7b60887527216..410808899b4939fbd8344df9199a01930fb17221 100644
 --- a/extensions/common/extension_features.cc
