@@ -43,7 +43,7 @@ index aca2c0f617170073aa2b6c97df80959c897060bb..c2168a2daa8c8e2b7f6df793cb5790b1
              flags |= (1 << (int) LockReason.A11Y_ENABLED);
          }
 diff --git a/chrome/browser/flag-metadata.json b/chrome/browser/flag-metadata.json
-index c13a2b3ccacdaef04a7ac1fe774560fafcdcc924..4430e30afe3168e348790a9e3a83ce26dfee805c 100644
+index d2d12fc34ae92aa4092096bc602f2f7c63376d10..6a92f27a25b87f1b1d7ae7381163a8a40b51f738 100644
 --- a/chrome/browser/flag-metadata.json
 +++ b/chrome/browser/flag-metadata.json
 @@ -223,7 +223,7 @@

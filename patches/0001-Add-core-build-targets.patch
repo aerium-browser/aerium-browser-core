@@ -49,10 +49,10 @@ index 6ed792010ee90f07562ce80b34afe5fe722df299..f02b13d39ca5dc05e4fab6cb13642237
        "../browser/share/android/java/src/org/chromium/chrome/browser/share/link_to_text/LinkToTextBridge.java",
        "../browser/share/android/java/src/org/chromium/chrome/browser/share/long_screenshots/bitmap_generation/LongScreenshotsTabService.java",
 diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
-index 33a6696fd803af080bb0a7d71b66e06d6950f86d..3382cc8d844e49ea54e35280fd8c9b21f0f887a6 100644
+index 5aa5b0447d68508bd5224b84ec040617c9a136ac..fd724115831c3fdf1ea6a3d91a330078c7abdaf8 100644
 --- a/chrome/browser/BUILD.gn
 +++ b/chrome/browser/BUILD.gn
-@@ -3285,7 +3285,10 @@ source_set("browser") {
+@@ -3286,7 +3286,10 @@ source_set("browser") {
    # TODO(https://crbug.com/356905053): Add more dependencies here and merge this
    # block with the `enable_extensions` block above.
    if (enable_desktop_android_extensions) {

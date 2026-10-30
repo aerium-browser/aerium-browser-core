@@ -9,7 +9,7 @@ Subject: [PATCH] Build the omnibox without VR icons
  2 files changed, 8 insertions(+)
 
 diff --git a/chrome/browser/ui/omnibox/omnibox_edit_model.cc b/chrome/browser/ui/omnibox/omnibox_edit_model.cc
-index 34572bb41b54d01f1b8b7bd713afb1bcb1cdd126..d7a16bdb87614f7665470486d65c61c30b756dd9 100644
+index e1d5a40954aeebee8449a3a0617b7c39c7c87ded..53fa543f16936652ee8b3552a22c1ea3acac6bdb 100644
 --- a/chrome/browser/ui/omnibox/omnibox_edit_model.cc
 +++ b/chrome/browser/ui/omnibox/omnibox_edit_model.cc
 @@ -1996,11 +1996,15 @@ gfx::Image OmniboxEditModel::GetMatchIcon(const AutocompleteMatch& match,
@@ -29,7 +29,7 @@ index 34572bb41b54d01f1b8b7bd713afb1bcb1cdd126..d7a16bdb87614f7665470486d65c61c3
  
  gfx::Image OmniboxEditModel::GetMatchIconIfExtension(
 diff --git a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
-index 2990268524a24b718532357d2200bbd202964121..74e96bd9c257d4839cab85a666ce05b13214cc48 100644
+index dc0975fd520ff89f405ed2e13bf1fdcefcd1c88c..7261bd40e01cea0d133a75a02f122c37630cb205 100644
 --- a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
 +++ b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
 @@ -1000,6 +1000,7 @@ SearchboxHandler::CreateAutocompleteMatch(
