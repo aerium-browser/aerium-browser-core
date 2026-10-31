@@ -37,7 +37,7 @@ index 32067c19d4f7a37a229d9437847c7809b7c30df0..8998689617e278fc0dda63a960e7f4c0
 -        app:url="@string/google_privacy_policy_url" />
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java
-index b2efe1f4727f29e96c95da3033f9f9069769cd9d..c0f82810591fe736d94d650a7c2dbf46c2f8a17c 100644
+index b2efe1f4727f29e96c95da3033f9f9069769cd9d..6ea23aaf900e4a2f5ae89ae0b85dff708d9b88f1 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java
 @@ -38,8 +38,7 @@ import java.util.Map;
@@ -46,7 +46,7 @@ index b2efe1f4727f29e96c95da3033f9f9069769cd9d..c0f82810591fe736d94d650a7c2dbf46
  public class HelpAndFeedbackLauncherImpl implements HelpAndFeedbackLauncher {
 -    protected static final String FALLBACK_SUPPORT_URL =
 -            "https://support.google.com/chrome/topic/6069782";
-+    protected static final String FALLBACK_SUPPORT_URL = "https://aerium-browser.github.io/";
++    protected static final String FALLBACK_SUPPORT_URL = "https://aeriumbrowser.com/";
  
      private static @Nullable ProfileKeyedMap<HelpAndFeedbackLauncher> sProfileToLauncherMap;
      private final HelpAndFeedbackLauncherDelegate mDelegate;
@@ -104,7 +104,7 @@ index d76fc6eedd75def3d10001aff6bc67365520e5ae..b4384228621c8df784559390b20cb4e8
  
      /** Adjust the Cookie Controls Card. */
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsCustomTabLauncherImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsCustomTabLauncherImpl.java
-index 75b4d46a5cfc356ed1139ce72c6296fcbb877a43..7cb40492d279ecae91be3353ac695f99d33d1738 100644
+index 75b4d46a5cfc356ed1139ce72c6296fcbb877a43..b3439df5b10e15ddee50069b57116ec32ba6615d 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsCustomTabLauncherImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsCustomTabLauncherImpl.java
 @@ -22,7 +22,11 @@ public class SettingsCustomTabLauncherImpl implements SettingsCustomTabLauncher
@@ -114,7 +114,7 @@ index 75b4d46a5cfc356ed1139ce72c6296fcbb877a43..7cb40492d279ecae91be3353ac695f99
 -        customTabIntent.intent.setData(Uri.parse(url));
 +        String target =
 +                url.startsWith("https://support.google.com/")
-+                        ? "https://aerium-browser.github.io/"
++                        ? "https://aeriumbrowser.com/"
 +                        : url;
 +        customTabIntent.intent.setData(Uri.parse(target));
          Intent intent =
@@ -147,7 +147,7 @@ index 75434944628628f4d2aff5e31600af2baa831a11..13a41ef605b8d762d042321a7300cd2b
  
      @Override
 diff --git a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java
-index 6d2020a781dc18d35c3ed8694ab9b721377db8f2..bf6bec8f627ca9a58fce8463611d854c4cab0256 100644
+index 6d2020a781dc18d35c3ed8694ab9b721377db8f2..8af77c8d93b464de5cc59dc4dc4568e746e92208 100644
 --- a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java
 +++ b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java
 @@ -17,7 +17,7 @@ import org.chromium.build.annotations.Nullable;
@@ -155,7 +155,7 @@ index 6d2020a781dc18d35c3ed8694ab9b721377db8f2..bf6bec8f627ca9a58fce8463611d854c
  @NullMarked
  public interface HelpAndFeedbackLauncherDelegate {
 -    String FALLBACK_SUPPORT_URL = "https://support.google.com/chrome/topic/6069782";
-+    String FALLBACK_SUPPORT_URL = "https://aerium-browser.github.io/";
++    String FALLBACK_SUPPORT_URL = "https://aeriumbrowser.com/";
      String P_LINK_URL_PREFIX = "https://support.google.com/chrome/?p=";
  
      /**

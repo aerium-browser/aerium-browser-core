@@ -7,5 +7,5 @@ contact_links:
     url: https://issues.chromium.org/issues
     about: If it also happens in Chrome or another Chromium browser, report it upstream instead.
   - name: Aerium project site
-    url: https://aerium-browser.github.io
+    url: https://aeriumbrowser.com
     about: Downloads, documentation and what this build changes.

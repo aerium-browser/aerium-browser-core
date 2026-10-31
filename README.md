@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://aerium-browser.github.io/brand/product_logo_256.png" width="110" alt="Aerium">
+<img src="https://aeriumbrowser.com/brand/product_logo_256.png" width="110" alt="Aerium">
 
 # Aerium
 
@@ -14,7 +14,7 @@ uBlock Origin in full, Manifest V2 included, on current Chromium.
 [![Latest Chromium](https://img.shields.io/badge/dynamic/json?style=flat-square&color=2A4485&label=latest%20Chromium&query=%24%5B0%5D.version&url=https%3A%2F%2Fchromiumdash.appspot.com%2Ffetch_releases%3Fchannel%3DStable%26platform%3DAndroid%26num%3D1)](https://chromiumdash.appspot.com/releases?platform=Android)
 [![License](https://img.shields.io/badge/license-GPLv3-2A4485?style=flat-square)](LICENSE)
 
-[**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aerium-browser.github.io) &nbsp;&nbsp;|&nbsp;&nbsp; [Get it with Obtainium](https://aerium-browser.github.io/obtainium/)
+[**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com) &nbsp;&nbsp;|&nbsp;&nbsp; [Get it with Obtainium](https://aeriumbrowser.com/obtainium/)
 
 <a href="https://alternativeto.net/software/aerium-browser/about/?utm_source=badge&utm_medium=referral"><img src="https://alternativeto.net/static/badges/badge-compact-color.svg" height="48" alt="Aerium on AlternativeTo"></a>&nbsp;
 <a href="https://www.androidauthority.com/google-chrome-alternatives-android-based-on-chromium-3726016/#:~:text=Honorable%20mentions"><img src="badges/android-authority.svg" height="48" alt="Featured in Android Authority"></a>
@@ -65,7 +65,7 @@ Most Android browsers can't run extensions. The few that could stopped following
 1. Download the APK from [Releases](https://github.com/aerium-browser/aerium-browser-core/releases/latest).
 2. Open the Chrome Web Store and add uBlock Origin. The store opens in its desktop layout by itself.
 
-Prefer automatic updates? Add this repository to [Obtainium](https://aerium-browser.github.io/obtainium/).
+Prefer automatic updates? Add this repository to [Obtainium](https://aeriumbrowser.com/obtainium/).
 
 ## How it's built
 
@@ -93,7 +93,7 @@ Questions, ideas, bug reports or just want to say what you think? Head to [Discu
 
 ## Support
 
-No ads, no investors, no data sales. If Aerium is useful to you, consider a donation in [Monero](https://aerium-browser.github.io/donate/xmr) or [Litecoin](https://aerium-browser.github.io/donate/ltc). A star helps too.
+No ads, no investors, no data sales. If Aerium is useful to you, consider a donation in [Monero](https://aeriumbrowser.com/donate/xmr) or [Litecoin](https://aeriumbrowser.com/donate/ltc). A star helps too.
 
 ## License
 
