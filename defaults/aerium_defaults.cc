@@ -49,6 +49,7 @@ constexpr const char* kFeaturesOff[] = {
     "BrowsingTopics",
     "ConversionMeasurement",
     "DetailedLanguageSettings",
+    "ExtensionsPinnedByDefault",
     "Glic",
     "InterestFeedV2",
     "MediaDrmPreprovisioning",
