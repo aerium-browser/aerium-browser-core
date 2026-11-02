@@ -1,0 +1,116 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Keep the browser from calling Google in the background
+
+---
+ services/network/url_loader_factory.cc | 75 ++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
+
+diff --git a/services/network/url_loader_factory.cc b/services/network/url_loader_factory.cc
+index 541b9e627d41503f8b17984e15a7e6359d0df1ea..8867b80af8cf7590b1118b526157e50d452afc72 100644
+--- a/services/network/url_loader_factory.cc
++++ b/services/network/url_loader_factory.cc
+@@ -7,6 +7,7 @@
+ #include <memory>
+ #include <optional>
+ #include <string>
++#include <string_view>
+ #include <utility>
+ 
+ #include "base/check_op.h"
+@@ -19,6 +20,7 @@
+ #include "net/base/isolation_info.h"
+ #include "net/cookies/cookie_constants.h"
+ #include "net/cookies/cookie_setting_override.h"
++#include "net/traffic_annotation/network_traffic_annotation.h"
+ #include "net/url_request/url_request_context.h"
+ #include "services/network/cookie_manager.h"
+ #include "services/network/cookie_settings.h"
+@@ -75,6 +77,70 @@ ObserverWrapper<T> CreateObserverWrapper(
+       remote_for_fallback_ptr ? remote_for_fallback_ptr.get() : nullptr);
+ }
+ 
++bool AeriumIsGoogleHost(std::string_view host) {
++  static constexpr std::string_view kDomains[] = {
++      "google.com",          "googleapis.com",        "gstatic.com",
++      "gvt1.com",            "gvt2.com",              "gvt3.com",
++      "googleusercontent.com", "ggpht.com",           "google-analytics.com",
++      "googletagmanager.com", "googlesyndication.com", "googleadservices.com",
++      "doubleclick.net",     "app-measurement.com",
++  };
++  for (std::string_view domain : kDomains) {
++    if (host == domain) {
++      return true;
++    }
++    if (host.size() > domain.size() && host.ends_with(domain) &&
++        host[host.size() - domain.size() - 1] == '.') {
++      return true;
++    }
++  }
++  return false;
++}
++
++bool AeriumBlocksBrowserRequest(const ResourceRequest& request,
++                                int32_t annotation) {
++  if (request.mode == mojom::RequestMode::kNavigate) {
++    return false;
++  }
++  const GURL& url = request.url;
++  if (!url.SchemeIsHTTPOrHTTPS()) {
++    return false;
++  }
++  std::string_view host = url.host();
++  if (!AeriumIsGoogleHost(host)) {
++    return false;
++  }
++  if (host == "translate.googleapis.com" ||
++      host == "translate-pa.googleapis.com" ||
++      host == "clients2.googleusercontent.com") {
++    return false;
++  }
++  if (host == "clients2.google.com" &&
++      url.path().starts_with("/service/update2/crx")) {
++    return false;
++  }
++  static constexpr int32_t kAllowed[] = {
++      net::internal::ComputeAnnotationHash("omnibox_suggest"),
++      net::internal::ComputeAnnotationHash("extension_crx_fetcher"),
++      net::internal::ComputeAnnotationHash("extension_manifest_fetcher"),
++      net::internal::ComputeAnnotationHash("webstore_installer"),
++      net::internal::ComputeAnnotationHash("webstore_install_helper"),
++      net::internal::ComputeAnnotationHash("translate_url_fetcher"),
++      net::internal::ComputeAnnotationHash("download_manager_resume"),
++      net::internal::ComputeAnnotationHash("render_view_context_menu"),
++      net::internal::ComputeAnnotationHash("renderer_initiated_download"),
++      net::internal::ComputeAnnotationHash("download_web_contents_frame"),
++      net::internal::ComputeAnnotationHash("parallel_download_job"),
++      net::internal::ComputeAnnotationHash("save_file_manager"),
++  };
++  for (int32_t allowed : kAllowed) {
++    if (annotation == allowed) {
++      return false;
++    }
++  }
++  return true;
++}
++
+ }  // namespace
+ 
+ constexpr int URLLoaderFactory::kMaxKeepaliveConnections;
+@@ -208,6 +274,15 @@ void URLLoaderFactory::CreateLoaderAndStartWithSyncClient(
+   // have been rejected at the CorsURLLoader layer.
+   DCHECK(!resource_request.trusted_params || params_->is_trusted);
+ 
++  if (params_->process_id.is_browser() &&
++      AeriumBlocksBrowserRequest(resource_request,
++                                 traffic_annotation.unique_id_hash_code)) {
++    URLLoaderCompletionStatus status(net::ERR_BLOCKED_BY_CLIENT);
++    status.completion_time = base::TimeTicks::Now();
++    mojo::Remote<mojom::URLLoaderClient>(std::move(client))->OnComplete(status);
++    return;
++  }
++
+   if (resource_request.web_bundle_token_params.has_value() &&
+       resource_request.destination !=
+           network::mojom::RequestDestination::kWebBundle) {
