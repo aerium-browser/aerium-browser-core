@@ -4,11 +4,11 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Keep the browser from calling Google in the background
 
 ---
- services/network/url_loader_factory.cc | 75 ++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+ services/network/url_loader_factory.cc | 81 ++++++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
 
 diff --git a/services/network/url_loader_factory.cc b/services/network/url_loader_factory.cc
-index 541b9e627d41503f8b17984e15a7e6359d0df1ea..8867b80af8cf7590b1118b526157e50d452afc72 100644
+index 541b9e627d41503f8b17984e15a7e6359d0df1ea..87ee3effca24ec06a6be79f53ed994ca268c6a4c 100644
 --- a/services/network/url_loader_factory.cc
 +++ b/services/network/url_loader_factory.cc
 @@ -7,6 +7,7 @@
@@ -27,7 +27,7 @@ index 541b9e627d41503f8b17984e15a7e6359d0df1ea..8867b80af8cf7590b1118b526157e50d
  #include "net/url_request/url_request_context.h"
  #include "services/network/cookie_manager.h"
  #include "services/network/cookie_settings.h"
-@@ -75,6 +77,70 @@ ObserverWrapper<T> CreateObserverWrapper(
+@@ -75,6 +77,76 @@ ObserverWrapper<T> CreateObserverWrapper(
        remote_for_fallback_ptr ? remote_for_fallback_ptr.get() : nullptr);
  }
  
@@ -64,12 +64,18 @@ index 541b9e627d41503f8b17984e15a7e6359d0df1ea..8867b80af8cf7590b1118b526157e50d
 +  if (!AeriumIsGoogleHost(host)) {
 +    return false;
 +  }
-+  if (host == "translate.googleapis.com" ||
-+      host == "translate-pa.googleapis.com" ||
-+      host == "clients2.googleusercontent.com") {
-+    return false;
++  static constexpr std::string_view kAllowedHosts[] = {
++      "translate.googleapis.com",      "translate-pa.googleapis.com",
++      "translate.google.com",          "translate.googleusercontent.com",
++      "chromewebstore.google.com",     "chrome.google.com",
++      "chromewebstore.googleapis.com", "clients2.googleusercontent.com",
++  };
++  for (std::string_view allowed : kAllowedHosts) {
++    if (host == allowed) {
++      return false;
++    }
 +  }
-+  if (host == "clients2.google.com" &&
++  if ((host == "clients2.google.com" || host == "update.googleapis.com") &&
 +      url.path().starts_with("/service/update2/crx")) {
 +    return false;
 +  }
@@ -98,7 +104,7 @@ index 541b9e627d41503f8b17984e15a7e6359d0df1ea..8867b80af8cf7590b1118b526157e50d
  }  // namespace
  
  constexpr int URLLoaderFactory::kMaxKeepaliveConnections;
-@@ -208,6 +274,15 @@ void URLLoaderFactory::CreateLoaderAndStartWithSyncClient(
+@@ -208,6 +280,15 @@ void URLLoaderFactory::CreateLoaderAndStartWithSyncClient(
    // have been rejected at the CorsURLLoader layer.
    DCHECK(!resource_request.trusted_params || params_->is_trusted);
  
