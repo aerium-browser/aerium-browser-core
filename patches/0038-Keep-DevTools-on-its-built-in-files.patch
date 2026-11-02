@@ -1,0 +1,58 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Keep DevTools on its built in files
+
+---
+ chrome/browser/devtools/devtools_window.cc                  | 4 ++++
+ chrome/browser/ui/webui/devtools/devtools_ui_data_source.cc | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/chrome/browser/devtools/devtools_window.cc b/chrome/browser/devtools/devtools_window.cc
+index e9803277eecb82c0769b02e3e48207d110b781af..72d303702aa02905c28b690ea542acbd8e6d7c04 100644
+--- a/chrome/browser/devtools/devtools_window.cc
++++ b/chrome/browser/devtools/devtools_window.cc
+@@ -1454,8 +1454,12 @@ GURL DevToolsWindow::GetDevToolsURL(Profile* profile,
+                                     bool browser_connection) {
+   std::string url;
+ 
++#if BUILDFLAG(IS_ANDROID)
++  std::string remote_base = "?";
++#else
+   std::string remote_base =
+       "?remoteBase=" + DevToolsUI::GetRemoteBaseURL().spec();
++#endif
+ 
+   const std::string valid_frontend =
+       frontend_url.empty() ? chrome::kChromeUIDevToolsURL : frontend_url;
+diff --git a/chrome/browser/ui/webui/devtools/devtools_ui_data_source.cc b/chrome/browser/ui/webui/devtools/devtools_ui_data_source.cc
+index 31bea976c80bdff0aa10c761d406ff7b13665b97..f3c4feb1ec6f699e616a7412695fbaaee5767b79 100644
+--- a/chrome/browser/ui/webui/devtools/devtools_ui_data_source.cc
++++ b/chrome/browser/ui/webui/devtools/devtools_ui_data_source.cc
+@@ -18,6 +18,7 @@
+ #include "base/strings/strcat.h"
+ #include "base/strings/string_util.h"
+ #include "base/task/thread_pool.h"
++#include "build/build_config.h"
+ #include "chrome/browser/devtools/devtools_ui_bindings.h"
+ #include "chrome/browser/devtools/url_constants.h"
+ #include "chrome/common/chrome_paths.h"
+@@ -185,6 +186,10 @@ void DevToolsDataSource::StartDataRequest(
+   remote_path_prefix += "/";
+   if (base::StartsWith(path, remote_path_prefix,
+                        base::CompareCase::INSENSITIVE_ASCII)) {
++#if BUILDFLAG(IS_ANDROID)
++    std::move(callback).Run(CreateNotFoundResponse());
++    return;
++#else
+     if (MaybeHandleCustomRequest(path.substr(remote_path_prefix.length()),
+                                  &callback)) {
+       return;
+@@ -201,6 +206,7 @@ void DevToolsDataSource::StartDataRequest(
+       std::move(callback).Run(CreateNotFoundResponse());
+     }
+     return;
++#endif
+   }
+ 
+   // Serve request to devtools://custom from custom URL.
