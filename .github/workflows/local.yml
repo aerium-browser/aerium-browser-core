@@ -1,0 +1,103 @@
+# Copyright 2026 Aerium Browser
+# SPDX-License-Identifier: GPL-3.0-only
+
+name: Local build
+run-name: ${{ inputs.kind == 'release' && format('Release build{0}', inputs.arch == 'x64' && ' x64' || '') || format('Local build {0}', inputs.arch) }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      fresh:
+        description: 'Delete the kept Chromium tree and start from scratch'
+        type: boolean
+        required: false
+        default: false
+      arch:
+        description: 'arm64 for phones, x64 for emulators and Chromebooks'
+        type: choice
+        options:
+          - arm64
+          - x64
+        default: arm64
+      kind:
+        description: 'beta goes only to the private Telegram channel, release publishes a draft release'
+        type: choice
+        options:
+          - beta
+          - release
+        default: beta
+
+permissions:
+  contents: read
+
+concurrency:
+  group: local-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: [self-hosted, linux, x64, aerium]
+    timeout-minutes: 1440
+    env:
+      AERIUM_FLAVOR: full
+      AERIUM_UI_DIR: ${{ github.workspace }}/ui
+      AERIUM_APK_BASE: aerium
+      AERIUM_KIND: ${{ inputs.kind }}
+      AERIUM_TARGET_CPU: ${{ inputs.arch }}
+      JOB_TIMEOUT_MIN: '100000'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          clean: false
+          submodules: false
+
+      - name: Check out the Aerium layer
+        uses: actions/checkout@v5
+        with:
+          repository: aerium-browser/aerium-browser-ui
+          ssh-key: ${{ secrets.AERIUM_UI_KEY }}
+          path: ui
+          clean: false
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Start from scratch
+        if: ${{ inputs.fresh }}
+        run: rm -rf chromium/src
+
+      - name: Clear old output
+        run: rm -rf release stage-diag.txt
+
+      - name: Build
+        env:
+          LOCAL_TEST_JKS: ${{ secrets.LOCAL_TEST_JKS }}
+          STORE_TEST_JKS: ${{ secrets.STORE_TEST_JKS }}
+        run: |
+          chmod +x ./*.sh
+          mkdir -p "$HOME/aerium-logs"
+          log="$HOME/aerium-logs/build-${{ github.run_number }}.log"
+          echo "Build output goes to $log on the runner."
+          ./build.sh > "$log" 2>&1
+
+      - name: Send the beta to Telegram
+        if: ${{ inputs.kind == 'beta' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_API_ID: ${{ secrets.TELEGRAM_API_ID }}
+          TELEGRAM_API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+        run: bash ./.github/scripts/telegram-beta.sh
+
+      - name: Upload the release APK
+        if: ${{ inputs.kind == 'release' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: aerium-full-${{ inputs.arch }}
+          path: ${{ github.workspace }}/release/
+          retention-days: 30
+          compression-level: 0
+          overwrite: true
+
+      - name: Point to the build log
+        if: ${{ failure() }}
+        run: echo "Build failed. Read $HOME/aerium-logs/build-${{ github.run_number }}.log on the runner."
