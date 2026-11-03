@@ -39,10 +39,10 @@ index 0e926865ba33954b799318e2ae0e0b5d9a2f606c..5478da5109f3397c031e7a015e5b25d5
              builder.registerPane(
                      PaneId.INCOGNITO_TAB_SWITCHER,
 diff --git a/chrome/browser/extensions/api/tabs/tabs_api.cc b/chrome/browser/extensions/api/tabs/tabs_api.cc
-index e9ffa4e9b622730762408e30a7c7cb1eaab28b44..e687a6006589a1eb54990d7f54a35a77e11c19ea 100644
+index 2378fcd5dab04ff287f0d09aa5bc201a24430580..d584b9c8062872093449801603845c6cf38ed481 100644
 --- a/chrome/browser/extensions/api/tabs/tabs_api.cc
 +++ b/chrome/browser/extensions/api/tabs/tabs_api.cc
-@@ -632,6 +632,9 @@ base::ListValue TabsQueryFunction::BuildTabList(
+@@ -633,6 +633,9 @@ base::ListValue TabsQueryFunction::BuildTabList(
      }
  
      TabListInterface* tab_list = TabListInterface::From(browser);
@@ -103,7 +103,7 @@ index d08378d6b30fe4d91ec847e77a3ed92a5bd4e9c2..b4db68a6018cb22ea073908262edbbed
                "ProfileDestroyer::DestroyOTRProfileWhenAppropriateWithTimeout",
                [&](perfetto::EventContext ctx) {
 diff --git a/content/browser/web_contents/web_contents_impl.cc b/content/browser/web_contents/web_contents_impl.cc
-index 9cef52109c698811042ff7deaee38a295b47d9aa..abed27f57548bf9d4559e73bcd6dd695b264c340 100644
+index a2704216f1c2ab5dd47fe347a310d37c4b927735..aa504b8c6e069560cb97e880d0bf58ee95938559 100644
 --- a/content/browser/web_contents/web_contents_impl.cc
 +++ b/content/browser/web_contents/web_contents_impl.cc
 @@ -835,6 +835,15 @@ WebContents* WebContents::FromRenderViewHost(RenderViewHost* rvh) {

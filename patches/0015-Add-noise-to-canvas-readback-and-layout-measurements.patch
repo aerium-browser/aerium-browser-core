@@ -17,7 +17,7 @@ Subject: [PATCH] Add noise to canvas readback and layout measurements
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 
 diff --git a/third_party/blink/renderer/core/dom/element.cc b/third_party/blink/renderer/core/dom/element.cc
-index 45c7ba4d30cc400f259e1153ee32f6ae49686947..c70261b2e3572abf13e764f9cf173c97799ac632 100644
+index 755950af16f2786df2ff357f0d830d8666b8e6d3..df48bfa06499898d6e0c216b17c8efe44cf3e032 100644
 --- a/third_party/blink/renderer/core/dom/element.cc
 +++ b/third_party/blink/renderer/core/dom/element.cc
 @@ -307,6 +307,7 @@
