@@ -6,7 +6,7 @@
 
 **The Android browser that runs real Chrome extensions.**
 
-uBlock Origin in full, Manifest V2 included, on current Chromium.
+uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 
 [![Release](https://img.shields.io/github/v/release/aerium-browser/aerium-browser-core?style=flat-square&label=release&color=2A4485)](https://github.com/aerium-browser/aerium-browser-core/releases/latest)
 [![Downloads](https://img.shields.io/badge/downloads-15k%2B-2A4485?style=flat-square)](https://github.com/aerium-browser/aerium-browser-core/releases)
@@ -45,7 +45,6 @@ Most Android browsers can't run extensions. The few that could stopped following
 |  | Most browsers | Older extension browsers | **Aerium** |
 |---|:---:|:---:|:---:|
 | Chrome Web Store extensions | ✗ | ✓ | **✓** |
-| Manifest V2 (full uBlock Origin) | ✗ | ✓ | **✓** |
 | Up to date Chromium | ✓ | ✗ | **✓** |
 | Built straight on Chromium, no fork in between | ✓ | ✗ | **✓** |
 | Aerium Guard privacy presets | ✗ | ✗ | **✓** |
@@ -63,7 +62,7 @@ Most Android browsers can't run extensions. The few that could stopped following
 ## Install
 
 1. Download the APK from [Releases](https://github.com/aerium-browser/aerium-browser-core/releases/latest).
-2. Open the Chrome Web Store and add uBlock Origin. The store opens in its desktop layout by itself.
+2. Pick uBlock Origin Lite during setup, or add any extension from the Chrome Web Store. The store opens in its desktop layout by itself.
 
 Prefer automatic updates? Add this repository to [Obtainium](https://aeriumbrowser.com/obtainium/).
 
