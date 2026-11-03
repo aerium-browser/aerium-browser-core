@@ -93,7 +93,7 @@ Questions, ideas, bug reports or just want to say what you think? Head to [Discu
 
 ## Support
 
-No ads, no investors, no data sales. If Aerium is useful to you, consider a donation in [Monero](https://aeriumbrowser.com/donate/xmr), [Litecoin](https://aeriumbrowser.com/donate/ltc) or [Bitcoin Lightning](https://aeriumbrowser.com/donate/btc). A star helps too.
+No ads, no investors, no data sales. Aerium is built in spare time and paid for out of pocket. Donations go to real costs like the Google Play developer fee and the domain. If Aerium is useful to you, any amount in [Monero](https://aeriumbrowser.com/donate/xmr), [Litecoin](https://aeriumbrowser.com/donate/ltc) or [Bitcoin Lightning](https://aeriumbrowser.com/donate/btc) helps. A star helps too.
 
 ## License
 
