@@ -12,7 +12,7 @@ Subject: [PATCH] Open aerium pages
  5 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
-index 90ea0196dbf5c91dfc2d9f04a5c65d23cbcedd36..f4ea8bdc6e9a03d1ebbd568138bbf9a2c418606f 100644
+index 90ea0196dbf5c91dfc2d9f04a5c65d23cbcedd36..87d2ea0d272d44f6b286802d0fd5a29be5f04f68 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
 @@ -1046,6 +1046,10 @@ class TabImpl implements Tab, TabInternal {
@@ -20,7 +20,7 @@ index 90ea0196dbf5c91dfc2d9f04a5c65d23cbcedd36..f4ea8bdc6e9a03d1ebbd568138bbf9a2
          try {
              TraceEvent.begin("Tab.loadUrl");
 +            String typedUrl = params.getUrl();
-+            if (typedUrl.regionMatches(true, 0, "aerium://", 0, 9)) {
++            if (typedUrl != null && typedUrl.regionMatches(true, 0, "aerium://", 0, 9)) {
 +                params.setUrl("chrome://" + typedUrl.substring(9));
 +            }
              if (maybeHandleBeforeUnload(() -> loadUrl(params))) {
