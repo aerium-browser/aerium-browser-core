@@ -21,9 +21,24 @@ uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 
 <br>
 
-<img src="screenshots/extensions.webp" width="23%" alt="Extensions">&nbsp;
+<img src="screenshots/welcome.webp" width="23%" alt="Welcome">&nbsp;
+<img src="screenshots/onboarding-guard.webp" width="23%" alt="Pick your protection">&nbsp;
+<img src="screenshots/onboarding-extensions.webp" width="23%" alt="Add extensions">&nbsp;
+<img src="screenshots/onboarding-look.webp" width="23%" alt="Your look">
+
 <img src="screenshots/new-tab.webp" width="23%" alt="New tab">&nbsp;
+<img src="screenshots/browsing.webp" width="23%" alt="Browsing">&nbsp;
+<img src="screenshots/site-panel.webp" width="23%" alt="Site panel">&nbsp;
+<img src="screenshots/extensions-sheet.webp" width="23%" alt="Extensions on this page">
+
+<img src="screenshots/tabs.webp" width="23%" alt="Tabs">&nbsp;
+<img src="screenshots/aerogel.webp" width="23%" alt="Aerogel tabs">&nbsp;
+<img src="screenshots/menu.webp" width="23%" alt="Menu">&nbsp;
+<img src="screenshots/toolbar.webp" width="23%" alt="Toolbar layouts">
+
+<img src="screenshots/settings.webp" width="23%" alt="Settings">&nbsp;
 <img src="screenshots/settings-guard.webp" width="23%" alt="Aerium Guard">&nbsp;
+<img src="screenshots/extensions.webp" width="23%" alt="Extensions">&nbsp;
 <img src="screenshots/settings-backup.webp" width="23%" alt="Backup and restore">
 
 </div>
