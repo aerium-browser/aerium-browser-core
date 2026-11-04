@@ -86,10 +86,6 @@ Fork it and run the **Build** workflow, it builds on GitHub runners and resumes 
 
 Questions, ideas, bug reports or just want to say what you think? Head to [Discussions](https://github.com/aerium-browser/aerium-browser-core/discussions). It's the best place to reach us and other Aerium users, and it's where we post news about upcoming releases. Before opening an issue, take a quick look there, your question may already be answered.
 
-## Community
-
-Questions, ideas, bug reports or just want to say what you think? Head to [Discussions](https://github.com/aerium-browser/aerium-browser-core/discussions). It's the best place to reach us and other Aerium users, and it's where we post news about upcoming releases. Before opening an issue, take a quick look there, your question may already be answered.
-
 ## Support
 
 No ads, no investors, no data sales. Aerium is built in spare time and paid for out of pocket. Many independent browsers before it were abandoned because nobody could keep paying for them, and Aerium can not go much further without your support either. Donations go to real costs like the Google Play developer fee and the domain. If Aerium is useful to you, any amount in [Monero](https://aeriumbrowser.com/donate/xmr), [Litecoin](https://aeriumbrowser.com/donate/ltc) or [Bitcoin Lightning](https://aeriumbrowser.com/donate/btc) keeps it alive. A star helps too.
