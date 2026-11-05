@@ -45,6 +45,7 @@ constexpr char kFeaturesOffSwitch[] = "aerium-features-off";
 
 constexpr const char* kFeaturesOff[] = {
     "AbusiveOriginNotificationPermissionRevocation",
+    "AimEnabled",
     "AutofillServerCommunication",
     "BrowsingTopics",
     "ConversionMeasurement",
