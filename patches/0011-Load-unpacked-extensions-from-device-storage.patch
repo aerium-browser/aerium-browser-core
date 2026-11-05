@@ -4,18 +4,18 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Load unpacked extensions from device storage
 
 ---
- .../org/chromium/base/VirtualDocumentPath.java   | 16 ++++++++++++++--
- extensions/browser/unpacked_installer.cc         | 14 +++++++++++---
- extensions/common/extension_l10n_util.cc         | 14 ++++++++++++++
- extensions/common/extension_l10n_util.h          |  4 ++++
- .../manifest_handlers/default_locale_handler.cc  |  2 ++
- 5 files changed, 45 insertions(+), 5 deletions(-)
+ .../org/chromium/base/VirtualDocumentPath.java  | 17 +++++++++++++++++
+ extensions/browser/unpacked_installer.cc        | 14 +++++++++++---
+ extensions/common/extension_l10n_util.cc        | 14 ++++++++++++++
+ extensions/common/extension_l10n_util.h         |  4 ++++
+ .../manifest_handlers/default_locale_handler.cc |  2 ++
+ 5 files changed, 48 insertions(+), 3 deletions(-)
 
 diff --git a/base/android/java/src/org/chromium/base/VirtualDocumentPath.java b/base/android/java/src/org/chromium/base/VirtualDocumentPath.java
-index 7a440c9893ae493a243211f7dc4f67f4256e86f7..6bc1be4f78be92c6dcfe0b541d0af39a87955cc4 100644
+index 5597fdda7b44554d5293d0fabfc7e2a00a4c7db0..8f1d6b4fb3d8f34e77f830ce8bef78ec05adf6f0 100644
 --- a/base/android/java/src/org/chromium/base/VirtualDocumentPath.java
 +++ b/base/android/java/src/org/chromium/base/VirtualDocumentPath.java
-@@ -51,6 +51,8 @@ class VirtualDocumentPath {
+@@ -82,6 +82,8 @@ class VirtualDocumentPath {
  
      private static final String VIRTUAL_PATH_MARKER = "SAF";
      private static final String TREE_PATH = "tree";
@@ -23,37 +23,38 @@ index 7a440c9893ae493a243211f7dc4f67f4256e86f7..6bc1be4f78be92c6dcfe0b541d0af39a
 +            "com.android.externalstorage.documents";
  
      private final String mAuthority;
-     private final String mEncodedTreeId;
-@@ -166,8 +168,9 @@ class VirtualDocumentPath {
-         String documentId = DocumentsContract.getTreeDocumentId(tree);
-         assert treeId.equals(documentId);
- 
--        // TODO(crbug.com/406136787): create a fast path for com.android.externalstorage.documents,
--        // which is known to use the relative paths directly as document IDs.
+     private final String mTreeId;
+@@ -210,6 +212,10 @@ class VirtualDocumentPath {
+     @CalledByNative
+     ResolveResult resolveDocument() {
+         Uri tree = DocumentsContract.buildTreeDocumentUri(mAuthority, mTreeId);
 +        if (EXTERNAL_STORAGE_AUTHORITY.equals(mAuthority)) {
-+            return resolveByRelativeDocumentId(tree, treeId);
++            ResolveResult direct = resolveByRelativeDocumentId(tree);
++            if (direct != null) return direct;
 +        }
- 
-         String[] columns = {
-             DocumentsContract.Document.COLUMN_DISPLAY_NAME,
-@@ -313,6 +316,15 @@ class VirtualDocumentPath {
-                 names[names.length - 1]);
+         Uri rootUri = DocumentsContract.buildDocumentUriUsingTree(tree, mTreeId);
+         ResolveResult current = queryDocument(tree, rootUri, null);
+         for (String name : mRelativePath) {
+@@ -224,6 +230,17 @@ class VirtualDocumentPath {
+         return current;
      }
  
-+    private @Nullable Uri resolveByRelativeDocumentId(Uri tree, String treeId) {
-+        String documentId = treeId;
-+        if (!mRelativePath.isEmpty()) {
-+            documentId += treeId.endsWith(":") ? mRelativePath : "/" + mRelativePath;
++    private @Nullable ResolveResult resolveByRelativeDocumentId(Uri tree) {
++        String documentId = mTreeId;
++        if (mRelativePath.length > 0) {
++            String relative = String.join("/", mRelativePath);
++            documentId += mTreeId.endsWith(":") ? relative : "/" + relative;
 +        }
 +        Uri uri = DocumentsContract.buildDocumentUriUsingTree(tree, documentId);
-+        return contentUriExists(uri) ? uri : null;
++        ResolveResult result = queryDocument(tree, uri, null);
++        return result.status == FileError.FILE_OK ? result : null;
 +    }
 +
-     private String[] relativePathComponents() {
-         if (mRelativePath.isEmpty()) return new String[0];
-         return mRelativePath.split("/");
+     private ResolveResult resolveChild(Uri parentDocumentUri, String name) {
+         Uri tree = DocumentsContract.buildTreeDocumentUri(mAuthority, mTreeId);
+         String parentDocId = DocumentsContract.getDocumentId(parentDocumentUri);
 diff --git a/extensions/browser/unpacked_installer.cc b/extensions/browser/unpacked_installer.cc
-index 91814e1612bdc2795f285234df2e8b359b0def61..f45f96974ff7599b468e1743e42d0e544cf3b0b5 100644
+index 642115f8e65cd59f3d3b70f49f35fe12741a862d..f176797e78f8293feef507337c0a32facf8d8d05 100644
 --- a/extensions/browser/unpacked_installer.cc
 +++ b/extensions/browser/unpacked_installer.cc
 @@ -317,9 +317,17 @@ bool UnpackedInstaller::LoadExtension(mojom::ManifestLocation location,

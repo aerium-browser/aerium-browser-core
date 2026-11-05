@@ -22,7 +22,7 @@ index 57eadce73652b553b10ef5889bfc836958f03df8..e426ab02d9d686afef5213dd7014b334
  
      /** Builds a promo view object for the corresponding access point. */
 diff --git a/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoMediator.java b/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoMediator.java
-index e543af7c6fdf140e3c1179a26fea61349b3cd8ca..6eea91e6aa6f34e2ad5ae46f2aaa1ef2ca80a872 100644
+index def310d5db4c9b678af822a0c9239dafc267ee86..8f4cc6a30d6d8b9b7a45c1faa05e11111f6a50e1 100644
 --- a/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoMediator.java
 +++ b/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoMediator.java
 @@ -162,7 +162,7 @@ final class SigninPromoMediator

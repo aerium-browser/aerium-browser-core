@@ -8,10 +8,10 @@ Subject: [PATCH] Leave the search button off the JavaScript optimization page
  1 file changed, 4 insertions(+)
 
 diff --git a/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleCategorySettings.java b/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleCategorySettings.java
-index 9575bc80e41ec719770493a5051246093c1a569b..508659356b0452bd8aa206bf9c5404c8d384463e 100644
+index e67868eba8f269445d8c80ead213f167fe5de65a..a1740413fd4df11efc7f1c05b4f24eb0f1bc2f40 100644
 --- a/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleCategorySettings.java
 +++ b/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleCategorySettings.java
-@@ -593,6 +593,10 @@ public class SingleCategorySettings extends BaseSiteSettingsFragment
+@@ -594,6 +594,10 @@ public class SingleCategorySettings extends BaseSiteSettingsFragment
                  getActivity(),
                  assumeNonNull(mSearchViewObserver),
                  this::onSearchQueryChanged);

@@ -14,7 +14,7 @@ Subject: [PATCH] Keep extensions working in Aerogel tabs
  7 files changed, 33 insertions(+), 12 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 0e926865ba33954b799318e2ae0e0b5d9a2f606c..5478da5109f3397c031e7a015e5b25d58b4ff33a 100644
+index d536a1c832561e3f73c1ceefc45e01d3fe996415..4f83c243c9fbc45c27819a26fc3a0ca3c9834f70 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -1292,15 +1292,17 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
@@ -39,10 +39,10 @@ index 0e926865ba33954b799318e2ae0e0b5d9a2f606c..5478da5109f3397c031e7a015e5b25d5
              builder.registerPane(
                      PaneId.INCOGNITO_TAB_SWITCHER,
 diff --git a/chrome/browser/extensions/api/tabs/tabs_api.cc b/chrome/browser/extensions/api/tabs/tabs_api.cc
-index 2378fcd5dab04ff287f0d09aa5bc201a24430580..d584b9c8062872093449801603845c6cf38ed481 100644
+index de78a212cda49cdaedb23674e30ceec3db56807f..4738d4a19bba27ab97f5e899516ccf628fa57a01 100644
 --- a/chrome/browser/extensions/api/tabs/tabs_api.cc
 +++ b/chrome/browser/extensions/api/tabs/tabs_api.cc
-@@ -633,6 +633,9 @@ base::ListValue TabsQueryFunction::BuildTabList(
+@@ -637,6 +637,9 @@ base::ListValue TabsQueryFunction::BuildTabList(
      }
  
      TabListInterface* tab_list = TabListInterface::From(browser);
@@ -80,7 +80,7 @@ index 363eb2dc2d2f2a56a0a70af64416425b022874b2..e510f52c6035ffe04d8dc0030bb7f07a
  
      /**
 diff --git a/chrome/browser/profiles/profile_destroyer.cc b/chrome/browser/profiles/profile_destroyer.cc
-index d08378d6b30fe4d91ec847e77a3ed92a5bd4e9c2..b4db68a6018cb22ea073908262edbbed6628e8ce 100644
+index b21c05ff433ccd22ffc29ccfe0301cbd90afe142..5445ed114d98bf8fd8e4dc79ddfe63e070a5237c 100644
 --- a/chrome/browser/profiles/profile_destroyer.cc
 +++ b/chrome/browser/profiles/profile_destroyer.cc
 @@ -23,6 +23,7 @@
@@ -91,7 +91,7 @@ index d08378d6b30fe4d91ec847e77a3ed92a5bd4e9c2..b4db68a6018cb22ea073908262edbbed
  
  namespace {
  
-@@ -202,6 +203,10 @@ void ProfileDestroyer::DestroyOTRProfileWhenAppropriateWithTimeout(
+@@ -204,6 +205,10 @@ void ProfileDestroyer::DestroyOTRProfileWhenAppropriateWithTimeout(
    if (GetPendingDestroyerForProfile(profile))
      return;
  
@@ -103,10 +103,10 @@ index d08378d6b30fe4d91ec847e77a3ed92a5bd4e9c2..b4db68a6018cb22ea073908262edbbed
                "ProfileDestroyer::DestroyOTRProfileWhenAppropriateWithTimeout",
                [&](perfetto::EventContext ctx) {
 diff --git a/content/browser/web_contents/web_contents_impl.cc b/content/browser/web_contents/web_contents_impl.cc
-index a2704216f1c2ab5dd47fe347a310d37c4b927735..aa504b8c6e069560cb97e880d0bf58ee95938559 100644
+index a2638c29d409ebe008a9c3487aa6dfb093c36500..52d5763495dc690127f15ea110dd084da26067e2 100644
 --- a/content/browser/web_contents/web_contents_impl.cc
 +++ b/content/browser/web_contents/web_contents_impl.cc
-@@ -835,6 +835,15 @@ WebContents* WebContents::FromRenderViewHost(RenderViewHost* rvh) {
+@@ -831,6 +831,15 @@ WebContents* WebContents::FromRenderViewHost(RenderViewHost* rvh) {
        static_cast<RenderViewHostImpl*>(rvh)->GetDelegate());
  }
  
@@ -123,10 +123,10 @@ index a2704216f1c2ab5dd47fe347a310d37c4b927735..aa504b8c6e069560cb97e880d0bf58ee
    OPTIONAL_TRACE_EVENT1(TRACE_DISABLED_BY_DEFAULT("content.verbose"),
                          "WebContents::FromRenderFrameHost", "render_frame_host",
 diff --git a/content/public/browser/web_contents.h b/content/public/browser/web_contents.h
-index fde5f306d77d8614dbc8d9a1a1710e3ab38ac01c..9fad749a1bd09edf7a007371cbf9360705a110bf 100644
+index 1c5e61a5aabc589826fe44976a4a7718bcae09be..9161f32368de7761194fdbae8f540518adab95f0 100644
 --- a/content/public/browser/web_contents.h
 +++ b/content/public/browser/web_contents.h
-@@ -447,6 +447,9 @@ class WebContents : public PageNavigator, public base::SupportsUserData {
+@@ -445,6 +445,9 @@ class WebContents : public PageNavigator, public base::SupportsUserData {
    //   one case where a RenderFrameHost can be active but not primary.
    CONTENT_EXPORT static WebContents* FromRenderFrameHost(RenderFrameHost* rfh);
  
@@ -137,7 +137,7 @@ index fde5f306d77d8614dbc8d9a1a1710e3ab38ac01c..9fad749a1bd09edf7a007371cbf93607
    // return nullptr if the RenderFrameHost is shutting down.
    CONTENT_EXPORT static WebContents* FromFrameTreeNodeId(
 diff --git a/extensions/browser/process_manager.cc b/extensions/browser/process_manager.cc
-index d097a45600c4b40ea984d6935c49f5c2b8cbbd6f..e399c2e9ca7464cc2d53eab6f78166e4351638bb 100644
+index 7422ff493a308a1cd014640e429b499e68d735b9..42b5ec79c7774abd5f1dc1c019d2bc60754164a3 100644
 --- a/extensions/browser/process_manager.cc
 +++ b/extensions/browser/process_manager.cc
 @@ -23,6 +23,7 @@
@@ -148,7 +148,7 @@ index d097a45600c4b40ea984d6935c49f5c2b8cbbd6f..e399c2e9ca7464cc2d53eab6f78166e4
  #include "components/back_forward_cache/back_forward_cache_disable.h"
  #include "components/back_forward_cache/disabled_reason_id.h"
  #include "content/public/browser/browser_context.h"
-@@ -212,7 +213,12 @@ ProcessManager::ProcessManager(BrowserContext* context,
+@@ -213,7 +214,12 @@ ProcessManager::ProcessManager(BrowserContext* context,
  
    // Only the original profile needs to listen for ready to create background
    // pages for all spanning extensions.

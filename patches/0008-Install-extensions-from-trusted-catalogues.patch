@@ -8,7 +8,7 @@ Subject: [PATCH] Install extensions from trusted catalogues
  1 file changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/browser/download/download_crx_util.cc b/chrome/browser/download/download_crx_util.cc
-index 77e32a025e1086f24fa2c7549438ecdb9f7019f5..dab7642c0cec613f558e639a258f5218fc76c31c 100644
+index d6c2c8d29f2014c3deff7d7833348d2e20d3e9e8..d83f2b7c64852e049d98fd6a741cb8d8c2339fc0 100644
 --- a/chrome/browser/download/download_crx_util.cc
 +++ b/chrome/browser/download/download_crx_util.cc
 @@ -7,6 +7,8 @@

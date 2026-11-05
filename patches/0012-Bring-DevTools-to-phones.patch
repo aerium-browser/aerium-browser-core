@@ -12,10 +12,10 @@ Subject: [PATCH] Bring DevTools to phones
  5 files changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java
-index 7ec43d454a6c9dc2e8278de9643f34756786181c..5aadb357551aedec514f80c723a7b684f622ede7 100644
+index 62ed84b70331dcbad872c3d4cee07b3918a7657c..3f655c726e1959b0891a2467b9559236830bc708 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java
-@@ -519,6 +519,9 @@ public abstract class BaseCustomTabActivity extends ChromeActivity {
+@@ -524,6 +524,9 @@ public abstract class BaseCustomTabActivity extends ChromeActivity {
                  assumeNonNull(mIntentDataProvider);
                  switch (mIntentDataProvider.getCustomTabMode()) {
                      case CustomTabProfileType.INCOGNITO:
@@ -26,7 +26,7 @@ index 7ec43d454a6c9dc2e8278de9643f34756786181c..5aadb357551aedec514f80c723a7b684
                          // the same primary OTR profile associated with the requester's profile.
                          if (mIntentDataProvider.getUiType() == CustomTabsUiType.POPUP) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/devtools/DevToolsActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/devtools/DevToolsActivity.java
-index dc0fd3076ff9efd4cdfd179c06d6f9c6384cd1f9..2e4056b0131252f6777281cab11d110c9662982d 100644
+index 20de203ce2720fe9b1340c6d9ae5980d50598556..310b1c7d3a1871b7ca99c5b810582c939c4fbb76 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/devtools/DevToolsActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/devtools/DevToolsActivity.java
 @@ -31,6 +31,8 @@ import org.chromium.content_public.browser.WebContents;
@@ -83,10 +83,10 @@ index 6b03859660fb2fa2df8a6c6d77e51024a1264711..7768e0038e74a72e457ee945cb31a5a9
      public Intent getIntent() {
          return mIntent;
 diff --git a/chrome/browser/devtools/android/java/src/org/chromium/chrome/browser/devtools/DevToolsWindowAndroid.java b/chrome/browser/devtools/android/java/src/org/chromium/chrome/browser/devtools/DevToolsWindowAndroid.java
-index 4b6e043626a02ee68b408726e8f7c4faf112eb3f..2a0fab35c2ee1a2e2a150daf45bd21bf106350d6 100644
+index e1c0cdadf5ba5420a4efbd85e241fe751cb8144b..4022fc52f77f1be46dc9df6321b4df3d517a3634 100644
 --- a/chrome/browser/devtools/android/java/src/org/chromium/chrome/browser/devtools/DevToolsWindowAndroid.java
 +++ b/chrome/browser/devtools/android/java/src/org/chromium/chrome/browser/devtools/DevToolsWindowAndroid.java
-@@ -14,7 +14,6 @@ import org.chromium.chrome.browser.profiles.Profile;
+@@ -16,7 +16,6 @@ import org.chromium.chrome.browser.ui.browser_window.ChromeAndroidTask.NativeBro
  import org.chromium.content_public.browser.ContentFeatureList;
  import org.chromium.content_public.browser.ContentFeatureMap;
  import org.chromium.content_public.browser.WebContents;
@@ -94,7 +94,7 @@ index 4b6e043626a02ee68b408726e8f7c4faf112eb3f..2a0fab35c2ee1a2e2a150daf45bd21bf
  
  /** DevToolsWindowAndroid provides an interface to control DevTools windows. */
  @NullMarked
-@@ -24,8 +23,7 @@ public class DevToolsWindowAndroid {
+@@ -26,8 +25,7 @@ public class DevToolsWindowAndroid {
      private DevToolsWindowAndroid() {}
  
      public static boolean isDevToolsAvailable(Context context) {

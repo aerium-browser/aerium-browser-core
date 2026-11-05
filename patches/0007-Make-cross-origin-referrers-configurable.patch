@@ -71,12 +71,12 @@ index e5258679dd876490012a756f7e10cfb64541cbe6..a4a8e6717dab2d724780e12adc32b190
  }
  
 diff --git a/net/base/features.cc b/net/base/features.cc
-index 59c6ac9e179062a6438434602dc40c8fa0c1a2af..f9de15974ca714b87cc73e4fd191a769817a25cd 100644
+index 3a3f3a0b0bbba686a0935a3ee24662ae99a4e4b4..7450c3efffbafb5da8376a4093f3b2296a0f058c 100644
 --- a/net/base/features.cc
 +++ b/net/base/features.cc
-@@ -1086,5 +1086,12 @@ BASE_FEATURE_PARAM(int,
-                    &kQuicSocketSendBufferSize,
-                    -1);
+@@ -1126,5 +1126,12 @@ BASE_FEATURE(kCookieMonsterPerKeyDelete, base::FEATURE_DISABLED_BY_DEFAULT);
+ 
+ BASE_FEATURE(kHttpChunkedDecoderInRust, base::FEATURE_DISABLED_BY_DEFAULT);
  
 +BASE_FEATURE(kAeriumCrossOriginReferrer, base::FEATURE_DISABLED_BY_DEFAULT);
 +BASE_FEATURE_PARAM(int,
@@ -88,12 +88,12 @@ index 59c6ac9e179062a6438434602dc40c8fa0c1a2af..f9de15974ca714b87cc73e4fd191a769
  }  // namespace net::features
  
 diff --git a/net/base/features.h b/net/base/features.h
-index 377ae9e8fc3ce6ba8f83dd640c427d6fdfbbf855..48a880487e7fb78434bd4e77684fe9ca915e88c7 100644
+index b589550d3fe9e8abe09b323b323e5a0f77671e42..343ac8f270ac788d39628be9de4b43f78868a560 100644
 --- a/net/base/features.h
 +++ b/net/base/features.h
-@@ -1075,6 +1075,9 @@ NET_EXPORT BASE_DECLARE_FEATURE(kEnableWindowsTcpLoopbackFastFail);
- NET_EXPORT BASE_DECLARE_FEATURE(kQuicSocketSendBufferSize);
- NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int, kQuicSocketSendBufferSizeParam);
+@@ -1101,6 +1101,9 @@ NET_EXPORT BASE_DECLARE_FEATURE(kCookieMonsterPerKeyDelete);
+ // Enables the Rust implementation of the HTTP chunked decoder, called via FFI.
+ NET_EXPORT BASE_DECLARE_FEATURE(kHttpChunkedDecoderInRust);
  
 +NET_EXPORT BASE_DECLARE_FEATURE(kAeriumCrossOriginReferrer);
 +NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int, kAeriumCrossOriginReferrerMode);

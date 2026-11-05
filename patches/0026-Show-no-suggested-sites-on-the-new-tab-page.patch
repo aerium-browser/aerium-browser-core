@@ -8,10 +8,10 @@ Subject: [PATCH] Show no suggested sites on the new tab page
  1 file changed, 9 deletions(-)
 
 diff --git a/chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.cc b/chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.cc
-index e97af3e79ba5d63ad3f07c6848181eec86d737ba..4182888c44b7cb8652ea5c5630f29dc26673a97b 100644
+index 146ea52abf68bbd99cc45eff7193dfa455d45ea7..6df801e9b1305e994eed578c375876a321c8fa1c 100644
 --- a/chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.cc
 +++ b/chrome/browser/ntp_tiles/chrome_most_visited_sites_factory.cc
-@@ -37,16 +37,7 @@
+@@ -36,16 +36,7 @@
  namespace {
  
  bool ShouldCreatePopularSites(Profile* profile) {
@@ -26,5 +26,5 @@ index e97af3e79ba5d63ad3f07c6848181eec86d737ba..4182888c44b7cb8652ea5c5630f29dc2
    return false;
 -#endif
  }
- 
- bool ShouldCreateCustomLinksManager() {
+ bool ShouldCreateEnterpriseShortcutsManager() {
+ #if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || \

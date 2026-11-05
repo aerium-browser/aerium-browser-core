@@ -21,12 +21,12 @@ index e778aefef2c32caa29253d80ce46da0a02fa1f73..a65cd32c6a735c655cd7ef39ae54558c
  <style>
    @media (prefers-color-scheme: dark) {
 diff --git a/front_end/panels/settings/settingsScreen.css b/front_end/panels/settings/settingsScreen.css
-index edaaf1ad90b100e7ff91de55faa64848bf9032e4..9a1f91cd169043a6644609099bd909ca30747ec2 100644
+index 8628dc9de1d629161182169b9a39261401a4a4fd..ed6400a1fec39bf756f55a604770f9886d56dd77 100644
 --- a/front_end/panels/settings/settingsScreen.css
 +++ b/front_end/panels/settings/settingsScreen.css
-@@ -195,3 +195,13 @@ devtools-button.link-icon {
- .greendev-widgets input[type="radio"] {
-   margin: var(--sys-size-4);
+@@ -191,3 +191,13 @@ devtools-button.link-icon {
+     color: HighlightText;
+   }
  }
 +
 +@media (max-width: 599px) {

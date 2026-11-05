@@ -14,10 +14,10 @@ Subject: [PATCH] Let the UI clean copied and shared links
  create mode 100644 chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/LinkCleaner.java
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ChromeContextMenuPopulator.java b/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ChromeContextMenuPopulator.java
-index 97bd52057ec0e8cc661d8175d36adc2481749c96..f042c98ba951d102126bd6dd043f1ea5a5fae4c6 100644
+index 0a9639c6bc1359b5d9708197dcfd21f6ef391961..f8fbd6cdfe0864edeb67794d4395595ffdb9b29d 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ChromeContextMenuPopulator.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/contextmenu/ChromeContextMenuPopulator.java
-@@ -67,6 +67,7 @@ import org.chromium.chrome.browser.lens.LensMetrics;
+@@ -71,6 +71,7 @@ import org.chromium.chrome.browser.lens.LensMetrics;
  import org.chromium.chrome.browser.lens.LensSupportStatusHelper;
  import org.chromium.chrome.browser.locale.LocaleManager;
  import org.chromium.chrome.browser.multiwindow.MultiWindowUtils;
@@ -25,7 +25,7 @@ index 97bd52057ec0e8cc661d8175d36adc2481749c96..f042c98ba951d102126bd6dd043f1ea5
  import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
  import org.chromium.chrome.browser.preferences.ChromeSharedPreferences;
  import org.chromium.chrome.browser.profiles.Profile;
-@@ -1180,7 +1181,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
+@@ -1209,7 +1210,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                      new ShareParams.Builder(
                                      getWindow(),
                                      ContextMenuUtils.getAltText(mParams),
@@ -34,7 +34,7 @@ index 97bd52057ec0e8cc661d8175d36adc2481749c96..f042c98ba951d102126bd6dd043f1ea5
                              .build();
              assumeNonNull(mShareDelegateSupplier.get())
                      .share(
-@@ -1231,7 +1232,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
+@@ -1260,7 +1261,7 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                      new ShareParams.Builder(
                                      getWindow(),
                                      ContextMenuUtils.getAltText(mParams),
@@ -43,7 +43,7 @@ index 97bd52057ec0e8cc661d8175d36adc2481749c96..f042c98ba951d102126bd6dd043f1ea5
                              .build();
              assumeNonNull(mShareDelegateSupplier.get())
                      .share(
-@@ -1247,9 +1248,10 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
+@@ -1276,9 +1277,10 @@ public class ChromeContextMenuPopulator implements ContextMenuPopulator {
                      new ShareParams.Builder(
                                      getWindow(),
                                      ContextMenuUtils.getAltText(mParams),
@@ -58,7 +58,7 @@ index 97bd52057ec0e8cc661d8175d36adc2481749c96..f042c98ba951d102126bd6dd043f1ea5
              assumeNonNull(mShareDelegateSupplier.get())
                      .share(
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/share/ShareDelegateImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/share/ShareDelegateImpl.java
-index e6f25a2139aa0bc838ca77c729fb5843216b7338..ea37586f6af5d86724a5c66cdc869546fe184c4e 100644
+index e93385a47d1a9c541a50dd671acc769f9072c2d8..41004b98e24a6cb4ed2fccd5ee03f88abb1ab3eb 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/share/ShareDelegateImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/share/ShareDelegateImpl.java
 @@ -297,7 +297,7 @@ public class ShareDelegateImpl implements ShareDelegate {
@@ -88,7 +88,7 @@ index 452ed08a773049d435f98df50a561fa9b5794902..8cf0b8c90a9447a415e9d6ee9e1d9838
              // TODO(crbug.com/40732234): Find a better way of passing event for IPH.
              mContextMenuCopyLinkObserver.run();
 diff --git a/chrome/browser/ui/android/omnibox/BUILD.gn b/chrome/browser/ui/android/omnibox/BUILD.gn
-index e3cde2dc7a58b479a1ac4b78e11cdbcf41f82d76..384e6514d0f894e3475ad492a419189ad1f5fb75 100644
+index cb970c0242086cfb1f94e60bce6b256acbb19344..c2759242723d551d09037d9f62837d447d71407a 100644
 --- a/chrome/browser/ui/android/omnibox/BUILD.gn
 +++ b/chrome/browser/ui/android/omnibox/BUILD.gn
 @@ -35,6 +35,7 @@ android_library("java") {
@@ -134,10 +134,10 @@ index 0000000000000000000000000000000000000000..07db4d39d6113091711f258e2960d7d6
 +    }
 +}
 diff --git a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/UrlBarMediator.java b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/UrlBarMediator.java
-index 2f6cf6ac51a4280c279eaaf6e0cf3f4d1a414caf..7562709095ab94e62fe86d94f5bc904a3fc9bfe0 100644
+index 520c4f1262b081055b789bf7caad03fe8f658980..38a088824129f479db19e8dbf2657e9e3cfb7624 100644
 --- a/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/UrlBarMediator.java
 +++ b/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/UrlBarMediator.java
-@@ -460,7 +460,8 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
+@@ -458,7 +458,8 @@ class UrlBarMediator implements UrlBarTextContextMenuDelegate {
              return null;
          }
  

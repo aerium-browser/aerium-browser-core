@@ -8,7 +8,7 @@ Subject: [PATCH] Host the Aerium new tab header
  1 file changed, 4 insertions(+)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
-index ce184206971cad39d624ca5176c7f393c65a8bde..2119f2c6ec365c23c3407e78f0636bdb9c3fdd7d 100644
+index a08c5880ba6c2239406650444cc78de868940477..532186e76e1f51a7c66f088102036fba1bcbf786 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
 @@ -531,6 +531,10 @@ public class NewTabPage

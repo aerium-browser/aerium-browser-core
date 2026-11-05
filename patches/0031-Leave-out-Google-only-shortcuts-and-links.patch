@@ -202,10 +202,10 @@ index 887dc4583050a740cad85c200b9141d5bd5a6824..cfda3356b8e0fffae46a6121b09b263f
          }
  
 diff --git a/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc b/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
-index 2b253bcc6c549723844b146283cace194bfc686a..7a16394d956e8e963febd8933bf6e85cefb10150 100644
+index ecb45392ae7246064158fab5ca8cbf358e7aa077..71051b63f4ef7dc87f482339fa09fe5883193b3b 100644
 --- a/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
 +++ b/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
-@@ -2060,12 +2060,7 @@ GetPedalImplementations(OmniboxPedalProfileType profile_type,
+@@ -2064,12 +2064,7 @@ GetPedalImplementations(OmniboxPedalProfileType profile_type,
    if (!otr && !guest) {
      add(new OmniboxPedalClearBrowsingData(/*incognito=*/false));
    }

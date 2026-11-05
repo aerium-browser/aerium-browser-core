@@ -12,10 +12,10 @@ Subject: [PATCH] Host the Aerium menu
  create mode 100644 chrome/browser/ui/android/appmenu/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuSheet.java
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index 6d2f9de7c5418cc5e779efa826952b8e8f8c33a4..4523904bb9f8d173b4eb9473042049bfe7f93b29 100644
+index 2b49c0e5b72039195c1ed85fc5730b27bddebc00..53de5e3ac36eeddec9e16084cde9a193de5210bc 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-@@ -300,6 +300,10 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -301,6 +301,10 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
          } else if (menuGroup == MenuGroup.TABLET_EMPTY_MODE_MENU) {
              populateTabletEmptyModeMenu(modelList);
          }
@@ -27,7 +27,7 @@ index 6d2f9de7c5418cc5e779efa826952b8e8f8c33a4..4523904bb9f8d173b4eb9473042049bf
      }
  
 diff --git a/chrome/browser/ui/android/appmenu/BUILD.gn b/chrome/browser/ui/android/appmenu/BUILD.gn
-index 67d0b39999f53544bd138373ed5c358316055882..d55041701cdead2793b556506ac3c02f1b298a90 100644
+index d59ecbc720b691275d65e7f425d191d607162138..50133339995d74b92d8c09e27ed24b8ddbfc1d47 100644
 --- a/chrome/browser/ui/android/appmenu/BUILD.gn
 +++ b/chrome/browser/ui/android/appmenu/BUILD.gn
 @@ -19,6 +19,7 @@ android_library("java") {
@@ -39,7 +39,7 @@ index 67d0b39999f53544bd138373ed5c358316055882..d55041701cdead2793b556506ac3c02f
      "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuTabGroupItemProperties.java",
      "java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuTabItemProperties.java",
 diff --git a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuHandlerImpl.java b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuHandlerImpl.java
-index 4e886676977f7002dd2bf4341840aedfd134f0c5..b88a6148993abdc9a1322ea4570b26f841a4f079 100644
+index cc8ac963bc098f9f976a8d53f499622ce3f2d451..fefd50b77da4412a78c24b25e5f758d83f896a29 100644
 --- a/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuHandlerImpl.java
 +++ b/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuHandlerImpl.java
 @@ -119,6 +119,29 @@ class AppMenuHandlerImpl
@@ -89,7 +89,7 @@ index 4e886676977f7002dd2bf4341840aedfd134f0c5..b88a6148993abdc9a1322ea4570b26f8
          ContextThemeWrapper wrapper =
                  new ContextThemeWrapper(mContext, R.style.AppMenuThemeOverlay);
  
-@@ -456,9 +489,44 @@ class AppMenuHandlerImpl
+@@ -455,9 +488,44 @@ class AppMenuHandlerImpl
          }
      }
  
@@ -135,7 +135,7 @@ index 4e886676977f7002dd2bf4341840aedfd134f0c5..b88a6148993abdc9a1322ea4570b26f8
      }
  
      /**
-@@ -474,6 +542,7 @@ class AppMenuHandlerImpl
+@@ -473,6 +541,7 @@ class AppMenuHandlerImpl
  
      @Override
      public void hideAppMenu() {

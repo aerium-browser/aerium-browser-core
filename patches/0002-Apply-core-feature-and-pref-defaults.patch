@@ -9,7 +9,7 @@ Subject: [PATCH] Apply core feature and pref defaults
  2 files changed, 7 insertions(+)
 
 diff --git a/chrome/browser/metrics/chrome_feature_list_creator.cc b/chrome/browser/metrics/chrome_feature_list_creator.cc
-index f45f66f62c3a0bf6dfd27ae06269e08b2713fb36..6dfa082e223f66d1a571ca7d414d944f39cc6b62 100644
+index dbf10a26eae44aa286126ac39aff016932b44b46..2c294e56d6ded76a9a37fbb06a8d7c7c27546fd2 100644
 --- a/chrome/browser/metrics/chrome_feature_list_creator.cc
 +++ b/chrome/browser/metrics/chrome_feature_list_creator.cc
 @@ -8,6 +8,7 @@
@@ -29,7 +29,7 @@ index f45f66f62c3a0bf6dfd27ae06269e08b2713fb36..6dfa082e223f66d1a571ca7d414d944f
    SetupInitialPrefs();
    SetUpFieldTrials();
 diff --git a/chrome/browser/prefs/browser_prefs.cc b/chrome/browser/prefs/browser_prefs.cc
-index 334da9ad62b59013c44ba6335072e433157f40d6..ca8e7bf8938e2638a42944f23e352a4aed5b3bd8 100644
+index fdd05fad32252be538eef299e830625a6a3c96ba..60ee7a1a2abb0519fb2f9dd412f15cb72f6842cc 100644
 --- a/chrome/browser/prefs/browser_prefs.cc
 +++ b/chrome/browser/prefs/browser_prefs.cc
 @@ -9,6 +9,7 @@
@@ -40,7 +40,7 @@ index 334da9ad62b59013c44ba6335072e433157f40d6..ca8e7bf8938e2638a42944f23e352a4a
  #include "ash/constants/ash_login_pref_names.h"
  #include "base/files/file_path.h"
  #include "base/files/file_util.h"
-@@ -1985,6 +1986,8 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
+@@ -2041,6 +2042,8 @@ void RegisterLocalState(PrefRegistrySimple* registry) {
        policy::policy_prefs::kLocalNetworkAccessPermissionsPolicyDefaultEnabled,
        false);
  
@@ -49,9 +49,9 @@ index 334da9ad62b59013c44ba6335072e433157f40d6..ca8e7bf8938e2638a42944f23e352a4a
    // This is intentionally last.
    RegisterLocalStatePrefsForMigration(registry);
  }
-@@ -2543,6 +2546,8 @@ void RegisterUserProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
-   ash::LegacyTokenHandleFetcher::RegisterPrefs(registry);
-   ash::TokenHandleStoreImpl::RegisterPrefs(registry);
+@@ -2604,6 +2607,8 @@ void RegisterUserProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
+   ash::RegisterUserProfilePrefs(registry, locale);
+   ash::TokenHandleStore::RegisterPrefs(registry);
  #endif
 +
 +  aerium::RegisterProfileDefaults(registry);

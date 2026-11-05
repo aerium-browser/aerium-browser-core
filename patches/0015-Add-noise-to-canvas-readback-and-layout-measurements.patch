@@ -17,10 +17,10 @@ Subject: [PATCH] Add noise to canvas readback and layout measurements
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 
 diff --git a/third_party/blink/renderer/core/dom/element.cc b/third_party/blink/renderer/core/dom/element.cc
-index 755950af16f2786df2ff357f0d830d8666b8e6d3..df48bfa06499898d6e0c216b17c8efe44cf3e032 100644
+index 1e198ecbe34094f4d55a320755a14c1228ec2cfd..23bb7cc139b0d7eb42d243244504ef100dc4ff43 100644
 --- a/third_party/blink/renderer/core/dom/element.cc
 +++ b/third_party/blink/renderer/core/dom/element.cc
-@@ -307,6 +307,7 @@
+@@ -309,6 +309,7 @@
  #include "third_party/blink/renderer/platform/bindings/v8_per_context_data.h"
  #include "third_party/blink/renderer/platform/geometry/calculation_value.h"
  #include "third_party/blink/renderer/platform/graphics/compositing/paint_artifact_compositor.h"
@@ -28,7 +28,7 @@ index 755950af16f2786df2ff357f0d830d8666b8e6d3..df48bfa06499898d6e0c216b17c8efe4
  #include "third_party/blink/renderer/platform/graphics/paint/float_clip_rect.h"
  #include "third_party/blink/renderer/platform/graphics/paint/tracked_element_data.h"
  #include "third_party/blink/renderer/platform/heap/collection_support/heap_hash_set.h"
-@@ -3477,6 +3478,7 @@ DOMRectList* Element::getClientRects() {
+@@ -3479,6 +3480,7 @@ DOMRectList* Element::getClientRects() {
    for (auto& rect : rects) {
      GetDocument().AdjustRectForScrollAndAbsoluteZoom(rect,
                                                       *element_layout_object);
@@ -36,7 +36,7 @@ index 755950af16f2786df2ff357f0d830d8666b8e6d3..df48bfa06499898d6e0c216b17c8efe4
    }
    return MakeGarbageCollected<DOMRectList>(rects);
  }
-@@ -3574,7 +3576,10 @@ DOMRect* Element::GetBoundingClientRectForBinding() {
+@@ -3576,7 +3578,10 @@ DOMRect* Element::GetBoundingClientRectForBinding() {
    // TODO(crbug.com/1499981): This should be removed once synchronized scrolling
    // impact is understood.
    SyncScrollAttemptHeuristic::DidAccessScrollOffset();
@@ -49,18 +49,18 @@ index 755950af16f2786df2ff357f0d830d8666b8e6d3..df48bfa06499898d6e0c216b17c8efe4
  
  ContainerQueryList* Element::matchContainer(const String& query) {
 diff --git a/third_party/blink/renderer/core/dom/range.cc b/third_party/blink/renderer/core/dom/range.cc
-index ac67dbb89e3b9fb92b691e116f963db7e2fbac00..adf61afafec9882a57c2fcfbc9bcd73c80c46252 100644
+index 4b6baabc2af84ed69ff782818ab805118c2bb212..d865e6c906c61f4c669f424018364408c0f88f7d 100644
 --- a/third_party/blink/renderer/core/dom/range.cc
 +++ b/third_party/blink/renderer/core/dom/range.cc
-@@ -66,6 +66,7 @@
+@@ -67,6 +67,7 @@
  #include "third_party/blink/renderer/core/trustedtypes/trusted_types_names.h"
  #include "third_party/blink/renderer/core/trustedtypes/trusted_types_util.h"
  #include "third_party/blink/renderer/platform/bindings/exception_state.h"
 +#include "third_party/blink/renderer/platform/graphics/fingerprint_noise.h"
  #include "third_party/blink/renderer/platform/heap/garbage_collected.h"
  #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
- #include "third_party/blink/renderer/platform/wtf/text/strcat.h"
-@@ -1707,6 +1708,9 @@ DOMRectList* Range::getClientRects() const {
+ #include "third_party/blink/renderer/platform/wtf/text/format.h"
+@@ -1667,6 +1668,9 @@ DOMRectList* Range::getClientRects() const {
  
    Vector<gfx::QuadF> quads;
    GetBorderAndTextQuads(quads);
@@ -70,7 +70,7 @@ index ac67dbb89e3b9fb92b691e116f963db7e2fbac00..adf61afafec9882a57c2fcfbc9bcd73c
  
    return MakeGarbageCollected<DOMRectList>(quads);
  }
-@@ -1715,7 +1719,7 @@ DOMRect* Range::getBoundingClientRect() const {
+@@ -1675,7 +1679,7 @@ DOMRect* Range::getBoundingClientRect() const {
    // TODO(crbug.com/1499981): This should be removed once synchronized scrolling
    // impact is understood.
    SyncScrollAttemptHeuristic::DidAccessScrollOffset();
@@ -104,18 +104,18 @@ index a78150b4a695b8a78a2d5462414a72f41693c1c8..995860e67e11e7dccfbeb57697793d4d
    // y direction
    const FontMetrics& font_metrics = font_data->GetFontMetrics();
 diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
-index ba2dcc2f2f0e46309034d6966fc0579ee9f4a731..1d8d867d8636a9fca790ca94373b44ab575b1413 100644
+index eaa71b910d565e940e69b4ef9f203097f92bc0a1..689b1ae6c45aa21bccdcf63b213089f66ae67f9a 100644
 --- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
 +++ b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
-@@ -96,6 +96,7 @@
+@@ -95,6 +95,7 @@
+ #include "third_party/blink/renderer/platform/graphics/blend_mode.h"
  #include "third_party/blink/renderer/platform/graphics/canvas_2d_resource_provider.h"
- #include "third_party/blink/renderer/platform/graphics/canvas_deferred_paint_record.h"
  #include "third_party/blink/renderer/platform/graphics/canvas_image_provider.h"
 +#include "third_party/blink/renderer/platform/graphics/fingerprint_noise.h"
  #include "third_party/blink/renderer/platform/graphics/flush_reason.h"
  #include "third_party/blink/renderer/platform/graphics/gpu/shared_gpu_context.h"
  #include "third_party/blink/renderer/platform/graphics/gpu/webgpu_cpp.h"
-@@ -868,6 +869,9 @@ ImageData* BaseRenderingContext2D::getImageDataInternal(
+@@ -930,6 +931,9 @@ ImageData* BaseRenderingContext2D::getImageDataInternal(
          snapshot->PaintImageForCurrentFrame().readPixels(
              image_data_pixmap.info(), image_data_pixmap.writable_addr(),
              image_data_pixmap.rowBytes(), sx, sy);
@@ -126,10 +126,10 @@ index ba2dcc2f2f0e46309034d6966fc0579ee9f4a731..1d8d867d8636a9fca790ca94373b44ab
        SkIRect bounds =
            snapshot->PaintImageForCurrentFrame().GetSkImageInfo().bounds();
 diff --git a/third_party/blink/renderer/platform/BUILD.gn b/third_party/blink/renderer/platform/BUILD.gn
-index 0adcb6894f30356c933d6f77b5a9f6e4723ea6b7..8fe7ea16b22452f095d22a2930f90c47c171d906 100644
+index ec13ed073610cc166bd3d7f14aa65d36338abd2c..aee4a39fe03faa7903c6aca32c840d80ad07f1f2 100644
 --- a/third_party/blink/renderer/platform/BUILD.gn
 +++ b/third_party/blink/renderer/platform/BUILD.gn
-@@ -1098,6 +1098,8 @@ component("platform") {
+@@ -1091,6 +1091,8 @@ component("platform") {
      "graphics/filters/source_graphic.h",
      "graphics/filters/spot_light_source.cc",
      "graphics/filters/spot_light_source.h",

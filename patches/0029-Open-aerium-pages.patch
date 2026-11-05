@@ -12,10 +12,10 @@ Subject: [PATCH] Open aerium pages
  5 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
-index 90ea0196dbf5c91dfc2d9f04a5c65d23cbcedd36..87d2ea0d272d44f6b286802d0fd5a29be5f04f68 100644
+index 8f9a561242df75bd084394ffdfebf8b7457d531d..63461abda6cea4339fac6d3f74734935f1860ef8 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
-@@ -1046,6 +1046,10 @@ class TabImpl implements Tab, TabInternal {
+@@ -1063,6 +1063,10 @@ class TabImpl implements Tab, TabInternal {
      public LoadUrlResult loadUrl(LoadUrlParams params) {
          try {
              TraceEvent.begin("Tab.loadUrl");
@@ -27,10 +27,10 @@ index 90ea0196dbf5c91dfc2d9f04a5c65d23cbcedd36..87d2ea0d272d44f6b286802d0fd5a29b
                  return new LoadUrlResult(
                          TabLoadStatus.DEFAULT_PAGE_LOAD, /* navigationHandle= */ null);
 diff --git a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
-index 868d7421ef7e194244e1849a487cb03511c8224e..47a9d59176c267f6f6564e899f7c034f8b6707af 100644
+index 8be77fd6ddb6c3ea2e965cb0fa2a8a1b08aa6e9c..5a2f036c65cd1df19e72974918b2c92f4120cf68 100644
 --- a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
 +++ b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
-@@ -429,7 +429,7 @@ std::string ChromeAutocompleteProviderClient::GetAcceptLanguages() const {
+@@ -430,7 +430,7 @@ std::string ChromeAutocompleteProviderClient::GetAcceptLanguages() const {
  std::string
  ChromeAutocompleteProviderClient::GetEmbedderRepresentationOfAboutScheme()
      const {
@@ -39,7 +39,7 @@ index 868d7421ef7e194244e1849a487cb03511c8224e..47a9d59176c267f6f6564e899f7c034f
  }
  
  std::vector<std::u16string> ChromeAutocompleteProviderClient::GetBuiltinURLs() {
-@@ -461,12 +461,9 @@ std::vector<std::u16string> ChromeAutocompleteProviderClient::GetBuiltinURLs() {
+@@ -462,12 +462,9 @@ std::vector<std::u16string> ChromeAutocompleteProviderClient::GetBuiltinURLs() {
  std::vector<std::u16string>
  ChromeAutocompleteProviderClient::GetBuiltinsToProvideAsUserTypes() {
    std::vector<std::u16string> builtins_to_provide;

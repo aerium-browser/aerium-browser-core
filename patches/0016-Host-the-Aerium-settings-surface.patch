@@ -8,7 +8,7 @@ Subject: [PATCH] Host the Aerium settings surface
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java
-index 2a29455c8de8367b6f54bf9ca0aefd04c306781f..6eb47932f427b22f37f4c05de8f74d26906501db 100644
+index 68ec16daa2ed60e11152b510ddc29b046ae6c5bd..79600d744753bdccbe74182d1d3ba1ba201794e7 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsActivity.java
 @@ -536,10 +536,18 @@ public class SettingsActivity extends ChromeBaseAppCompatActivity
