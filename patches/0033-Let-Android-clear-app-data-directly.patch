@@ -8,7 +8,7 @@ Subject: [PATCH] Let Android clear app data directly
  1 file changed, 1 deletion(-)
 
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
-index c1de007fc1cfb008bd58b2826ca080cc2daa2a05..1ee34abbcf9a63cefc3ad84c39a92d7d08ea092f 100644
+index 7d31a5fac815e681b613ae7b8f61c6bcae01d26c..b983b520b9e7015681bd3ed0317096c62d27c7f5 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
 @@ -224,7 +224,6 @@ by a child template that "extends" this file.

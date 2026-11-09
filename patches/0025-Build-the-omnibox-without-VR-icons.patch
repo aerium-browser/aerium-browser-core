@@ -29,7 +29,7 @@ index 7af049b6b6dd3ebc96ce61b43c419c222cd42a13..11b70734318db7a4577282351e4f22f9
  
  gfx::Image OmniboxEditModel::GetMatchIconIfExtension(
 diff --git a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
-index a736ab17a16fa7f6da21a7e2e447f3f76ebd95f6..5ad2b88c176c95c989ccd0145807781135a660b4 100644
+index 14f60db67d0ba7697fb36fd73e0818e7be113edb..d8afb5c8ac5545487559f18435b764eaaddbef4b 100644
 --- a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
 +++ b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
 @@ -1078,6 +1078,7 @@ SearchboxHandler::CreateAutocompleteMatch(
