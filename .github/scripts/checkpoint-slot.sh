@@ -66,6 +66,22 @@ if [ "$_mode" = restore ]; then
         _name="$(jq -r '.[-1].name // ""' <<<"$_fallback")"
         [ -n "$_name" ] && _source_run_id="$RESTORE_RUN_ID"
     fi
+    if [ -z "$_name" ]; then
+        _newest="$( { gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=$BASE&per_page=100" \
+                          --jq '.artifacts[] | select(.expired == false) | [.id, .name, .workflow_run.id] | @tsv' 2>/dev/null || true
+                      gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=$BASE-b&per_page=100" \
+                          --jq '.artifacts[] | select(.expired == false) | [.id, .name, .workflow_run.id] | @tsv' 2>/dev/null || true
+                    } | sort -rn -k1,1 | head -n 10)"
+        while IFS=$'\t' read -r _id _cand _run; do
+            [ -n "$_run" ] && [ "$_run" != "$GITHUB_RUN_ID" ] || continue
+            _conclusion="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$_run" --jq '.conclusion // ""' 2>/dev/null || echo cancelled)"
+            [ "$_conclusion" = cancelled ] && continue
+            _name="$_cand"
+            _source_run_id="$_run"
+            echo "[checkpoint-slot] using the newest saved tree: $_cand of run $_run" >&2
+            break
+        done <<<"$_newest"
+    fi
     echo "[checkpoint-slot] restoring from: ${_name:-<none>} (run ${_source_run_id:-$GITHUB_RUN_ID})" >&2
     echo "name=$_name" >> "$GITHUB_OUTPUT"
     echo "run_id=$_source_run_id" >> "$GITHUB_OUTPUT"
