@@ -30,6 +30,7 @@ jobs:
           BUILD_WORKFLOW: 'build.yml'
           FULL_TITLE: 'Full build'
           RELEASE_TITLE: 'Release build'
+          BUNDLE_TITLE: 'Bundle build'
           PROGRESS_JOB_PATTERN: ''
           COMPLETION_JOB: 'check-completion'
           ATTEMPT_CAP: '5'
@@ -51,9 +52,9 @@ jobs:
 
           of_flavor() {
             if [ "$1" = full ]; then
-              jq --arg t "$FULL_TITLE" --arg r "$RELEASE_TITLE" '{workflow_runs: [.workflow_runs[] | select(.display_title == $t or .display_title == $r)]}'
+              jq --arg t "$FULL_TITLE" --arg r "$RELEASE_TITLE" --arg b "$BUNDLE_TITLE" '{workflow_runs: [.workflow_runs[] | select(.display_title == $t or .display_title == $r or .display_title == $b)]}'
             else
-              jq --arg t "$FULL_TITLE" --arg r "$RELEASE_TITLE" '{workflow_runs: [.workflow_runs[] | select(.display_title != $t and .display_title != $r)]}'
+              jq --arg t "$FULL_TITLE" --arg r "$RELEASE_TITLE" --arg b "$BUNDLE_TITLE" '{workflow_runs: [.workflow_runs[] | select(.display_title != $t and .display_title != $r and .display_title != $b)]}'
             fi
           }
 
@@ -224,6 +225,7 @@ jobs:
               kind=beta
               title=$(jq -r --argjson id "$RUN_ID" '.workflow_runs[] | select(.id == $id) | .display_title' <<<"$flavor_json")
               [ "$title" = "$RELEASE_TITLE" ] && kind=release
+              [ "$title" = "$BUNDLE_TITLE" ] && kind=bundle
               gh api -X POST "repos/$REPO/actions/workflows/$BUILD_WORKFLOW/dispatches" \
                 -f ref="$BRANCH" -f "inputs[resume_run_id]=$RUN_ID" -f "inputs[flavor]=$flavor" -f "inputs[kind]=$kind"
             else

@@ -26,3 +26,24 @@ sign_apk() {
             --ks-pass "pass:$storePassword" --key-pass "pass:$keyPassword" --out "$2" "$1"
     ) || exit 1
 }
+
+sign_bundle() {
+    local signer
+    signer=$(command -v jarsigner || true)
+    if [ -z "$signer" ]; then
+        echo "[aerium] FATAL: jarsigner not found" >&2
+        exit 1
+    fi
+    cp "$1" "$2"
+    (
+        set -a
+        . "$SCRIPT_DIR/keys/local.properties"
+        "$signer" -keystore "$SCRIPT_DIR/keys/test.jks" -storepass:env storePassword \
+            -keypass:env keyPassword "$2" "$keyAlias" > /dev/null
+        "$signer" -verify "$2" | grep -q 'jar verified'
+    ) || {
+        rm -f "$2"
+        echo "[aerium] FATAL: the bundle could not be signed" >&2
+        exit 1
+    }
+}

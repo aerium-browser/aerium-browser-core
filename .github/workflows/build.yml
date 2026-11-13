@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 name: Build
-run-name: ${{ inputs.flavor == 'full' && format('{0}{1}', inputs.kind == 'release' && 'Release build' || 'Full build', inputs.arch == 'x64' && ' x64' || '') || (inputs.arch == 'x64' && 'Build x64' || '') }}
+run-name: ${{ inputs.flavor == 'full' && format('{0}{1}', inputs.kind == 'release' && 'Release build' || (inputs.kind == 'bundle' && 'Bundle build' || 'Full build'), inputs.arch == 'x64' && ' x64' || '') || (inputs.arch == 'x64' && 'Build x64' || '') }}
 
 on:
   push:
@@ -46,11 +46,12 @@ on:
           - x64
         default: arm64
       kind:
-        description: 'beta goes only to the private Telegram channel, release publishes a draft release'
+        description: 'beta goes only to the private Telegram channel, release publishes a draft release, bundle sends an app bundle to the private Telegram channel'
         type: choice
         options:
           - beta
           - release
+          - bundle
         default: beta
       jobs:
         description: 'Parallel compile jobs on the free runners, 1 for light finishing builds'
@@ -930,6 +931,8 @@ jobs:
           if [ "${{ env.AERIUM_FLAVOR }}" = full ]; then
             if [ "${{ env.AERIUM_KIND }}" = release ]; then
               echo "Release build finished. The APK goes to a draft release."
+            elif [ "${{ env.AERIUM_KIND }}" = bundle ]; then
+              echo "Bundle build finished. The app bundle was sent to the Telegram channel."
             else
               echo "Beta build finished. The APK was sent to the Telegram channel."
             fi

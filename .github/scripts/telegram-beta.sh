@@ -7,7 +7,10 @@ for v in TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID TELEGRAM_API_ID TELEGRAM_API_HASH; 
   if [ -z "${!v:-}" ]; then echo "$v is not set"; exit 1; fi
 done
 
-apk=$(ls "$GITHUB_WORKSPACE"/release/aerium-*.apk | grep -v mapping | head -n1)
+apk=$(find "$GITHUB_WORKSPACE/release" -maxdepth 1 \( -name 'aerium-*.apk' -o -name 'aerium-*.aab' \) | sort | head -n1)
+[ -n "$apk" ] || { echo "Nothing to send"; exit 1; }
+label=beta
+[ "${AERIUM_KIND:-}" = bundle ] && label="app bundle"
 version=$(tr -d '[:space:]' < "$GITHUB_WORKSPACE/release/version.txt" 2>/dev/null || echo "")
 sum=$(sha256sum "$apk" | cut -c1-16)
 
@@ -28,7 +31,7 @@ for i in 1 2 3; do
   out=$(curl -s --max-time 1800 \
     -F chat_id="$TELEGRAM_CHAT_ID" \
     -F document=@"$apk" \
-    -F caption="Aerium $version beta, build $GITHUB_RUN_NUMBER
+    -F caption="Aerium $version $label, build $GITHUB_RUN_NUMBER
 sha256 $sum" \
     "$api/sendDocument" || true)
   if grep -q '"ok":true' <<<"$out"; then ok=1; break; fi

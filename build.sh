@@ -57,6 +57,14 @@ echo "[aerium] target cpu: $AERIUM_TARGET_CPU  abi: $AERIUM_ABI"
 export CHROMIUM_SOURCE=https://chromium.googlesource.com/chromium/src.git
 export DEBIAN_FRONTEND=noninteractive
 echo "[aerium] chromium version: $VERSION  ci: $MODE_CI"
+if [ "${AERIUM_KIND:-}" = bundle ]; then
+    AERIUM_TARGET=chrome_public_bundle
+    AERIUM_PACKAGE=aab
+else
+    AERIUM_TARGET=chrome_public_apk
+    AERIUM_PACKAGE=apk
+fi
+echo "[aerium] package: $AERIUM_PACKAGE"
 
 # --- stage diagnostics --------------------------------------------------------
 # The CI job log can only be read from its tail (~400 KB, i.e. the last couple
@@ -248,6 +256,42 @@ if [ -z "${AERIUM_FRESH:-}" ]; then
     fi
 fi
 
+aerium_version_arg=""
+if [ "$AERIUM_PACKAGE" = aab ]; then
+    aerium_revision=0
+    if [ -n "${AERIUM_UI_DIR:-}" ] && [ -f "$AERIUM_UI_DIR/engine/bundle_revision" ]; then
+        aerium_revision=$(tr -dc '0-9' < "$AERIUM_UI_DIR/engine/bundle_revision")
+        aerium_revision=${aerium_revision:-0}
+    fi
+    [ "$aerium_revision" -le 9 ] || {
+        echo "[aerium] FATAL: bundle revision $aerium_revision is above 9" >&2
+        exit 1
+    }
+    aerium_base_code=$(python3 build/util/android_chrome_version.py --version-name "$VERSION" \
+        --arch "$AERIUM_TARGET_CPU" | sed -n 's/^CHROME_VERSION_CODE=//p')
+    [ -n "$aerium_base_code" ] || {
+        echo "[aerium] FATAL: no version code for $VERSION" >&2
+        exit 1
+    }
+    aerium_version_arg="android_override_version_code = \"$((aerium_base_code + aerium_revision * 10))\""
+fi
+if [ "$(grep '^android_override_version_code = ' out/Default/args.gn || true)" != "$aerium_version_arg" ]; then
+    sed -i '/^android_override_version_code = /d' out/Default/args.gn
+    if [ -n "$aerium_version_arg" ]; then
+        echo "$aerium_version_arg" >> out/Default/args.gn
+    fi
+    if [ -n "${AERIUM_UI_DIR:-}" ]; then
+        gn gen out/Default > "$SCRIPT_DIR/gn_gen.log" 2>&1 || {
+            echo "[aerium] FATAL: gn gen failed, the log is in the encrypted failure marker" >&2
+            exit 1
+        }
+    else
+        gn gen out/Default
+    fi
+fi
+if [ -n "$aerium_version_arg" ]; then
+    echo "[aerium] version code: ${aerium_version_arg##* = }"
+fi
 
 # compile prerequisites must exist on every fresh runner
 ./build/install-build-deps.sh --no-prompt --unsupported || true
@@ -382,13 +426,13 @@ if [ $MODE_CI = 1 ]; then
     if [ -n "${AERIUM_UI_DIR:-}" ]; then
         timeout -s INT -k 5m ${REMAINING_MIN}m \
             autoninja -j "${NINJA_JOBS:-2}" -k "${NINJA_KEEP_GOING:-0}" \
-            -C out/Default chrome_public_apk \
+            -C out/Default "$AERIUM_TARGET" \
             >> "$BUILD_LOG" 2>&1
         RET=$?
     else
         timeout -s INT -k 5m ${REMAINING_MIN}m \
             autoninja -j "${NINJA_JOBS:-2}" -k "${NINJA_KEEP_GOING:-0}" \
-            -C out/Default chrome_public_apk \
+            -C out/Default "$AERIUM_TARGET" \
             > >(tee -a "$BUILD_LOG") 2>&1
         RET=$?
     fi
@@ -463,7 +507,7 @@ if [ $MODE_CI = 1 ]; then
         exit $RET
     fi
 else
-    autoninja -j "${NINJA_JOBS:-2}" -k "${NINJA_KEEP_GOING:-1}" -C out/Default chrome_public_apk
+    autoninja -j "${NINJA_JOBS:-2}" -k "${NINJA_KEEP_GOING:-1}" -C out/Default "$AERIUM_TARGET"
 fi
 
 # --- sign & finish ------------------------------------------------------------
@@ -472,14 +516,30 @@ export ANDROID_HOME=$PWD/third_party/android_sdk/public
 
 mkdir -p $SCRIPT_DIR/release
 set_keys
-UNSIGNED_APK=out/Default/apks/ChromePublic.apk
+UNSIGNED_APK=out/Default/apks/ChromePublic.$AERIUM_PACKAGE
 [ -f "$UNSIGNED_APK" ] || { echo "[aerium] FATAL: $UNSIGNED_APK was not built" >&2; exit 1; }
 APK_BASE=${AERIUM_APK_BASE:-aerium-core}
-sign_apk "$UNSIGNED_APK" "$SCRIPT_DIR/release/$APK_BASE-$VERSION-$AERIUM_ABI.apk"
+FINAL_NAME=$APK_BASE-$VERSION-$AERIUM_ABI.$AERIUM_PACKAGE
+if [ "$AERIUM_PACKAGE" = aab ]; then
+    sign_bundle "$UNSIGNED_APK" "$SCRIPT_DIR/release/$FINAL_NAME"
+else
+    sign_apk "$UNSIGNED_APK" "$SCRIPT_DIR/release/$FINAL_NAME"
+fi
 rm -rf $SCRIPT_DIR/keys
-if [ -n "${AERIUM_UI_DIR:-}" ]; then
+if [ -n "${AERIUM_UI_DIR:-}" ] && [ "$AERIUM_PACKAGE" = aab ]; then
+    bundletool=third_party/android_build_tools/bundletool/cipd/bundletool.jar
+    bundle_package=$(java -jar "$bundletool" dump manifest --bundle "$SCRIPT_DIR/release/$FINAL_NAME" \
+        --xpath /manifest/@package 2>/dev/null | tr -d '[:space:]')
+    [ "$bundle_package" = com.aeriumbrowser.android ] \
+        || { echo "[aerium] FATAL: the bundle is not com.aeriumbrowser.android" >&2; exit 1; }
+    if grep -q '^com.aeriumbrowser.android.ui.AeriumUiProvider ->' "$UNSIGNED_APK.mapping" 2>/dev/null; then
+        echo "[aerium] bundle check: package and UI layer present"
+    else
+        echo "[aerium] WARNING: the UI layer was not found in the R8 mapping"
+    fi
+elif [ -n "${AERIUM_UI_DIR:-}" ]; then
     aapt2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 2>/dev/null | sort -V | tail -n1)
-    badging=$("$aapt2" dump badging "$SCRIPT_DIR/release/$APK_BASE-$VERSION-$AERIUM_ABI.apk" 2>/dev/null || true)
+    badging=$("$aapt2" dump badging "$SCRIPT_DIR/release/$FINAL_NAME" 2>/dev/null || true)
     grep -q "^package: name='com.aeriumbrowser.android'" <<<"$badging" \
         || { echo "[aerium] FATAL: the apk is not com.aeriumbrowser.android" >&2; exit 1; }
     grep -q "^application-label:'Aerium'" <<<"$badging" \
@@ -513,8 +573,8 @@ fi
 # apk under whatever name upstream gave it - it is not renamed by sign_apk,
 # which only ever writes its signed copy elsewhere.
 if [ -f "$UNSIGNED_APK.mapping" ]; then
-    cp "$UNSIGNED_APK.mapping" "$SCRIPT_DIR/release/$APK_BASE-$VERSION-$AERIUM_ABI.apk.mapping"
-    echo "[aerium] archived R8 mapping: release/$APK_BASE-$VERSION-$AERIUM_ABI.apk.mapping"
+    cp "$UNSIGNED_APK.mapping" "$SCRIPT_DIR/release/$FINAL_NAME.mapping"
+    echo "[aerium] archived R8 mapping: release/$FINAL_NAME.mapping"
 else
     echo "[aerium] no R8 mapping next to $UNSIGNED_APK - crash reports for this build will stay unsymbolised"
 fi
@@ -535,4 +595,4 @@ fi
 
 echo "$VERSION" > $SCRIPT_DIR/release/version.txt
 touch $SCRIPT_DIR/release/finished.marker
-echo "[aerium] build finished: release/$APK_BASE-$VERSION-$AERIUM_ABI.apk"
+echo "[aerium] build finished: release/$FINAL_NAME"
