@@ -2,23 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 name: Build
-run-name: ${{ inputs.flavor == 'full' && format('{0}{1}', inputs.kind == 'release' && 'Release build' || (inputs.kind == 'bundle' && 'Bundle build' || 'Full build'), inputs.arch == 'x64' && ' x64' || '') || (inputs.arch == 'x64' && 'Build x64' || '') }}
+run-name: ${{ format('{0}{1}', inputs.kind == 'release' && 'Release build' || (inputs.kind == 'bundle' && 'Bundle build' || 'Full build'), inputs.arch == 'x64' && ' x64' || '') }}
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - 'NOTICE'
-      - 'donate/**'
-      - '.github/ISSUE_TEMPLATE/**'
-      - '.github/workflows/triage.yml'
-      - '.github/workflows/auto-resume.yml'
-      - '.github/workflows/details.yml'
-      - '.github/workflows/publish.yml'
-      - '.github/workflows/upstream-watch.yml'
-      - '.github/triage-rules.js'
   workflow_dispatch:
     inputs:
       fresh:
@@ -31,13 +17,6 @@ on:
         type: string
         required: false
         default: ''
-      flavor:
-        description: 'core builds the open core alone, full adds the private Aerium layer'
-        type: choice
-        options:
-          - core
-          - full
-        default: core
       arch:
         description: 'arm64 for phones, x64 for emulators and Chromebooks'
         type: choice
@@ -64,20 +43,20 @@ permissions:
   actions: write
 
 env:
-  AERIUM_FLAVOR: ${{ inputs.flavor || 'core' }}
-  AERIUM_UI_DIR: ${{ inputs.flavor == 'full' && format('{0}/ui', github.workspace) || '' }}
-  AERIUM_APK_BASE: ${{ inputs.flavor == 'full' && 'aerium' || 'aerium-core' }}
-  AERIUM_CHECKPOINT_KEY: ${{ inputs.flavor == 'full' && secrets.AERIUM_CHECKPOINT_KEY || '' }}
+  AERIUM_FLAVOR: full
+  AERIUM_UI_DIR: ${{ format('{0}/ui', github.workspace) }}
+  AERIUM_APK_BASE: aerium
+  AERIUM_CHECKPOINT_KEY: ${{ secrets.AERIUM_CHECKPOINT_KEY }}
   NINJA_JOBS: ${{ inputs.jobs }}
   AERIUM_KIND: ${{ inputs.kind || 'beta' }}
-  TELEGRAM_BOT_TOKEN: ${{ inputs.flavor == 'full' && inputs.kind != 'release' && secrets.TELEGRAM_BOT_TOKEN || '' }}
-  TELEGRAM_CHAT_ID: ${{ inputs.flavor == 'full' && inputs.kind != 'release' && secrets.TELEGRAM_CHAT_ID || '' }}
-  TELEGRAM_API_ID: ${{ inputs.flavor == 'full' && inputs.kind != 'release' && secrets.TELEGRAM_API_ID || '' }}
-  TELEGRAM_API_HASH: ${{ inputs.flavor == 'full' && inputs.kind != 'release' && secrets.TELEGRAM_API_HASH || '' }}
+  TELEGRAM_BOT_TOKEN: ${{ inputs.kind != 'release' && secrets.TELEGRAM_BOT_TOKEN || '' }}
+  TELEGRAM_CHAT_ID: ${{ inputs.kind != 'release' && secrets.TELEGRAM_CHAT_ID || '' }}
+  TELEGRAM_API_ID: ${{ inputs.kind != 'release' && secrets.TELEGRAM_API_ID || '' }}
+  TELEGRAM_API_HASH: ${{ inputs.kind != 'release' && secrets.TELEGRAM_API_HASH || '' }}
 
 concurrency:
-  group: ${{ inputs.flavor || 'core' }}-${{ inputs.arch || 'arm64' }}-build-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  group: full-${{ inputs.arch || 'arm64' }}-build-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build-1:

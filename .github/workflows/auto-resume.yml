@@ -221,19 +221,13 @@ jobs:
             fi
 
             echo "Dispatching resume of run $RUN_ID as a $label (auto-attempt $((attempts + 1)))"
-            if [ "$flavor" = full ]; then
-              kind=beta
-              title=$(jq -r --argjson id "$RUN_ID" '.workflow_runs[] | select(.id == $id) | .display_title' <<<"$flavor_json")
-              [ "$title" = "$RELEASE_TITLE" ] && kind=release
-              [ "$title" = "$BUNDLE_TITLE" ] && kind=bundle
-              gh api -X POST "repos/$REPO/actions/workflows/$BUILD_WORKFLOW/dispatches" \
-                -f ref="$BRANCH" -f "inputs[resume_run_id]=$RUN_ID" -f "inputs[flavor]=$flavor" -f "inputs[kind]=$kind"
-            else
-              gh api -X POST "repos/$REPO/actions/workflows/$BUILD_WORKFLOW/dispatches" \
-                -f ref="$BRANCH" -f "inputs[resume_run_id]=$RUN_ID" -f "inputs[flavor]=$flavor"
-            fi
+            kind=beta
+            title=$(jq -r --argjson id "$RUN_ID" '.workflow_runs[] | select(.id == $id) | .display_title' <<<"$flavor_json")
+            [ "$title" = "$RELEASE_TITLE" ] && kind=release
+            [ "$title" = "$BUNDLE_TITLE" ] && kind=bundle
+            gh api -X POST "repos/$REPO/actions/workflows/$BUILD_WORKFLOW/dispatches" \
+              -f ref="$BRANCH" -f "inputs[resume_run_id]=$RUN_ID" -f "inputs[kind]=$kind"
           }
 
-          resume_flavor core
           resume_flavor full
           exit "$stalled"
