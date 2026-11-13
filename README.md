@@ -10,11 +10,13 @@ uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 
 [![Release](https://img.shields.io/github/v/release/aerium-browser/aerium-browser-core?style=flat-square&label=release&color=2A4485)](https://github.com/aerium-browser/aerium-browser-core/releases/latest)
 [![Downloads](https://img.shields.io/badge/downloads-20k%2B-2A4485?style=flat-square)](https://github.com/aerium-browser/aerium-browser-core/releases)
-[![Chromium](https://img.shields.io/badge/Chromium-156-2A4485?style=flat-square)](chromium.pin)
+[![Chromium](https://img.shields.io/badge/Chromium-158-2A4485?style=flat-square)](chromium.pin)
 [![Latest Chromium](https://img.shields.io/badge/dynamic/json?style=flat-square&color=2A4485&label=latest%20Chromium&query=%24%5B0%5D.version&url=https%3A%2F%2Fchromiumdash.appspot.com%2Ffetch_releases%3Fchannel%3DStable%26platform%3DAndroid%26num%3D1)](https://chromiumdash.appspot.com/releases?platform=Android)
 [![License](https://img.shields.io/badge/license-GPLv3-2A4485?style=flat-square)](LICENSE)
 
-[**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com) &nbsp;&nbsp;|&nbsp;&nbsp; [Get it with Obtainium](https://aeriumbrowser.com/obtainium/)
+[**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com) &nbsp;&nbsp;|&nbsp;&nbsp; [Get it with Obtainium](https://aeriumbrowser.com/obtainium/) &nbsp;&nbsp;|&nbsp;&nbsp; [Join the beta](https://play.google.com/apps/testing/com.aeriumbrowser.android)
+
+<a href="https://play.google.com/store/apps/details?id=com.aeriumbrowser.android"><img src="badges/google-play.png" height="56" alt="Get it on Google Play"></a>
 
 <a href="https://alternativeto.net/software/aerium-browser/about/?utm_source=badge&utm_medium=referral"><img src="https://alternativeto.net/static/badges/badge-compact-color.svg" height="48" alt="Aerium on AlternativeTo"></a>&nbsp;
 <a href="https://www.androidauthority.com/google-chrome-alternatives-android-based-on-chromium-3726016/#:~:text=Honorable%20mentions"><img src="badges/android-authority.svg" height="48" alt="Featured in Android Authority"></a>
@@ -22,9 +24,9 @@ uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 <br>
 
 <img src="screenshots/extensions.webp" width="23%" alt="Extensions">&nbsp;
-<img src="screenshots/new-tab.webp" width="23%" alt="New tab">&nbsp;
-<img src="screenshots/settings-guard.webp" width="23%" alt="Aerium Guard">&nbsp;
-<img src="screenshots/settings-backup.webp" width="23%" alt="Backup and restore">
+<img src="screenshots/tabs.webp" width="23%" alt="Desktop style tabs">&nbsp;
+<img src="screenshots/toolbar.webp" width="23%" alt="Toolbar editor">&nbsp;
+<img src="screenshots/settings-guard.webp" width="23%" alt="Aerium Guard">
 
 </div>
 
@@ -32,9 +34,9 @@ uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 
 ## What's changed
 
-Aerium is no longer based on Vanadium or any of its forks. It's now built on pure Chromium, straight from the source, with nothing in between.
+Aerium is no longer based on Vanadium or any of its forks. It's now built on pure Chromium 158, straight from the source, with nothing in between.
 
-The whole interface has been redesigned too. Until it becomes stable, new releases will take a bit longer while we build, fix bugs and polish everything. Thanks for your patience.
+The whole interface has been redesigned, and the next release brings a lot of new things: a toolbar you build yourself, desktop style tabs, a home screen widget, search shortcuts, sleeping tabs, a mobile data saver and cookie banners rejected for you. Until the redesign is stable, new releases take a bit longer while we fix bugs and polish everything. Thanks for your patience.
 
 Follow [Announcements](https://github.com/aerium-browser/aerium-browser-core/discussions/categories/announcements) to stay up to date.
 
@@ -51,20 +53,24 @@ Most Android browsers can't run extensions. The few that could stopped following
 
 ## Features
 
-**Extensions.** Install from the Chrome Web Store, Opera and Edge add-ons, or a `.crx` from GitHub. Pinned extensions sit in the toolbar and their popups fit the screen.
+**Extensions.** Install from the Chrome Web Store, Opera and Edge add-ons, or a `.crx` from GitHub. Open any extension from the toolbar, choose which ones also run in Aerogel, and their popups fit the screen.
 
-**Privacy.** Fingerprinting noise on canvas and layout reads, Global Privacy Control on every request, stricter site isolation, and Google's background services switched off.
+**Privacy.** Aerium Guard modes in one tap, fingerprinting noise on canvas and layout reads, Global Privacy Control on every request, tracking parameters stripped from links, redirect trackers and AMP skipped, cookie banners rejected when you ask, stricter site isolation, and Google's background services switched off.
 
 **Aerogel.** Private tabs with their own window, per site rules for what gets deleted, and links from other apps can open there by default.
 
-**Made for daily use.** True black dark mode, your own toolbar and menu, backup and restore with your extensions, an update check that never installs anything without asking.
+**Yours to customize.** Address bar on top or bottom, a toolbar you build button by button with an optional second row, your own menu order, desktop style tabs, true black dark mode, alternate app icons and a home screen widget in three sizes.
+
+**Made for daily use.** Search shortcuts for your favorite sites, an address bar that always shows the site name in full, sleeping tabs to save battery, a mobile data saver, a video player made for phones, backup and restore with your extensions, and an update check that never installs anything without asking.
 
 ## Install
 
-1. Download the APK from [Releases](https://github.com/aerium-browser/aerium-browser-core/releases/latest).
+1. Get Aerium on [Google Play](https://play.google.com/store/apps/details?id=com.aeriumbrowser.android), or download the APK from [Releases](https://github.com/aerium-browser/aerium-browser-core/releases/latest).
 2. Pick uBlock Origin Lite during setup, or add any extension from the Chrome Web Store. The store opens in its desktop layout by itself.
 
 Prefer automatic updates? Add this repository to [Obtainium](https://aeriumbrowser.com/obtainium/).
+
+Want new versions before everyone else? [Join the closed beta on Google Play](https://play.google.com/apps/testing/com.aeriumbrowser.android).
 
 ## How it's built
 
