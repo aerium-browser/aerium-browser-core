@@ -23,10 +23,10 @@ uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 
 <br>
 
-<img src="screenshots/extensions.webp" width="23%" alt="Extensions">&nbsp;
-<img src="screenshots/tabs.webp" width="23%" alt="Desktop style tabs">&nbsp;
-<img src="screenshots/toolbar.webp" width="23%" alt="Toolbar editor">&nbsp;
-<img src="screenshots/settings-guard.webp" width="23%" alt="Aerium Guard">
+<img src="screenshots/extensions.webp" width="23%" alt="Desktop extensions on your phone">&nbsp;
+<img src="screenshots/tabs.webp" width="23%" alt="Tabs on top, like on a computer">&nbsp;
+<img src="screenshots/toolbar.webp" width="23%" alt="Build your own toolbar">&nbsp;
+<img src="screenshots/settings-guard.webp" width="23%" alt="Privacy in one tap with Aerium Guard">
 
 </div>
 
