@@ -43,7 +43,7 @@ index 361adc0a7b4a16b0bcc387d1355098fbdea928eb..5ed6e3fcaef53e4e6de60a102c26457e
              flags |= (1 << (int) LockReason.A11Y_ENABLED);
          }
 diff --git a/chrome/browser/flag-metadata.json b/chrome/browser/flag-metadata.json
-index cd8b2da46ad86fd0c18e31d8742d8c2dad22efcb..c80326185192010255e2c1f2997fa9c915acfa20 100644
+index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f879bbab76 100644
 --- a/chrome/browser/flag-metadata.json
 +++ b/chrome/browser/flag-metadata.json
 @@ -272,7 +272,7 @@
@@ -64,7 +64,7 @@ index cd8b2da46ad86fd0c18e31d8742d8c2dad22efcb..c80326185192010255e2c1f2997fa9c9
    },
    {
      "name": "android-bricks-native-page",
-@@ -1923,7 +1923,7 @@
+@@ -1928,7 +1928,7 @@
    {
      "name": "cct-open-in-browser-button-if-allowed-by-embedder",
      "owners": ["kamalchoudhury@google.com", "edmundw@google.com"],
@@ -73,7 +73,7 @@ index cd8b2da46ad86fd0c18e31d8742d8c2dad22efcb..c80326185192010255e2c1f2997fa9c9
    },
    {
      "name": "cct-open-in-browser-button-if-enabled-by-embedder",
-@@ -2789,7 +2789,7 @@
+@@ -2799,7 +2799,7 @@
    {
      "name": "darken-websites-checkbox-in-themes-setting",
      "owners": [ "nemco@google.com", "wenyufu@google.com", "twellington@chromium.org" ],
@@ -82,7 +82,7 @@ index cd8b2da46ad86fd0c18e31d8742d8c2dad22efcb..c80326185192010255e2c1f2997fa9c9
    },
    {
      "name": "data-controls-search-with",
-@@ -3457,7 +3457,7 @@
+@@ -3467,7 +3467,7 @@
    {
      "name": "enable-accessibility-sequential-focus",
      "owners": [ "jocelyntran@google.com", "//ui/accessibility/OWNERS" ],
@@ -91,7 +91,7 @@ index cd8b2da46ad86fd0c18e31d8742d8c2dad22efcb..c80326185192010255e2c1f2997fa9c9
    },
    {
      "name": "enable-accessibility-shake-to-locate",
-@@ -4951,7 +4951,7 @@
+@@ -4961,7 +4961,7 @@
    {
      "name": "enforce-incognito-isolation",
      "owners": [ "shuyng@google.com", "clank-large-form-factors@google.com" ],
@@ -100,7 +100,7 @@ index cd8b2da46ad86fd0c18e31d8742d8c2dad22efcb..c80326185192010255e2c1f2997fa9c9
    },
    {
      "name": "enforce-mono-audio-capture",
-@@ -6368,7 +6368,7 @@
+@@ -6378,7 +6378,7 @@
    {
      "name": "inline-pdf-v2",
      "owners": [ "rathomas@google.com", "clank-large-form-factors@google.com" ],
@@ -109,7 +109,7 @@ index cd8b2da46ad86fd0c18e31d8742d8c2dad22efcb..c80326185192010255e2c1f2997fa9c9
    },
    {
      "name": "inline-pdf-v2-incognito",
-@@ -6900,7 +6900,7 @@
+@@ -6910,7 +6910,7 @@
        "twellington@chromium.org",
        "skavuluru@google.com"
      ],
@@ -118,7 +118,7 @@ index cd8b2da46ad86fd0c18e31d8742d8c2dad22efcb..c80326185192010255e2c1f2997fa9c9
    },
    {
      "name": "long-screenshots-lenient-memory-check",
-@@ -7529,7 +7529,7 @@
+@@ -7548,7 +7548,7 @@
    {
      "name": "offline-auto-fetch",
      "owners": [ "tbansal@google.com" ],
@@ -127,7 +127,7 @@ index cd8b2da46ad86fd0c18e31d8742d8c2dad22efcb..c80326185192010255e2c1f2997fa9c9
    },
    {
      "name": "omaha-min-sdk-version-android",
-@@ -9997,7 +9997,7 @@
+@@ -10016,7 +10016,7 @@
    {
      "name": "use-fullscreen-insets-api",
      "owners": [ "clhager@google.com"],

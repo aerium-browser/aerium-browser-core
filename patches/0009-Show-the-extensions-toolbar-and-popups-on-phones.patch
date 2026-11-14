@@ -18,10 +18,10 @@ Subject: [PATCH] Show the extensions toolbar and popups on phones
  11 files changed, 71 insertions(+), 10 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-index e225ddf50a20941115178213e300c4d8257bf5b8..91fe57e42816bfaeef3fe4b948ebee9d0ee3af77 100644
+index 34e99088425d52621aa6b8935c1669183357440b..91b734011a1172b6eb42dd2aca4a77b0f1d5e311 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-@@ -2834,7 +2834,7 @@ public class ToolbarManager
+@@ -2835,7 +2835,7 @@ public class ToolbarManager
                                                          mActivityTabProvider.asObservable(),
                                                          mTabCreatorManager.getTabCreator(false),
                                                          getBrowsingModeThemeColorProvider(),

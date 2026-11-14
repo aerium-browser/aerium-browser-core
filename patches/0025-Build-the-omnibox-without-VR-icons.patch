@@ -29,10 +29,10 @@ index 7af049b6b6dd3ebc96ce61b43c419c222cd42a13..11b70734318db7a4577282351e4f22f9
  
  gfx::Image OmniboxEditModel::GetMatchIconIfExtension(
 diff --git a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
-index 14f60db67d0ba7697fb36fd73e0818e7be113edb..d8afb5c8ac5545487559f18435b764eaaddbef4b 100644
+index 628a00172dff0cbce4fc2043cb78e0a5ca9445fb..7c0297f47d64c353ac3d4545b05f5c40c952f611 100644
 --- a/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
 +++ b/chrome/browser/ui/webui/cr_components/searchbox/searchbox_handler.cc
-@@ -1078,6 +1078,7 @@ SearchboxHandler::CreateAutocompleteMatch(
+@@ -1081,6 +1081,7 @@ SearchboxHandler::CreateAutocompleteMatch(
    mojom_match->destination_url = match.destination_url;
    mojom_match->suggestion_group_id =
        match.suggestion_group_id.value_or(omnibox::GROUP_INVALID);
@@ -40,7 +40,7 @@ index 14f60db67d0ba7697fb36fd73e0818e7be113edb..d8afb5c8ac5545487559f18435b764ea
    const bool is_bookmarked =
        bookmark_model->IsBookmarked(match.destination_url);
    // For starter pack suggestions, use template url to generate proper vector
-@@ -1088,6 +1089,7 @@ SearchboxHandler::CreateAutocompleteMatch(
+@@ -1091,6 +1092,7 @@ SearchboxHandler::CreateAutocompleteMatch(
            : turl_service->GetTemplateURLForKeyword(match.associated_keyword);
    mojom_match->icon_path = AutocompleteIconToResourceName(
        match.GetVectorIcon(is_bookmarked, associated_keyword_turl));
@@ -48,7 +48,7 @@ index 14f60db67d0ba7697fb36fd73e0818e7be113edb..d8afb5c8ac5545487559f18435b764ea
    OverrideIconPaths(match, mojom_match.get());
    mojom_match->icon_url = match.icon_url;
    // For featured enterprise search suggestions, use template url to generate
-@@ -1121,7 +1123,9 @@ SearchboxHandler::CreateAutocompleteMatch(
+@@ -1124,7 +1126,9 @@ SearchboxHandler::CreateAutocompleteMatch(
  #endif
        std::string icon_path;
        if (action->GetIconImage().IsEmpty()) {

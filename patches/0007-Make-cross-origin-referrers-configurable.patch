@@ -71,10 +71,10 @@ index e5258679dd876490012a756f7e10cfb64541cbe6..a4a8e6717dab2d724780e12adc32b190
  }
  
 diff --git a/net/base/features.cc b/net/base/features.cc
-index 3a3f3a0b0bbba686a0935a3ee24662ae99a4e4b4..7450c3efffbafb5da8376a4093f3b2296a0f058c 100644
+index 7ea61dc9a5f3fbd8a57e31417c821835a471a47c..667a2b5ba48dbad9d9809fc9b9e09672215a5e8e 100644
 --- a/net/base/features.cc
 +++ b/net/base/features.cc
-@@ -1126,5 +1126,12 @@ BASE_FEATURE(kCookieMonsterPerKeyDelete, base::FEATURE_DISABLED_BY_DEFAULT);
+@@ -1144,5 +1144,12 @@ BASE_FEATURE(kCookieMonsterPerKeyDelete, base::FEATURE_DISABLED_BY_DEFAULT);
  
  BASE_FEATURE(kHttpChunkedDecoderInRust, base::FEATURE_DISABLED_BY_DEFAULT);
  
@@ -88,10 +88,10 @@ index 3a3f3a0b0bbba686a0935a3ee24662ae99a4e4b4..7450c3efffbafb5da8376a4093f3b229
  }  // namespace net::features
  
 diff --git a/net/base/features.h b/net/base/features.h
-index b589550d3fe9e8abe09b323b323e5a0f77671e42..343ac8f270ac788d39628be9de4b43f78868a560 100644
+index a8e12f3ada45610d95db160dd2b5d83a950d952a..a90a9807304790a3456a1df2d633b518a3f8d039 100644
 --- a/net/base/features.h
 +++ b/net/base/features.h
-@@ -1101,6 +1101,9 @@ NET_EXPORT BASE_DECLARE_FEATURE(kCookieMonsterPerKeyDelete);
+@@ -1113,6 +1113,9 @@ NET_EXPORT BASE_DECLARE_FEATURE(kCookieMonsterPerKeyDelete);
  // Enables the Rust implementation of the HTTP chunked decoder, called via FFI.
  NET_EXPORT BASE_DECLARE_FEATURE(kHttpChunkedDecoderInRust);
  
