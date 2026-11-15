@@ -25,6 +25,7 @@ enable_vr = false
 enable_arcore = false
 enable_openxr = false
 enable_cardboard = false
+dfmify_dev_ui = false
 enable_remoting = false
 build_contextual_search = false
 rtc_build_examples = false
