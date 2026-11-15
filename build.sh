@@ -295,13 +295,23 @@ done < <(
 )
 for aerium_key in "${aerium_args_order[@]}"; do
     aerium_arg=${aerium_args_wanted[$aerium_key]}
-    grep -qxF -- "$aerium_arg" out/Default/args.gn && continue
+    if [ "$(grep -c "^${aerium_key} = " out/Default/args.gn)" = 1 ] \
+        && grep -qxF -- "$aerium_arg" out/Default/args.gn; then
+        continue
+    fi
     sed -i "/^${aerium_key} = /d" out/Default/args.gn
     echo "$aerium_arg" >> out/Default/args.gn
     aerium_args_changed=1
 done
+mapfile -t aerium_args_present < <(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\) = .*/\1/p' out/Default/args.gn)
+for aerium_key in "${aerium_args_present[@]}"; do
+    case "$aerium_key" in target_cpu|android_override_version_code) continue ;; esac
+    [ -n "${aerium_args_wanted[$aerium_key]+set}" ] && continue
+    sed -i "/^${aerium_key} = /d" out/Default/args.gn
+    aerium_args_changed=1
+done
 [ -n "$aerium_args_changed" ] && echo "[aerium] build settings refreshed"
-unset aerium_args_wanted aerium_args_order aerium_key aerium_arg
+unset aerium_args_wanted aerium_args_order aerium_args_present aerium_key aerium_arg
 if [ -n "$aerium_args_changed" ] \
     || [ "$(grep '^android_override_version_code = ' out/Default/args.gn || true)" != "$aerium_version_arg" ]; then
     sed -i '/^android_override_version_code = /d' out/Default/args.gn
