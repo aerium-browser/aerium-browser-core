@@ -14,19 +14,10 @@ uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 [![Latest Chromium](https://img.shields.io/badge/dynamic/json?style=flat-square&color=2A4485&label=latest%20Chromium&query=%24%5B0%5D.version&url=https%3A%2F%2Fchromiumdash.appspot.com%2Ffetch_releases%3Fchannel%3DStable%26platform%3DAndroid%26num%3D1)](https://chromiumdash.appspot.com/releases?platform=Android)
 [![License](https://img.shields.io/badge/license-GPLv3-2A4485?style=flat-square)](LICENSE)
 
-[**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com) &nbsp;&nbsp;|&nbsp;&nbsp; [Get it with Obtainium](https://aeriumbrowser.com/obtainium/) &nbsp;&nbsp;|&nbsp;&nbsp; [Join the closed test](#join-the-closed-test-on-google-play)
+[**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Join the closed test](#google-play) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com) &nbsp;&nbsp;|&nbsp;&nbsp; [Obtainium](https://aeriumbrowser.com/obtainium/)
 
-<a href="https://play.google.com/store/apps/details?id=com.aeriumbrowser.android"><img src="badges/google-play.png" height="56" alt="Get it on Google Play"></a>
-
-### Join the closed test on Google Play
-
-Aerium is in closed testing and anyone can join. Use the same Google account for all three steps.
-
-1. Join the [Aerium testers group](https://groups.google.com/g/aeriumbrowser).
-2. [Become a tester](https://play.google.com/apps/testing/com.aeriumbrowser.android) on the web.
-3. [Install Aerium from Google Play](https://play.google.com/store/apps/details?id=com.aeriumbrowser.android).
-
-It can take a few minutes after joining before Google Play shows the app.
+<a href="#google-play"><img src="badges/google-play.png" height="56" alt="Get it on Google Play"></a><br>
+<sub>Closed test, open to everyone. <a href="#google-play">Join in three steps</a>.</sub>
 
 <a href="https://alternativeto.net/software/aerium-browser/about/?utm_source=badge&utm_medium=referral"><img src="https://alternativeto.net/static/badges/badge-compact-color.svg" height="48" alt="Aerium on AlternativeTo"></a>&nbsp;
 <a href="https://www.androidauthority.com/google-chrome-alternatives-android-based-on-chromium-3726016/#:~:text=Honorable%20mentions"><img src="badges/android-authority.svg" height="48" alt="Featured in Android Authority"></a>
@@ -75,10 +66,23 @@ Most Android browsers can't run extensions. The few that could stopped following
 
 ## Install
 
-1. Join the [closed test](#join-the-closed-test-on-google-play), then get Aerium on [Google Play](https://play.google.com/store/apps/details?id=com.aeriumbrowser.android). Or download the APK from [Releases](https://github.com/aerium-browser/aerium-browser-core/releases/latest).
-2. Pick uBlock Origin Lite during setup, or add any extension from the Chrome Web Store. The store opens in its desktop layout by itself.
+### Google Play
 
-Prefer automatic updates? Add this repository to [Obtainium](https://aeriumbrowser.com/obtainium/).
+Aerium is in closed testing and anyone can join. Use the same Google account for every step.
+
+1. **Join** the [Aerium testers group](https://groups.google.com/g/aeriumbrowser)
+2. **Opt in** on the [testing page](https://play.google.com/apps/testing/com.aeriumbrowser.android)
+3. **Install** from [Google Play](https://play.google.com/store/apps/details?id=com.aeriumbrowser.android)
+
+Google Play can take a few minutes to show the app after you join.
+
+### APK
+
+Download it from [Releases](https://github.com/aerium-browser/aerium-browser-core/releases/latest), or add this repository to [Obtainium](https://aeriumbrowser.com/obtainium/) for automatic updates.
+
+### First start
+
+Pick uBlock Origin Lite during setup, or add any extension from the Chrome Web Store. The store opens in its desktop layout by itself.
 
 ## How it's built
 
