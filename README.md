@@ -54,7 +54,7 @@ Most Android browsers can't run extensions. The few that could stopped following
 
 ## Features
 
-**Extensions.** Install from the Chrome Web Store, Opera and Edge add-ons, or a `.crx` from GitHub. Open any extension from the toolbar, choose which ones also run in Aerogel, and their popups fit the screen.
+**Extensions.** Install from the Chrome Web Store, or a `.crx` from GitHub. Open any extension from the toolbar, choose which ones also run in Aerogel, and their popups fit the screen.
 
 **Privacy.** Aerium Guard modes in one tap, fingerprinting noise on canvas and layout reads, Global Privacy Control on every request, tracking parameters stripped from links, redirect trackers and AMP skipped, cookie banners rejected when you ask, stricter site isolation, and Google's background services switched off.
 
