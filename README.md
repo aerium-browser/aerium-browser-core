@@ -14,9 +14,11 @@ uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 [![Latest Chromium](https://img.shields.io/badge/dynamic/json?style=flat-square&color=2A4485&label=latest%20Chromium&query=%24%5B0%5D.version&url=https%3A%2F%2Fchromiumdash.appspot.com%2Ffetch_releases%3Fchannel%3DStable%26platform%3DAndroid%26num%3D1)](https://chromiumdash.appspot.com/releases?platform=Android)
 [![License](https://img.shields.io/badge/license-GPLv3-2A4485?style=flat-square)](LICENSE)
 
-[**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com) &nbsp;&nbsp;|&nbsp;&nbsp; [Get it with Obtainium](https://aeriumbrowser.com/obtainium/) &nbsp;&nbsp;|&nbsp;&nbsp; [Join the beta](https://play.google.com/apps/testing/com.aeriumbrowser.android)
+[**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com) &nbsp;&nbsp;|&nbsp;&nbsp; [Get it with Obtainium](https://aeriumbrowser.com/obtainium/) &nbsp;&nbsp;|&nbsp;&nbsp; [Join the closed test](https://play.google.com/apps/testing/com.aeriumbrowser.android)
 
 <a href="https://play.google.com/store/apps/details?id=com.aeriumbrowser.android"><img src="badges/google-play.png" height="56" alt="Get it on Google Play"></a>
+
+Aerium is in closed testing on Google Play and open to everyone. [Join the test](https://play.google.com/apps/testing/com.aeriumbrowser.android) on the web first, then [install it from Google Play](https://play.google.com/store/apps/details?id=com.aeriumbrowser.android).
 
 <a href="https://alternativeto.net/software/aerium-browser/about/?utm_source=badge&utm_medium=referral"><img src="https://alternativeto.net/static/badges/badge-compact-color.svg" height="48" alt="Aerium on AlternativeTo"></a>&nbsp;
 <a href="https://www.androidauthority.com/google-chrome-alternatives-android-based-on-chromium-3726016/#:~:text=Honorable%20mentions"><img src="badges/android-authority.svg" height="48" alt="Featured in Android Authority"></a>
@@ -65,12 +67,10 @@ Most Android browsers can't run extensions. The few that could stopped following
 
 ## Install
 
-1. Get Aerium on [Google Play](https://play.google.com/store/apps/details?id=com.aeriumbrowser.android), or download the APK from [Releases](https://github.com/aerium-browser/aerium-browser-core/releases/latest).
+1. [Join the closed test](https://play.google.com/apps/testing/com.aeriumbrowser.android), then get Aerium on [Google Play](https://play.google.com/store/apps/details?id=com.aeriumbrowser.android). Or download the APK from [Releases](https://github.com/aerium-browser/aerium-browser-core/releases/latest).
 2. Pick uBlock Origin Lite during setup, or add any extension from the Chrome Web Store. The store opens in its desktop layout by itself.
 
 Prefer automatic updates? Add this repository to [Obtainium](https://aeriumbrowser.com/obtainium/).
-
-Want new versions before everyone else? [Join the closed beta on Google Play](https://play.google.com/apps/testing/com.aeriumbrowser.android).
 
 ## How it's built
 
