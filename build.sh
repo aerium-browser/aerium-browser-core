@@ -257,23 +257,19 @@ if [ -z "${AERIUM_FRESH:-}" ]; then
 fi
 
 aerium_version_arg=""
-if [ "$AERIUM_PACKAGE" = aab ]; then
-    aerium_revision=0
-    if [ -n "${AERIUM_UI_DIR:-}" ] && [ -f "$AERIUM_UI_DIR/engine/bundle_revision" ]; then
-        aerium_revision=$(tr -dc '0-9' < "$AERIUM_UI_DIR/engine/bundle_revision")
-        aerium_revision=${aerium_revision:-0}
-    fi
-    [ "$aerium_revision" -le 9 ] || {
-        echo "[aerium] FATAL: bundle revision $aerium_revision is above 9" >&2
-        exit 1
-    }
+if [ -n "${GITHUB_RUN_NUMBER:-}" ]; then
+    aerium_build_number=$(echo "$VERSION" | cut -d. -f3)
     aerium_base_code=$(python3 build/util/android_chrome_version.py --version-name "$VERSION" \
         --arch "$AERIUM_TARGET_CPU" | sed -n 's/^CHROME_VERSION_CODE=//p')
-    [ -n "$aerium_base_code" ] || {
+    [ -n "$aerium_build_number" ] && [ -n "$aerium_base_code" ] || {
         echo "[aerium] FATAL: no version code for $VERSION" >&2
         exit 1
     }
-    aerium_version_arg="android_override_version_code = \"$((aerium_base_code + aerium_revision * 10))\""
+    [ "$GITHUB_RUN_NUMBER" -lt 10000 ] || {
+        echo "[aerium] FATAL: run number $GITHUB_RUN_NUMBER does not fit the version code" >&2
+        exit 1
+    }
+    aerium_version_arg="android_override_version_code = \"$((aerium_build_number * 100000 + GITHUB_RUN_NUMBER * 10 + aerium_base_code % 10))\""
 fi
 aerium_args_changed=""
 declare -A aerium_args_wanted=()
