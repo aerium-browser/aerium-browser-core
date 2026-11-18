@@ -4,9 +4,9 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Open external links in Aerogel and close tabs on exit
 
 ---
- .../chrome/browser/ChromeTabbedActivity.java     |  5 ++++-
- .../chrome/browser/LaunchIntentDispatcher.java   | 16 ++++++++++++++++
- 2 files changed, 20 insertions(+), 1 deletion(-)
+ .../chrome/browser/ChromeTabbedActivity.java   |  5 ++++-
+ .../chrome/browser/LaunchIntentDispatcher.java | 18 ++++++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 index eb3e5785daad6ea265e0497a8c918af330c398c9..d536a1c832561e3f73c1ceefc45e01d3fe996415 100644
@@ -32,10 +32,18 @@ index eb3e5785daad6ea265e0497a8c918af330c398c9..d536a1c832561e3f73c1ceefc45e01d3
              final AtomicBoolean isActiveUrlNtp = new AtomicBoolean(false);
              if (noRestoreState) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java b/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
-index 3429f1cf1b3d714ef0b2a657fc2b71b3a0c2fab9..e8c1a0bfc2e388dfd6eebf11f4dd7e3686685be4 100644
+index 3429f1cf1b3d714ef0b2a657fc2b71b3a0c2fab9..646f8fb0077b623cd2c79f8320fb225c124f54d4 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
-@@ -21,6 +21,8 @@ import androidx.browser.customtabs.CustomTabsIntent;
+@@ -13,6 +13,7 @@ import android.app.ActivityManager.RecentTaskInfo;
+ import android.content.Context;
+ import android.content.Intent;
+ import android.net.Uri;
++import android.provider.Browser;
+ import android.text.TextUtils;
+ 
+ import androidx.annotation.IntDef;
+@@ -21,6 +22,8 @@ import androidx.browser.customtabs.CustomTabsIntent;
  import androidx.browser.customtabs.TrustedWebUtils;
  import androidx.core.os.BuildCompat;
  
@@ -44,7 +52,7 @@ index 3429f1cf1b3d714ef0b2a657fc2b71b3a0c2fab9..e8c1a0bfc2e388dfd6eebf11f4dd7e36
  import org.chromium.base.ApiCompatibilityUtils;
  import org.chromium.base.ApplicationStatus;
  import org.chromium.base.CommandLine;
-@@ -118,6 +120,9 @@ public class LaunchIntentDispatcher {
+@@ -118,6 +121,9 @@ public class LaunchIntentDispatcher {
      public static @Action int dispatchToCustomTabActivity(Activity currentActivity, Intent intent) {
          LaunchIntentDispatcher dispatcher = new LaunchIntentDispatcher(currentActivity, intent);
          if (!isCustomTabIntent(dispatcher.mIntent)) return Action.CONTINUE;
@@ -54,7 +62,7 @@ index 3429f1cf1b3d714ef0b2a657fc2b71b3a0c2fab9..e8c1a0bfc2e388dfd6eebf11f4dd7e36
          if (shouldOverrideAlwaysOpenInBrowser(dispatcher.mIntent)) {
              RecordUserAction.record("CustomTabs.AlwaysOpenInBrowserOverride");
              return dispatcher.dispatchToTabbedActivity();
-@@ -314,6 +319,12 @@ public class LaunchIntentDispatcher {
+@@ -314,6 +320,12 @@ public class LaunchIntentDispatcher {
          mIntent = assertNonNull(IntentUtils.sanitizeIntent(intent));
      }
  
@@ -67,13 +75,14 @@ index 3429f1cf1b3d714ef0b2a657fc2b71b3a0c2fab9..e8c1a0bfc2e388dfd6eebf11f4dd7e36
      /** When started with an intent, maybe pre-resolve the domain. */
      private void maybePrefetchDnsInBackground() {
          if (Intent.ACTION_VIEW.equals(mIntent.getAction())) {
-@@ -577,6 +588,11 @@ public class LaunchIntentDispatcher {
+@@ -577,6 +589,12 @@ public class LaunchIntentDispatcher {
              if (!chromeTabbedTaskExists(mActivity)) {
                  newIntent.putExtra(IntentHandler.EXTRA_STARTED_TABBED_CHROME_TASK, true);
              }
 +            if (AeriumPrefs.get(AeriumPrefs.EXTERNAL_LINKS_IN_AEROGEL)
 +                    && isWebUrl(IntentHandler.getUrlFromIntent(newIntent))) {
 +                newIntent.putExtra(IntentHandler.EXTRA_OPEN_NEW_INCOGNITO_TAB, true);
++                newIntent.putExtra(Browser.EXTRA_APPLICATION_ID, mActivity.getPackageName());
 +                IntentUtils.addTrustedIntentExtras(newIntent);
 +            }
              if ((newIntent.getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK) != 0) {
