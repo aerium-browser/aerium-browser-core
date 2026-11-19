@@ -14,7 +14,7 @@ uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 [![Latest Chromium](https://img.shields.io/badge/dynamic/json?style=flat-square&color=2A4485&label=latest%20Chromium&query=%24%5B0%5D.version&url=https%3A%2F%2Fchromiumdash.appspot.com%2Ffetch_releases%3Fchannel%3DStable%26platform%3DAndroid%26num%3D1)](https://chromiumdash.appspot.com/releases?platform=Android)
 [![License](https://img.shields.io/badge/license-GPLv3-2A4485?style=flat-square)](LICENSE)
 
-[**Download APK**](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Join the closed test](#google-play) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com) &nbsp;&nbsp;|&nbsp;&nbsp; [Obtainium](https://aeriumbrowser.com/obtainium/)
+[**Join the closed test**](#google-play) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com)
 
 <a href="#google-play"><img src="badges/google-play.png" height="56" alt="Get it on Google Play"></a><br>
 <sub>Closed test, open to everyone. <a href="#google-play">Join in three steps</a>.</sub>
@@ -75,10 +75,6 @@ Aerium is in closed testing and anyone can join. Use the same Google account for
 3. **Install** from [Google Play](https://play.google.com/store/apps/details?id=com.aeriumbrowser.android)
 
 Google Play can take a few minutes to show the app after you join.
-
-### APK
-
-Download it from [Releases](https://github.com/aerium-browser/aerium-browser-core/releases/latest), or add this repository to [Obtainium](https://aeriumbrowser.com/obtainium/) for automatic updates.
 
 ### First start
 
