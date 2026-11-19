@@ -34,10 +34,10 @@ index 1f049eb708cd2ee3cecdab87e37adc4b0ece21b3..14f7a98c28af0631f3a2fa2e8309ba34
    request_->set_isolation_info(GetDohIsolationInfo());
  }
 diff --git a/net/url_request/url_request_http_job.cc b/net/url_request/url_request_http_job.cc
-index 29610dd99f5d240939bf086c9aac807228019f1b..6caef18669939ac76edf25f4fe84867aab7299d5 100644
+index 71efdab38ccd67b814b2240e89d80db8d28dc158..0fa346e4547501ca6aaa9123eaa21857f35066fc 100644
 --- a/net/url_request/url_request_http_job.cc
 +++ b/net/url_request/url_request_http_job.cc
-@@ -481,10 +481,12 @@ void URLRequestHttpJob::Start() {
+@@ -492,10 +492,12 @@ void URLRequestHttpJob::Start() {
                                            referer_value);
    }
  
@@ -54,7 +54,7 @@ index 29610dd99f5d240939bf086c9aac807228019f1b..6caef18669939ac76edf25f4fe84867a
  
    AddExtraHeaders();
  
-@@ -742,12 +744,14 @@ void URLRequestHttpJob::StartTransactionInternal() {
+@@ -762,12 +764,14 @@ void URLRequestHttpJob::StartTransactionInternal() {
  }
  
  void URLRequestHttpJob::AddExtraHeaders() {

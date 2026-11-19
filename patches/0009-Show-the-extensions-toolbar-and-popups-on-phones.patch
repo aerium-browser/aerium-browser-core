@@ -18,10 +18,10 @@ Subject: [PATCH] Show the extensions toolbar and popups on phones
  11 files changed, 71 insertions(+), 10 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-index 34e99088425d52621aa6b8935c1669183357440b..91b734011a1172b6eb42dd2aca4a77b0f1d5e311 100644
+index 4de5939da4edaac599cb5a03fbcaa77c7dea4b71..67e362b878aaf5ec5fc13af72da10043f5a78683 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-@@ -2835,7 +2835,7 @@ public class ToolbarManager
+@@ -2830,7 +2830,7 @@ public class ToolbarManager
                                                          mActivityTabProvider.asObservable(),
                                                          mTabCreatorManager.getTabCreator(false),
                                                          getBrowsingModeThemeColorProvider(),
@@ -234,10 +234,10 @@ index 157f6a21a919023ea9aa73819c28218a28bbef4e..5964e7c94aec7ad75cfbe8bb0cd47cda
                  new ActivityWindowAndroid(
                          activity,
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
-index fd98066d266e83f031cc9051a1f72ffe4f9d23a9..383f5b04e7197e77ea5de5b654459407f3b9d0d5 100644
+index 5c44a566850c64fa6884a250811a01e275ddc16c..7dc94fd69d1abfc44902872869d220838393181e 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
 +++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
-@@ -1703,6 +1703,8 @@ public class ToolbarPhone extends ToolbarLayout
+@@ -1702,6 +1702,8 @@ public class ToolbarPhone extends ToolbarLayout
              canvas.restore();
          }
  
@@ -246,7 +246,7 @@ index fd98066d266e83f031cc9051a1f72ffe4f9d23a9..383f5b04e7197e77ea5de5b654459407
          // Draw the signin button if visible.
          if (mSigninButtonCoordinator != null && mSigninButtonCoordinator.isVisible()) {
              View signinButtonView = mSigninButtonCoordinator.getViewForDrawing();
-@@ -1846,6 +1848,19 @@ public class ToolbarPhone extends ToolbarLayout
+@@ -1845,6 +1847,19 @@ public class ToolbarPhone extends ToolbarLayout
          return new Rect(left, top, right, bottom);
      }
  

@@ -8,10 +8,10 @@ Subject: [PATCH] Leave the experimental GPU file sandbox off
  1 file changed, 4 deletions(-)
 
 diff --git a/chrome/browser/chrome_browser_field_trials.cc b/chrome/browser/chrome_browser_field_trials.cc
-index b329f6491579e41df83e4d7c112b939c57de92c0..341c5a7d29793ae2979a1eeb456e61aec5496a3c 100644
+index ff5499119889fbb1642d339ebace07c73f894c21..ab68f2b16cb667a2ae4cf30d350677f708117517 100644
 --- a/chrome/browser/chrome_browser_field_trials.cc
 +++ b/chrome/browser/chrome_browser_field_trials.cc
-@@ -171,10 +171,6 @@ void ChromeBrowserFieldTrials::RegisterFeatureOverrides(
+@@ -172,10 +172,6 @@ void ChromeBrowserFieldTrials::RegisterFeatureOverrides(
    // Enable V8 optimizations for high-end Android Desktop devices.
    // TODO(crbug.com/425860368): Remove when the feature is stable.
    feature_overrides.EnableFeature(features::kV8AndroidDesktopHighEndConfig);

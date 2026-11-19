@@ -4,9 +4,9 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Fit DevTools to a phone screen
 
 ---
- front_end/entrypoint_template.html           |  1 +
- front_end/panels/settings/settingsScreen.css | 10 ++++++++++
- 2 files changed, 11 insertions(+)
+ front_end/entrypoint_template.html           | 1 +
+ front_end/panels/settings/settingsScreen.css | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
 diff --git a/front_end/entrypoint_template.html b/front_end/entrypoint_template.html
 index e778aefef2c32caa29253d80ce46da0a02fa1f73..a65cd32c6a735c655cd7ef39ae54558c3b69eb6b 100644
@@ -21,20 +21,16 @@ index e778aefef2c32caa29253d80ce46da0a02fa1f73..a65cd32c6a735c655cd7ef39ae54558c
  <style>
    @media (prefers-color-scheme: dark) {
 diff --git a/front_end/panels/settings/settingsScreen.css b/front_end/panels/settings/settingsScreen.css
-index 8628dc9de1d629161182169b9a39261401a4a4fd..ed6400a1fec39bf756f55a604770f9886d56dd77 100644
+index 616d0f8f5fc4c5d58cb6ca01be72e3a98dfda193..6ce09159b24745b9ff2561b2fea6c57a1b6c600f 100644
 --- a/front_end/panels/settings/settingsScreen.css
 +++ b/front_end/panels/settings/settingsScreen.css
-@@ -191,3 +191,13 @@ devtools-button.link-icon {
-     color: HighlightText;
+@@ -160,3 +160,9 @@ devtools-button.link-icon {
+     color: canvastext;
    }
  }
 +
 +@media (max-width: 599px) {
 +  .settings-window-title {
 +    display: none;
-+  }
-+
-+  .settings-content {
-+    margin: var(--sys-size-3) var(--sys-size-3) var(--sys-size-3) 0;
 +  }
 +}

@@ -5,15 +5,16 @@ Subject: [PATCH] Leave out Google only shortcuts and links
 
 ---
  .../res/xml/legal_information_preferences.xml | 12 ------
+ .../settings/AppearanceSettingsFragment.java  | 12 +-----
  .../feedback/HelpAndFeedbackLauncherImpl.java |  3 +-
  .../browser/ntp/IncognitoDescriptionView.java | 42 ++-----------------
  .../SettingsCustomTabLauncherImpl.java        |  6 ++-
- ...llbackHelpAndFeedbackLauncherDelegate.java |  8 +---
+ ...llbackHelpAndFeedbackLauncherDelegate.java |  4 +-
  .../HelpAndFeedbackLauncherDelegate.java      |  2 +-
  .../ImageDescriptionsController.java          |  3 +-
  .../browser/lens/LensSupportStatusHelper.java |  3 +-
  .../omnibox/omnibox_pedal_implementations.cc  |  5 ---
- 9 files changed, 15 insertions(+), 69 deletions(-)
+ 10 files changed, 16 insertions(+), 76 deletions(-)
 
 diff --git a/chrome/android/java/res/xml/legal_information_preferences.xml b/chrome/android/java/res/xml/legal_information_preferences.xml
 index 32067c19d4f7a37a229d9437847c7809b7c30df0..8998689617e278fc0dda63a960e7f4c031b6f16b 100644
@@ -36,6 +37,36 @@ index 32067c19d4f7a37a229d9437847c7809b7c30df0..8998689617e278fc0dda63a960e7f4c0
 -        android:title="@string/privacy_policy_title"
 -        app:url="@string/google_privacy_policy_url" />
  </PreferenceScreen>
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
+index 32d47b979afa323b1e109a39c6b358c5049be9c9..9a615eaba3db63a745db72ddf9381e350d35155c 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/appearance/settings/AppearanceSettingsFragment.java
+@@ -37,7 +37,6 @@ import org.chromium.chrome.browser.settings.ChromeManagedPreferenceDelegate;
+ import org.chromium.chrome.browser.settings.search.ChromeBaseSearchIndexProvider;
+ import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarStatePredictor;
+ import org.chromium.chrome.browser.toolbar.settings.AddressBarPreference;
+-import org.chromium.chrome.browser.ui.bottombar.BottomBarActionEligibility;
+ import org.chromium.chrome.browser.ui.bottombar.BottomBarConfigUtils;
+ import org.chromium.chrome.browser.ui.vertical_tabs.VerticalTabUtils;
+ import org.chromium.components.bookmarks.BookmarkBarVisibilityState;
+@@ -550,16 +549,7 @@ public class AppearanceSettingsFragment extends ChromeBaseSettingsFragment
+     }
+ 
+     static boolean shouldOfferGlicBottomBarButtonPref(Context context, Profile profile) {
+-        if (!BottomBarConfigUtils.shouldMoveToolbarSettingsToAppearance(context)
+-                || !BottomBarConfigUtils.isBottomBarEligible(context)) {
+-            return false;
+-        }
+-        // The bottom bar resolves the candidate action when it starts, which has not happened if
+-        // Chrome started with the bottom bar off.
+-        if (BottomBarActionEligibility.getCachedCandidateExtraAction() == null) {
+-            BottomBarActionEligibility.getCandidateExtraAction(profile);
+-        }
+-        return BottomBarActionEligibility.shouldShowBottomBarGlicSetting(profile);
++        return false;
+     }
+ 
+     static boolean shouldShowHomepagePref(Context context) {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java
 index b2efe1f4727f29e96c95da3033f9f9069769cd9d..6ea23aaf900e4a2f5ae89ae0b85dff708d9b88f1 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherImpl.java
@@ -121,39 +152,28 @@ index 75b4d46a5cfc356ed1139ce72c6296fcbb877a43..b3439df5b10e15ddee50069b57116ec3
                  LaunchIntentDispatcher.createCustomTabActivityIntent(
                          context, customTabIntent.intent);
 diff --git a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java
-index 75434944628628f4d2aff5e31600af2baa831a11..13a41ef605b8d762d042321a7300cd2b3e8b85ab 100644
+index e51d6455a82d1e04d115792944183b68aad9cad8..13a41ef605b8d762d042321a7300cd2b3e8b85ab 100644
 --- a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java
 +++ b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/FallbackHelpAndFeedbackLauncherDelegate.java
-@@ -8,7 +8,6 @@ import android.app.Activity;
- 
- import org.chromium.base.Log;
- import org.chromium.build.annotations.NullMarked;
--import org.chromium.chrome.browser.flags.ChromeFeatureList;
- 
- /**
-  * Basic implementation for displaying help support for Chrome.
-@@ -22,12 +21,7 @@ public class FallbackHelpAndFeedbackLauncherDelegate implements HelpAndFeedbackL
+@@ -21,9 +21,7 @@ public class FallbackHelpAndFeedbackLauncherDelegate implements HelpAndFeedbackL
      @Override
      public void show(Activity activity, String helpContext, FeedbackCollector collector) {
          Log.d(TAG, "Feedback data: %s", collector.getBundle());
--        if (ChromeFeatureList.isEnabled(ChromeFeatureList.USE_P_LINK_IN_HELP)) {
--            HelpAndFeedbackLauncherDelegate.launchFallbackSupportUri(
--                    activity, HelpAndFeedbackLauncherDelegate.getPLinkHelpUrl(helpContext));
--        } else {
--            HelpAndFeedbackLauncherDelegate.launchFallbackSupportUri(activity, /* url= */ null);
--        }
+-        HelpAndFeedbackLauncherDelegate.launchFallbackSupportUri(
+-                activity,
+-                HelpAndFeedbackLauncherDelegate.getPLinkHelpUrlIfSupported(activity, helpContext));
 +        HelpAndFeedbackLauncherDelegate.launchFallbackSupportUri(activity, /* url= */ null);
      }
  
      @Override
 diff --git a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java
-index 6d2020a781dc18d35c3ed8694ab9b721377db8f2..8af77c8d93b464de5cc59dc4dc4568e746e92208 100644
+index c8bde1b98abb4c4deddf48e5861b0e879136f7f9..27290753fb70234534d62659642969ecfb96c123 100644
 --- a/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java
 +++ b/chrome/browser/feedback/android/java/src/org/chromium/chrome/browser/feedback/HelpAndFeedbackLauncherDelegate.java
-@@ -17,7 +17,7 @@ import org.chromium.build.annotations.Nullable;
- /** Delegate that handles the display of the HelpAndFeedback flows. */
+@@ -24,7 +24,7 @@ import java.util.List;
  @NullMarked
  public interface HelpAndFeedbackLauncherDelegate {
+     String TAG = "HelpAndFeedback";
 -    String FALLBACK_SUPPORT_URL = "https://support.google.com/chrome/topic/6069782";
 +    String FALLBACK_SUPPORT_URL = "https://aeriumbrowser.com/";
      String P_LINK_URL_PREFIX = "https://support.google.com/chrome/?p=";
@@ -202,10 +222,10 @@ index 887dc4583050a740cad85c200b9141d5bd5a6824..cfda3356b8e0fffae46a6121b09b263f
          }
  
 diff --git a/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc b/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
-index ecb45392ae7246064158fab5ca8cbf358e7aa077..71051b63f4ef7dc87f482339fa09fe5883193b3b 100644
+index 0e9606af4ba376d96a1bb9cc2c1acfc2017086ee..5c7469abe267b4be0dea912398ffc3e729cdb944 100644
 --- a/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
 +++ b/chrome/browser/ui/omnibox/omnibox_pedal_implementations.cc
-@@ -2064,12 +2064,7 @@ GetPedalImplementations(OmniboxPedalProfileType profile_type,
+@@ -2063,12 +2063,7 @@ GetPedalImplementations(OmniboxPedalProfileType profile_type,
    if (!otr && !guest) {
      add(new OmniboxPedalClearBrowsingData(/*incognito=*/false));
    }

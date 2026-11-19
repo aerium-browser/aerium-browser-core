@@ -12,7 +12,7 @@ Subject: [PATCH] Bring DevTools to phones
  5 files changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java
-index 62ed84b70331dcbad872c3d4cee07b3918a7657c..3f655c726e1959b0891a2467b9559236830bc708 100644
+index 7b95482cd6670a5605c461187e0c20d05459df16..7f29f60d792f835a5bd977d60a9f9ad9d9465e7b 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/customtabs/BaseCustomTabActivity.java
 @@ -524,6 +524,9 @@ public abstract class BaseCustomTabActivity extends ChromeActivity {

@@ -9,7 +9,7 @@ Subject: [PATCH] Hide the sign in promos
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoCoordinator.java b/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoCoordinator.java
-index 57eadce73652b553b10ef5889bfc836958f03df8..e426ab02d9d686afef5213dd7014b334ed204b1d 100644
+index a991fdd19d4d9828d9a33b986810464350240190..00ceabf34aae421c8c83b409f99de6264c0a6592 100644
 --- a/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoCoordinator.java
 +++ b/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/signin_promo/SigninPromoCoordinator.java
 @@ -135,7 +135,7 @@ public class SigninPromoCoordinator

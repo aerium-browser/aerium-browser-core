@@ -12,19 +12,19 @@ Subject: [PATCH] Load unpacked extensions from device storage
  5 files changed, 48 insertions(+), 3 deletions(-)
 
 diff --git a/base/android/java/src/org/chromium/base/VirtualDocumentPath.java b/base/android/java/src/org/chromium/base/VirtualDocumentPath.java
-index 5597fdda7b44554d5293d0fabfc7e2a00a4c7db0..8f1d6b4fb3d8f34e77f830ce8bef78ec05adf6f0 100644
+index d44af1f95802bbbf2d4676fc37cdb10f420cc436..5e3739a66369682946958cc8b6e9c8791ad49f45 100644
 --- a/base/android/java/src/org/chromium/base/VirtualDocumentPath.java
 +++ b/base/android/java/src/org/chromium/base/VirtualDocumentPath.java
-@@ -82,6 +82,8 @@ class VirtualDocumentPath {
+@@ -85,6 +85,8 @@ class VirtualDocumentPath {
  
      private static final String VIRTUAL_PATH_MARKER = "SAF";
      private static final String TREE_PATH = "tree";
 +    private static final String EXTERNAL_STORAGE_AUTHORITY =
 +            "com.android.externalstorage.documents";
- 
-     private final String mAuthority;
-     private final String mTreeId;
-@@ -210,6 +212,10 @@ class VirtualDocumentPath {
+     // AOSP providers keep the requested display name unchanged for this type instead of appending
+     // an extension.
+     private static final String UNKNOWN_MIME_TYPE = "application/octet-stream";
+@@ -216,6 +218,10 @@ class VirtualDocumentPath {
      @CalledByNative
      ResolveResult resolveDocument() {
          Uri tree = DocumentsContract.buildTreeDocumentUri(mAuthority, mTreeId);
@@ -35,7 +35,7 @@ index 5597fdda7b44554d5293d0fabfc7e2a00a4c7db0..8f1d6b4fb3d8f34e77f830ce8bef78ec
          Uri rootUri = DocumentsContract.buildDocumentUriUsingTree(tree, mTreeId);
          ResolveResult current = queryDocument(tree, rootUri, null);
          for (String name : mRelativePath) {
-@@ -224,6 +230,17 @@ class VirtualDocumentPath {
+@@ -230,6 +236,17 @@ class VirtualDocumentPath {
          return current;
      }
  
@@ -54,7 +54,7 @@ index 5597fdda7b44554d5293d0fabfc7e2a00a4c7db0..8f1d6b4fb3d8f34e77f830ce8bef78ec
          Uri tree = DocumentsContract.buildTreeDocumentUri(mAuthority, mTreeId);
          String parentDocId = DocumentsContract.getDocumentId(parentDocumentUri);
 diff --git a/extensions/browser/unpacked_installer.cc b/extensions/browser/unpacked_installer.cc
-index 642115f8e65cd59f3d3b70f49f35fe12741a862d..f176797e78f8293feef507337c0a32facf8d8d05 100644
+index ea1612a8b843d46545a073acb1d003df278332e1..1d999890d9e6db606630eeb5e7b9bdf6ec28412d 100644
 --- a/extensions/browser/unpacked_installer.cc
 +++ b/extensions/browser/unpacked_installer.cc
 @@ -317,9 +317,17 @@ bool UnpackedInstaller::LoadExtension(mojom::ManifestLocation location,

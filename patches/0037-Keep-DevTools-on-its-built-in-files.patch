@@ -9,10 +9,10 @@ Subject: [PATCH] Keep DevTools on its built in files
  2 files changed, 10 insertions(+)
 
 diff --git a/chrome/browser/devtools/devtools_window.cc b/chrome/browser/devtools/devtools_window.cc
-index cf994792b490b3769685de6df717c2afbfa4b608..4907d8167bd33f783bdbff6279a4e9b4d2d1990b 100644
+index 998985a64a21124ea2c54fc31266fe8a0c4eadf0..b3f592d9095396bf7faa8280953937fe36bf9925 100644
 --- a/chrome/browser/devtools/devtools_window.cc
 +++ b/chrome/browser/devtools/devtools_window.cc
-@@ -1457,8 +1457,12 @@ GURL DevToolsWindow::GetDevToolsURL(Profile* profile,
+@@ -1527,8 +1527,12 @@ GURL DevToolsWindow::GetDevToolsURL(Profile* profile,
                                      bool browser_connection) {
    std::string url;
  

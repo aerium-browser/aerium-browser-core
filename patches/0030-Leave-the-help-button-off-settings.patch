@@ -8,7 +8,7 @@ Subject: [PATCH] Leave the help button off settings
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsMenuHelper.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsMenuHelper.java
-index 125b3eaf45c6b20b4eb7ff002f85728aa9a250c1..a443267c63db8125ccd5c2560b4e03e793b359b2 100644
+index 61285005535d1cf19f74668b2681e71215f0c0ed..9d3f0cf53a0d5e901a8e2165465bd876abf30bd5 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsMenuHelper.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsMenuHelper.java
 @@ -102,9 +102,7 @@ public class SettingsMenuHelper {

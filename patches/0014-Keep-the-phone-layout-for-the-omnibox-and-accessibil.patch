@@ -13,18 +13,18 @@ Subject: [PATCH] Keep the phone layout for the omnibox and accessibility
  6 files changed, 18 insertions(+), 16 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java
-index 361adc0a7b4a16b0bcc387d1355098fbdea928eb..5ed6e3fcaef53e4e6de60a102c26457e80a4ebed 100644
+index d3c6b8d5de7d7f8c4822db629db36d50236dbb41..8e2d9df46e81f270411a8f25bd8f9d247abfb427 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabStateBrowserControlsVisibilityDelegate.java
-@@ -23,7 +23,6 @@ import org.chromium.build.annotations.Nullable;
- import org.chromium.cc.input.BrowserControlsState;
+@@ -28,7 +28,6 @@ import org.chromium.chrome.browser.browser_controls.BrowserControlsStateProvider
+ import org.chromium.chrome.browser.browser_controls.BrowserControlsUtils;
  import org.chromium.chrome.browser.device.DeviceClassManager;
  import org.chromium.chrome.browser.flags.ChromeFeatureList;
 -import org.chromium.chrome.browser.util.ChromeAccessibilityUtil;
  import org.chromium.components.browser_ui.util.BrowserControlsVisibilityDelegate;
- import org.chromium.components.dom_distiller.core.DomDistillerUrlUtils;
  import org.chromium.components.embedder_support.util.UrlUtilities;
-@@ -32,6 +31,7 @@ import org.chromium.content_public.browser.ImeAdapter;
+ import org.chromium.components.security_state.SecurityStateModel;
+@@ -37,6 +36,7 @@ import org.chromium.content_public.browser.ImeAdapter;
  import org.chromium.content_public.browser.ImeEventObserver;
  import org.chromium.content_public.browser.NavigationHandle;
  import org.chromium.content_public.browser.WebContents;
@@ -32,7 +32,7 @@ index 361adc0a7b4a16b0bcc387d1355098fbdea928eb..5ed6e3fcaef53e4e6de60a102c26457e
  import org.chromium.ui.base.WindowAndroid;
  import org.chromium.url.GURL;
  
-@@ -251,7 +251,8 @@ public class TabStateBrowserControlsVisibilityDelegate extends BrowserControlsVi
+@@ -270,7 +270,8 @@ public class TabStateBrowserControlsVisibilityDelegate extends BrowserControlsVi
          }
          // TODO(tedchoc): AccessibilityUtil and DeviceClassManager checks do not belong in Tab
          //                logic.  They should be moved to application level checks.
@@ -43,10 +43,10 @@ index 361adc0a7b4a16b0bcc387d1355098fbdea928eb..5ed6e3fcaef53e4e6de60a102c26457e
              flags |= (1 << (int) LockReason.A11Y_ENABLED);
          }
 diff --git a/chrome/browser/flag-metadata.json b/chrome/browser/flag-metadata.json
-index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f879bbab76 100644
+index 0ba0de9d7469e3fcb842982a4c6b76564913838b..3e556314299e18887708496d4d67755c389bfd7f 100644
 --- a/chrome/browser/flag-metadata.json
 +++ b/chrome/browser/flag-metadata.json
-@@ -272,7 +272,7 @@
+@@ -270,7 +270,7 @@
      "owners": [
        "etiennep@google.com", "fdoray@google.com"
      ],
@@ -55,7 +55,7 @@ index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f8
    },
    {
      "name": "allow-all-sites-to-initiate-mirroring",
-@@ -383,7 +383,7 @@
+@@ -387,7 +387,7 @@
    {
      "name": "android-bottom-bar",
      "owners": [ "polardz@google.com", "ckitagawa@chromium.com", "clank-tab-dev@google.com" ],
@@ -64,7 +64,7 @@ index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f8
    },
    {
      "name": "android-bricks-native-page",
-@@ -1928,7 +1928,7 @@
+@@ -1957,7 +1957,7 @@
    {
      "name": "cct-open-in-browser-button-if-allowed-by-embedder",
      "owners": ["kamalchoudhury@google.com", "edmundw@google.com"],
@@ -73,7 +73,7 @@ index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f8
    },
    {
      "name": "cct-open-in-browser-button-if-enabled-by-embedder",
-@@ -2799,7 +2799,7 @@
+@@ -2832,7 +2832,7 @@
    {
      "name": "darken-websites-checkbox-in-themes-setting",
      "owners": [ "nemco@google.com", "wenyufu@google.com", "twellington@chromium.org" ],
@@ -82,7 +82,7 @@ index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f8
    },
    {
      "name": "data-controls-search-with",
-@@ -3467,7 +3467,7 @@
+@@ -3495,7 +3495,7 @@
    {
      "name": "enable-accessibility-sequential-focus",
      "owners": [ "jocelyntran@google.com", "//ui/accessibility/OWNERS" ],
@@ -91,7 +91,7 @@ index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f8
    },
    {
      "name": "enable-accessibility-shake-to-locate",
-@@ -4961,7 +4961,7 @@
+@@ -4967,7 +4967,7 @@
    {
      "name": "enforce-incognito-isolation",
      "owners": [ "shuyng@google.com", "clank-large-form-factors@google.com" ],
@@ -99,17 +99,17 @@ index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f8
 +    "expiry_milestone": -1
    },
    {
-     "name": "enforce-mono-audio-capture",
-@@ -6378,7 +6378,7 @@
+     "name": "enforce-system-aec",
+@@ -6386,7 +6386,7 @@
    {
      "name": "inline-pdf-v2",
      "owners": [ "rathomas@google.com", "clank-large-form-factors@google.com" ],
--    "expiry_milestone": 158
+-    "expiry_milestone": 162
 +    "expiry_milestone": -1
    },
    {
      "name": "inline-pdf-v2-incognito",
-@@ -6910,7 +6910,7 @@
+@@ -6908,7 +6908,7 @@
        "twellington@chromium.org",
        "skavuluru@google.com"
      ],
@@ -118,7 +118,7 @@ index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f8
    },
    {
      "name": "long-screenshots-lenient-memory-check",
-@@ -7548,7 +7548,7 @@
+@@ -7528,7 +7528,7 @@
    {
      "name": "offline-auto-fetch",
      "owners": [ "tbansal@google.com" ],
@@ -127,7 +127,7 @@ index 6700afb2c60a2ee8a379f418709ed7f041146ccf..7e06f249426def3f862eeb5a2f8a73f8
    },
    {
      "name": "omaha-min-sdk-version-android",
-@@ -10016,7 +10016,7 @@
+@@ -10014,7 +10014,7 @@
    {
      "name": "use-fullscreen-insets-api",
      "owners": [ "clhager@google.com"],
@@ -164,10 +164,10 @@ index 3785c8dab587bf13771a47091961280ee59c6df9..c7e3b1db071b243c80c7ada5eca1732c
                          : durationMs;
  
 diff --git a/components/omnibox/browser/autocomplete_result.cc b/components/omnibox/browser/autocomplete_result.cc
-index 0b24734e66f96e4568d6f989d54a82c81b1ee740..a2d1a6072071b7c7ca8c70e647444f37d73bc648 100644
+index 3d652e5ab689bbcb53fe0936f29fdf56b156aa61..d9b927072f3c1d758277857cfaa4fa4448e1d518 100644
 --- a/components/omnibox/browser/autocomplete_result.cc
 +++ b/components/omnibox/browser/autocomplete_result.cc
-@@ -79,7 +79,7 @@ using AutocompleteMatchType = omnibox::AutocompleteMatchType;
+@@ -80,7 +80,7 @@ using AutocompleteMatchType = omnibox::AutocompleteMatchType;
  namespace {
  
  constexpr bool is_android_any = !!BUILDFLAG(IS_ANDROID);
@@ -177,7 +177,7 @@ index 0b24734e66f96e4568d6f989d54a82c81b1ee740..a2d1a6072071b7c7ca8c70e647444f37
  constexpr bool is_ios = !!BUILDFLAG(IS_IOS);
  constexpr bool is_desktop = !(is_android_mobile || is_ios);
 diff --git a/components/omnibox/browser/zero_suggest_verbatim_match_provider.cc b/components/omnibox/browser/zero_suggest_verbatim_match_provider.cc
-index f3775921610c4f64fa93736ac6234153b8222bb9..cd4753f253840691f74e9ad360e465d3af47ec72 100644
+index 70c99f4128d3ee076a2d5ba2a9b5f2a0332aa065..e70c025b7e88d82f5277fb1240c0aa7c33dd12ec 100644
 --- a/components/omnibox/browser/zero_suggest_verbatim_match_provider.cc
 +++ b/components/omnibox/browser/zero_suggest_verbatim_match_provider.cc
 @@ -28,7 +28,7 @@

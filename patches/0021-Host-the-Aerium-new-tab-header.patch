@@ -8,10 +8,10 @@ Subject: [PATCH] Host the Aerium new tab header
  1 file changed, 4 insertions(+)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
-index a08c5880ba6c2239406650444cc78de868940477..532186e76e1f51a7c66f088102036fba1bcbf786 100644
+index fe4dc1a16c1e9bdfde5266ddac5055c3794bf5b6..228d2cdd7b0e41fcb4ec8faa718745c9315f40d9 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPage.java
-@@ -531,6 +531,10 @@ public class NewTabPage
+@@ -538,6 +538,10 @@ public class NewTabPage
          // TODO(crbug.com/347509698): Remove the log statements after fixing the bug.
          Log.d(TAG, "NewTabPageLayout inflate");
          mNewTabPageLayout = (NewTabPageLayout) inflater.inflate(R.layout.new_tab_page_layout, null);

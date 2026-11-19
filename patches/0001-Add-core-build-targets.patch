@@ -10,7 +10,7 @@ Subject: [PATCH] Add core build targets
  3 files changed, 10 insertions(+)
 
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
-index e3e9d0318a10d0988fbb30cdc4bd38d372d4cf2e..b4c578bb99010b2eee0cd6ea8392c599296f197c 100644
+index 31655cd27510814d640298abf29b6cd18017cfc0..b1546ed7e410676024135390c4094de34e4c7d3f 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
 @@ -8,6 +8,7 @@ import("//build/toolchain/gcc_toolchain.gni")
@@ -21,7 +21,7 @@ index e3e9d0318a10d0988fbb30cdc4bd38d372d4cf2e..b4c578bb99010b2eee0cd6ea8392c599
  import("//components/supervised_user/buildflags.gni")
  
  assert(!is_cronet_build)
-@@ -312,6 +313,7 @@ if (_is_default_toolchain) {
+@@ -288,6 +289,7 @@ if (_is_default_toolchain) {
  
    android_library("chrome_java") {
      deps = [
@@ -29,7 +29,7 @@ index e3e9d0318a10d0988fbb30cdc4bd38d372d4cf2e..b4c578bb99010b2eee0cd6ea8392c599
        ":base_module_java",
        ":chrome_app_java_resources",
        ":chrome_public_apk_template_resources",
-@@ -906,6 +908,10 @@ if (_is_default_toolchain) {
+@@ -886,6 +888,10 @@ if (_is_default_toolchain) {
  
      # From java_sources.gni.
      sources = chrome_java_sources
@@ -40,7 +40,7 @@ index e3e9d0318a10d0988fbb30cdc4bd38d372d4cf2e..b4c578bb99010b2eee0cd6ea8392c599
  
      # Include sources from feed_java_sources.gni.
      sources += feed_java_sources
-@@ -2740,6 +2746,7 @@ if (_is_default_toolchain) {
+@@ -2755,6 +2761,7 @@ if (_is_default_toolchain) {
  
    generate_jni("chrome_jni_headers") {
      sources = [
@@ -49,10 +49,10 @@ index e3e9d0318a10d0988fbb30cdc4bd38d372d4cf2e..b4c578bb99010b2eee0cd6ea8392c599
        "../browser/share/android/java/src/org/chromium/chrome/browser/share/link_to_text/LinkToTextBridge.java",
        "../browser/share/android/java/src/org/chromium/chrome/browser/share/long_screenshots/bitmap_generation/LongScreenshotsTabService.java",
 diff --git a/chrome/browser/BUILD.gn b/chrome/browser/BUILD.gn
-index f0f529901a3fcde87402a508a627cdfc2419be42..db19b0401737e2bec0f4d61f5e842e9fcddb2593 100644
+index 668ab11f76ac1fad82aa882cb840cdbc0f40b7bb..a4df725c37ebb5d1f0f7a6fca99d6e9f5f1b867a 100644
 --- a/chrome/browser/BUILD.gn
 +++ b/chrome/browser/BUILD.gn
-@@ -4121,6 +4121,7 @@ source_set("browser") {
+@@ -4115,6 +4115,7 @@ source_set("browser") {
    # block with the `enable_extensions` block above.
    if (enable_desktop_android_extensions) {
      deps += [
@@ -61,7 +61,7 @@ index f0f529901a3fcde87402a508a627cdfc2419be42..db19b0401737e2bec0f4d61f5e842e9f
        "//chrome/browser/ui/android/extensions/browser_window_helper/internal",
        "//chrome/browser/ui/android/extensions/side_panel/internal",
 diff --git a/chrome/browser/prefs/BUILD.gn b/chrome/browser/prefs/BUILD.gn
-index f73a22f47658fc998b277c3297e3163c34743884..1cbfb1258c659a079443ae19bad8dc53909b22ca 100644
+index fd4a1c2e2008ca3defc993befef944e6106f019c..9977995a5acd2f33b96ebb3dfb7b87dfd159888a 100644
 --- a/chrome/browser/prefs/BUILD.gn
 +++ b/chrome/browser/prefs/BUILD.gn
 @@ -47,6 +47,8 @@ source_set("prefs") {

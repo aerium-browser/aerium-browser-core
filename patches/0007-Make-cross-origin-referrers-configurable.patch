@@ -71,12 +71,12 @@ index e5258679dd876490012a756f7e10cfb64541cbe6..a4a8e6717dab2d724780e12adc32b190
  }
  
 diff --git a/net/base/features.cc b/net/base/features.cc
-index 7ea61dc9a5f3fbd8a57e31417c821835a471a47c..667a2b5ba48dbad9d9809fc9b9e09672215a5e8e 100644
+index c45efd21a70212c454c6fabc0fc389a241ad4f89..adadabedc27fc046ecd3c527899b52c33c43f7d4 100644
 --- a/net/base/features.cc
 +++ b/net/base/features.cc
-@@ -1144,5 +1144,12 @@ BASE_FEATURE(kCookieMonsterPerKeyDelete, base::FEATURE_DISABLED_BY_DEFAULT);
- 
- BASE_FEATURE(kHttpChunkedDecoderInRust, base::FEATURE_DISABLED_BY_DEFAULT);
+@@ -1180,5 +1180,12 @@ BASE_FEATURE(kPostHandshakeIpPoolingAllEndpoints,
+ BASE_FEATURE(kProactiveIpPoolingForInFlightJobs,
+              base::FEATURE_DISABLED_BY_DEFAULT);
  
 +BASE_FEATURE(kAeriumCrossOriginReferrer, base::FEATURE_DISABLED_BY_DEFAULT);
 +BASE_FEATURE_PARAM(int,
@@ -88,12 +88,12 @@ index 7ea61dc9a5f3fbd8a57e31417c821835a471a47c..667a2b5ba48dbad9d9809fc9b9e09672
  }  // namespace net::features
  
 diff --git a/net/base/features.h b/net/base/features.h
-index a8e12f3ada45610d95db160dd2b5d83a950d952a..a90a9807304790a3456a1df2d633b518a3f8d039 100644
+index 74243f76d6a92d58f1aa31c7be038b5dd559bcbd..3f7d3c9cd3f78fff723278116750a1a5e9af227b 100644
 --- a/net/base/features.h
 +++ b/net/base/features.h
-@@ -1113,6 +1113,9 @@ NET_EXPORT BASE_DECLARE_FEATURE(kCookieMonsterPerKeyDelete);
- // Enables the Rust implementation of the HTTP chunked decoder, called via FFI.
- NET_EXPORT BASE_DECLARE_FEATURE(kHttpChunkedDecoderInRust);
+@@ -1173,6 +1173,9 @@ NET_EXPORT BASE_DECLARE_FEATURE(kPostHandshakeIpPoolingAllEndpoints);
+ // resolved IP endpoints.
+ NET_EXPORT BASE_DECLARE_FEATURE(kProactiveIpPoolingForInFlightJobs);
  
 +NET_EXPORT BASE_DECLARE_FEATURE(kAeriumCrossOriginReferrer);
 +NET_EXPORT BASE_DECLARE_FEATURE_PARAM(int, kAeriumCrossOriginReferrerMode);
@@ -102,10 +102,10 @@ index a8e12f3ada45610d95db160dd2b5d83a950d952a..a90a9807304790a3456a1df2d633b518
  
  #endif  // NET_BASE_FEATURES_H_
 diff --git a/net/url_request/url_request_http_job.cc b/net/url_request/url_request_http_job.cc
-index c909310d202002b724941bd4e2b4fede56b69d45..29610dd99f5d240939bf086c9aac807228019f1b 100644
+index 3c8bd18bb51758d5ae7a2efa6f4c2a4b953650b3..71efdab38ccd67b814b2240e89d80db8d28dc158 100644
 --- a/net/url_request/url_request_http_job.cc
 +++ b/net/url_request/url_request_http_job.cc
-@@ -470,7 +470,8 @@ void URLRequestHttpJob::Start() {
+@@ -481,7 +481,8 @@ void URLRequestHttpJob::Start() {
  
    // URLRequest::SetReferrer ensures that we do not send username and password
    // fields in the referrer.
@@ -116,18 +116,18 @@ index c909310d202002b724941bd4e2b4fede56b69d45..29610dd99f5d240939bf086c9aac8072
    // Our consumer should have made sure that this is a safe referrer (e.g. via
    // URLRequestJob::ComputeReferrerForPolicy).
 diff --git a/net/url_request/url_request_job.cc b/net/url_request/url_request_job.cc
-index 80a9c132c2939c1750ae5b1cb6832c095dd75272..4e14ee2ff0810d9b7f6bc2b8b6f1edd152a23171 100644
+index 2b13832faed8b2952e639755f3ccc9e8a0c8d31c..abb6a44b80f9c7efe3207681262e1926a78d3dcc 100644
 --- a/net/url_request/url_request_job.cc
 +++ b/net/url_request/url_request_job.cc
-@@ -42,6 +42,7 @@
- #include "net/url_request/redirect_info.h"
+@@ -43,6 +43,7 @@
  #include "net/url_request/redirect_util.h"
  #include "net/url_request/url_request_context.h"
+ #include "net/url_request/url_request_http_transaction_factory_override.h"
 +#include "url/origin.h"
  
  namespace net {
  
-@@ -312,6 +313,26 @@ GURL MaybeStripToOrigin(GURL url, bool should_strip_to_origin) {
+@@ -313,6 +314,26 @@ GURL MaybeStripToOrigin(GURL url, bool should_strip_to_origin) {
  }  // namespace
  
  // static

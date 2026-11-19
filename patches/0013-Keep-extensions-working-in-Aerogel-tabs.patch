@@ -5,19 +5,18 @@ Subject: [PATCH] Keep extensions working in Aerogel tabs
 
 ---
  .../chromium/chrome/browser/ChromeTabbedActivity.java    | 8 +++++---
- chrome/browser/extensions/api/tabs/tabs_api.cc           | 3 +++
  .../chrome/browser/incognito/IncognitoUtils.java         | 9 +--------
  chrome/browser/profiles/profile_destroyer.cc             | 5 +++++
  content/browser/web_contents/web_contents_impl.cc        | 9 +++++++++
  content/public/browser/web_contents.h                    | 3 +++
  extensions/browser/process_manager.cc                    | 8 +++++++-
- 7 files changed, 33 insertions(+), 12 deletions(-)
+ 6 files changed, 30 insertions(+), 12 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index d536a1c832561e3f73c1ceefc45e01d3fe996415..4f83c243c9fbc45c27819a26fc3a0ca3c9834f70 100644
+index aff846c2f46de970e2f698230702487b4521ff94..4bb8cf21c56a1582808b45fe4360429a0b498bfc 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -1292,15 +1292,17 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -1320,15 +1320,17 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
                          defaultPaneId);
          // TODO(crbug.com/444024982): Preserve default pane via PaneListBuilder.
          var builder = hubProvider.getPaneListBuilder();
@@ -38,25 +37,11 @@ index d536a1c832561e3f73c1ceefc45e01d3fe996415..4f83c243c9fbc45c27819a26fc3a0ca3
                  || mSupportedProfileType == SupportedProfileType.OFF_THE_RECORD) {
              builder.registerPane(
                      PaneId.INCOGNITO_TAB_SWITCHER,
-diff --git a/chrome/browser/extensions/api/tabs/tabs_api.cc b/chrome/browser/extensions/api/tabs/tabs_api.cc
-index de78a212cda49cdaedb23674e30ceec3db56807f..4738d4a19bba27ab97f5e899516ccf628fa57a01 100644
---- a/chrome/browser/extensions/api/tabs/tabs_api.cc
-+++ b/chrome/browser/extensions/api/tabs/tabs_api.cc
-@@ -637,6 +637,9 @@ base::ListValue TabsQueryFunction::BuildTabList(
-     }
- 
-     TabListInterface* tab_list = TabListInterface::From(browser);
-+    if (!tab_list) {
-+      continue;
-+    }
-     for (int i = 0; i < tab_list->GetTabCount(); ++i) {
-       if (tab_index > -1 && i != tab_index) {
-         continue;
 diff --git a/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java b/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java
-index 363eb2dc2d2f2a56a0a70af64416425b022874b2..e510f52c6035ffe04d8dc0030bb7f07ac934ec29 100644
+index 6733aebf1b540692eb063fd631e079758e3e0f25..2fcaa3c527516678e62a732fb8d6c7ae47cda05b 100644
 --- a/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java
 +++ b/chrome/browser/incognito/android/java/src/org/chromium/chrome/browser/incognito/IncognitoUtils.java
-@@ -29,7 +29,6 @@ import org.chromium.chrome.browser.profiles.Profile;
+@@ -30,7 +30,6 @@ import org.chromium.chrome.browser.profiles.Profile;
  import org.chromium.chrome.browser.profiles.ProfileKey;
  import org.chromium.chrome.browser.profiles.ProfileKeyUtil;
  import org.chromium.chrome.browser.profiles.ProfileManager;
@@ -64,7 +49,7 @@ index 363eb2dc2d2f2a56a0a70af64416425b022874b2..e510f52c6035ffe04d8dc0030bb7f07a
  import org.chromium.ui.display.DisplayUtil;
  
  /** Utilities for working with incognito tabs spread across multiple activities. */
-@@ -139,13 +138,7 @@ public class IncognitoUtils {
+@@ -141,13 +140,7 @@ public class IncognitoUtils {
          if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2) {
              return false;
          }
@@ -103,10 +88,10 @@ index b21c05ff433ccd22ffc29ccfe0301cbd90afe142..5445ed114d98bf8fd8e4dc79ddfe63e0
                "ProfileDestroyer::DestroyOTRProfileWhenAppropriateWithTimeout",
                [&](perfetto::EventContext ctx) {
 diff --git a/content/browser/web_contents/web_contents_impl.cc b/content/browser/web_contents/web_contents_impl.cc
-index a2638c29d409ebe008a9c3487aa6dfb093c36500..52d5763495dc690127f15ea110dd084da26067e2 100644
+index 861b89ba9b5a3f991bf72064fdc244551550998b..39d705f811010c4a4e6d42990afde6d5a0a8cbca 100644
 --- a/content/browser/web_contents/web_contents_impl.cc
 +++ b/content/browser/web_contents/web_contents_impl.cc
-@@ -831,6 +831,15 @@ WebContents* WebContents::FromRenderViewHost(RenderViewHost* rvh) {
+@@ -832,6 +832,15 @@ WebContents* WebContents::FromRenderViewHost(RenderViewHost* rvh) {
        static_cast<RenderViewHostImpl*>(rvh)->GetDelegate());
  }
  
@@ -123,10 +108,10 @@ index a2638c29d409ebe008a9c3487aa6dfb093c36500..52d5763495dc690127f15ea110dd084d
    OPTIONAL_TRACE_EVENT1(TRACE_DISABLED_BY_DEFAULT("content.verbose"),
                          "WebContents::FromRenderFrameHost", "render_frame_host",
 diff --git a/content/public/browser/web_contents.h b/content/public/browser/web_contents.h
-index 1c5e61a5aabc589826fe44976a4a7718bcae09be..9161f32368de7761194fdbae8f540518adab95f0 100644
+index 50aa101a5c9bbc16392541918a1e0c3687af0ddc..33a9a0c5b734e9a7ce6bd356ed88ff23c4ecc305 100644
 --- a/content/public/browser/web_contents.h
 +++ b/content/public/browser/web_contents.h
-@@ -445,6 +445,9 @@ class WebContents : public PageNavigator, public base::SupportsUserData {
+@@ -446,6 +446,9 @@ class WebContents : public PageNavigator, public base::SupportsUserData {
    //   one case where a RenderFrameHost can be active but not primary.
    CONTENT_EXPORT static WebContents* FromRenderFrameHost(RenderFrameHost* rfh);
  
@@ -137,7 +122,7 @@ index 1c5e61a5aabc589826fe44976a4a7718bcae09be..9161f32368de7761194fdbae8f540518
    // return nullptr if the RenderFrameHost is shutting down.
    CONTENT_EXPORT static WebContents* FromFrameTreeNodeId(
 diff --git a/extensions/browser/process_manager.cc b/extensions/browser/process_manager.cc
-index 7422ff493a308a1cd014640e429b499e68d735b9..42b5ec79c7774abd5f1dc1c019d2bc60754164a3 100644
+index 32c123e98e169c44fe18511abf191facc1a41092..35a1237c3a15304dfebd0f9de7060633af6e44b8 100644
 --- a/extensions/browser/process_manager.cc
 +++ b/extensions/browser/process_manager.cc
 @@ -23,6 +23,7 @@

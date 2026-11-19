@@ -8,13 +8,13 @@ Subject: [PATCH] Leave the account button off the toolbar
  1 file changed, 1 insertion(+), 18 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java
-index 7ad16149ce4d54ec8e3b4823aad2cc7b0e28216c..9ff345a802b9b231f16c20d80d03c9c9c4b13168 100644
+index c4c28dbe01b4782e97943238ecca18ddb6ff267e..dc6fe5a370465190149f055b0d48270548eca9ac 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java
-@@ -31,7 +31,6 @@ import org.chromium.chrome.browser.commerce.coupons.DiscountsBottomSheetContentC
+@@ -29,7 +29,6 @@ import org.chromium.chrome.browser.commerce.CommerceBottomSheetContentProvider;
+ import org.chromium.chrome.browser.commerce.ShoppingServiceFactory;
+ import org.chromium.chrome.browser.commerce.coupons.DiscountsBottomSheetContentCoordinator;
  import org.chromium.chrome.browser.commerce.coupons.DiscountsButtonController;
- import org.chromium.chrome.browser.dom_distiller.ReaderModeIphController;
- import org.chromium.chrome.browser.dom_distiller.ReaderModeToolbarButtonController;
 -import org.chromium.chrome.browser.identity_disc.IdentityDiscController;
  import org.chromium.chrome.browser.lifecycle.ActivityLifecycleDispatcher;
  import org.chromium.chrome.browser.omnibox.voice.VoiceRecognitionHandler;

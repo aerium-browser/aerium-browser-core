@@ -8,7 +8,7 @@
 
 uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 
-[![Version](https://img.shields.io/badge/version-158.0.8127.43-2A4485?style=flat-square)](https://github.com/aerium-browser/aerium-browser-core/releases)
+[![Version](https://img.shields.io/badge/version-159.0.8154.18-2A4485?style=flat-square)](https://github.com/aerium-browser/aerium-browser-core/releases)
 [![Downloads](https://img.shields.io/badge/downloads-20k%2B-2A4485?style=flat-square)](https://github.com/aerium-browser/aerium-browser-core/releases)
 [![Chromium](https://img.shields.io/badge/Chromium-158-2A4485?style=flat-square)](chromium.pin)
 [![Latest Chromium](https://img.shields.io/badge/dynamic/json?style=flat-square&color=2A4485&label=latest%20Chromium&query=%24%5B0%5D.version&url=https%3A%2F%2Fchromiumdash.appspot.com%2Ffetch_releases%3Fchannel%3DStable%26platform%3DAndroid%26num%3D1)](https://chromiumdash.appspot.com/releases?platform=Android)

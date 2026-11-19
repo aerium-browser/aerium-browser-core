@@ -12,13 +12,13 @@ Subject: [PATCH] Open aerium pages
  5 files changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
-index 8f9a561242df75bd084394ffdfebf8b7457d531d..63461abda6cea4339fac6d3f74734935f1860ef8 100644
+index 31f8c30cc2a86d623532efd6b0e75847ea591d21..49aea45dedde25c8493043c98379c33012a9c3e5 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tab/TabImpl.java
-@@ -1063,6 +1063,10 @@ class TabImpl implements Tab, TabInternal {
+@@ -1073,6 +1073,10 @@ class TabImpl implements Tab {
+     @Override
      public LoadUrlResult loadUrl(LoadUrlParams params) {
-         try {
-             TraceEvent.begin("Tab.loadUrl");
+         try (TraceEvent e = TraceEvent.scoped("Tab.loadUrl")) {
 +            String typedUrl = params.getUrl();
 +            if (typedUrl != null && typedUrl.regionMatches(true, 0, "aerium://", 0, 9)) {
 +                params.setUrl("chrome://" + typedUrl.substring(9));
@@ -27,10 +27,10 @@ index 8f9a561242df75bd084394ffdfebf8b7457d531d..63461abda6cea4339fac6d3f74734935
                  return new LoadUrlResult(
                          TabLoadStatus.DEFAULT_PAGE_LOAD, /* navigationHandle= */ null);
 diff --git a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
-index 6f696e5d951ee747436f2187e563d83e7d551f5d..2a2f853bcdc1a8e20628e260de659794cda009ea 100644
+index a43e78cf55dc11a631bfe0092e9247d28b486aae..3c1f1f604b6c0440c0cc8fc9ef64e92792406028 100644
 --- a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
 +++ b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
-@@ -430,7 +430,7 @@ std::string ChromeAutocompleteProviderClient::GetAcceptLanguages() const {
+@@ -422,7 +422,7 @@ std::string ChromeAutocompleteProviderClient::GetAcceptLanguages() const {
  std::string
  ChromeAutocompleteProviderClient::GetEmbedderRepresentationOfAboutScheme()
      const {
@@ -39,7 +39,7 @@ index 6f696e5d951ee747436f2187e563d83e7d551f5d..2a2f853bcdc1a8e20628e260de659794
  }
  
  std::vector<std::u16string> ChromeAutocompleteProviderClient::GetBuiltinURLs() {
-@@ -462,12 +462,9 @@ std::vector<std::u16string> ChromeAutocompleteProviderClient::GetBuiltinURLs() {
+@@ -454,12 +454,9 @@ std::vector<std::u16string> ChromeAutocompleteProviderClient::GetBuiltinURLs() {
  std::vector<std::u16string>
  ChromeAutocompleteProviderClient::GetBuiltinsToProvideAsUserTypes() {
    std::vector<std::u16string> builtins_to_provide;
@@ -56,10 +56,10 @@ index 6f696e5d951ee747436f2187e563d83e7d551f5d..2a2f853bcdc1a8e20628e260de659794
  }
  
 diff --git a/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc b/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc
-index e0402ff520d50a0826a7803e214a9d8648bd2c2a..3791500a862ca68998d6be1216c17bf3ea97a4cd 100644
+index 12f64e72bc469e7095ea7d9ef2cc4936ca81fc92..2acecae670c783771aaa302a97147bf90937f84a 100644
 --- a/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc
 +++ b/chrome/browser/autocomplete/chrome_autocomplete_scheme_classifier.cc
-@@ -68,6 +68,9 @@ ChromeAutocompleteSchemeClassifier::GetInputTypeForScheme(
+@@ -63,6 +63,9 @@ ChromeAutocompleteSchemeClassifier::GetInputTypeForScheme(
    if (scheme.empty()) {
      return metrics::OmniboxInputType::EMPTY;
    }
@@ -70,7 +70,7 @@ index e0402ff520d50a0826a7803e214a9d8648bd2c2a..3791500a862ca68998d6be1216c17bf3
        (ProfileIOData::IsHandledProtocol(scheme) ||
         base::EqualsCaseInsensitiveASCII(scheme, content::kViewSourceScheme) ||
 diff --git a/chrome/common/chrome_content_client.cc b/chrome/common/chrome_content_client.cc
-index 601ff3ce617e212d57e59aa24e023a8a506da6f9..5a5e045871a87736e998375ce5d7bca5c4c65544 100644
+index c845ef3303c75805ba067d3d63a770ae81e47ab4..89028661f7c9ba4b5699f45546db630010fdd038 100644
 --- a/chrome/common/chrome_content_client.cc
 +++ b/chrome/common/chrome_content_client.cc
 @@ -205,6 +205,7 @@ static const char* const kChromeStandardURLSchemes[] = {
@@ -82,7 +82,7 @@ index 601ff3ce617e212d57e59aa24e023a8a506da6f9..5a5e045871a87736e998375ce5d7bca5
  #if BUILDFLAG(IS_ANDROID)
    schemes->referrer_schemes.push_back(content::kAndroidAppScheme);
 diff --git a/components/omnibox/browser/location_bar_model_impl.cc b/components/omnibox/browser/location_bar_model_impl.cc
-index 5445f8e5356969c240ef7c39e72cf064341b2c5b..18e4c0a58876865d29fc5cc25ed2c1767059e4d1 100644
+index 2222edd64594af45c5b21048018d30b9ac54e767..ab0bc19b1f911fdd05fcd6118c583ad74663c725 100644
 --- a/components/omnibox/browser/location_bar_model_impl.cc
 +++ b/components/omnibox/browser/location_bar_model_impl.cc
 @@ -147,11 +147,14 @@ std::u16string LocationBarModelImpl::GetFormattedURL(
