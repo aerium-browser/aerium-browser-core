@@ -627,6 +627,41 @@ else
     echo "[aerium] no unstripped libchrome.so found at $UNSTRIPPED_LIB"
 fi
 
+if [ "$AERIUM_PACKAGE" = aab ]; then
+    SYMBOLS_ZIP="$SCRIPT_DIR/release/$APK_BASE-$VERSION-$AERIUM_ABI-native-debug-symbols.zip"
+    SYMBOL_COUNT=$(python3 - "$UNSIGNED_APK" out/Default/lib.unstripped "$SYMBOLS_ZIP" <<'PY'
+import os
+import re
+import sys
+import zipfile
+
+bundle, unstripped, out = sys.argv[1:4]
+libs = set()
+with zipfile.ZipFile(bundle) as archive:
+    for name in archive.namelist():
+        match = re.match(r'^[^/]+/lib/([^/]+)/([^/]+\.so)$', name)
+        if match:
+            libs.add((match.group(1), match.group(2)))
+count = 0
+with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
+    for abi, lib in sorted(libs):
+        path = os.path.join(unstripped, lib)
+        if os.path.isfile(path):
+            archive.write(path, abi + '/' + lib)
+            count += 1
+if count == 0:
+    os.remove(out)
+print(count)
+PY
+    ) || SYMBOL_COUNT=0
+    if [ "$SYMBOL_COUNT" -gt 0 ] 2>/dev/null; then
+        echo "[aerium] native debug symbols for $SYMBOL_COUNT libraries: release/$(basename "$SYMBOLS_ZIP")"
+    else
+        rm -f "$SYMBOLS_ZIP"
+        echo "[aerium] no native debug symbols for the bundle"
+    fi
+fi
+
 echo "$VERSION" > $SCRIPT_DIR/release/version.txt
 touch $SCRIPT_DIR/release/finished.marker
 echo "[aerium] build finished: release/$FINAL_NAME"
