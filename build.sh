@@ -179,7 +179,8 @@ EOF
         source "$AERIUM_UI_DIR/engine/apply.sh"
     fi
     python3 "$SCRIPT_DIR/tools/google_scan.py" --src . \
-        --known "$SCRIPT_DIR/tools/google_known.txt" || true
+        --known "$SCRIPT_DIR/tools/google_known.txt" \
+        ${AERIUM_UI_DIR:+--known "$AERIUM_UI_DIR/engine/google_known.txt"} || true
 
     find . -name '*.grd.gritdeps' -not -path './out/*' | while read -r deps; do
         grd="${deps%.gritdeps}"

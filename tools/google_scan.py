@@ -90,7 +90,7 @@ def features(src):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--src", default=".")
-    parser.add_argument("--known", required=True)
+    parser.add_argument("--known", action="append", required=True)
     parser.add_argument("--update", action="store_true")
     args = parser.parse_args()
 
@@ -99,16 +99,17 @@ def main():
     found.update(features(args.src))
 
     if args.update:
-        with open(args.known, "w", encoding="utf-8") as f:
+        with open(args.known[0], "w", encoding="utf-8") as f:
             for key in sorted(found):
                 f.write(key + "\n")
         print("[aerium] google scan: %d known entries written" % len(found))
         return 0
 
     known = set()
-    if os.path.exists(args.known):
-        with open(args.known, encoding="utf-8") as f:
-            known = {line.strip() for line in f if line.strip()}
+    for path in args.known:
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                known.update(line.strip() for line in f if line.strip())
     new = sorted(k for k in found if k not in known)
 
     lines = ["[aerium] google scan: %d new of %d" % (len(new), len(found))]
