@@ -52,6 +52,18 @@ Most Android browsers can't run extensions. The few that could stopped following
 | Built straight on Chromium, no fork in between | ✓ | ✗ | **✓** |
 | Aerium Guard privacy presets | ✗ | ✗ | **✓** |
 
+## Compared with other browsers
+
+How Aerium differs from other Chromium based browsers on Android, as of November 2026. These browsers change often, so check their own documentation for the current state.
+
+|  | Aerium | Brave | Vivaldi | Cromite | Chrome |
+|---|---|---|---|---|---|
+| **Desktop extensions** | Chrome Web Store and `.crx` | Not supported | Not supported | Not supported | Not supported |
+| **Fingerprinting** | Noise on canvas readback, text metrics and layout measurements, with a new seed every browser session, so sites see a different fingerprint each time | Randomized per site, new seed every session | No randomization | Noise on several APIs | None |
+| **Source and Google services** | Engine patches under GPLv3, app layer closed source. Google services removed, no telemetry | Open source. Google services removed, privacy preserving usage stats (P3A) | Vivaldi account and sync services | Open source. Google services removed, no telemetry | Chromium is open source, Chrome is not. Full Google integration |
+| **Bundled extras** | None | Crypto wallet, Leo AI, VPN, News, Rewards | Partner speed dials, Vivaldi Translate | None | Gemini, Discover feed, Google Lens |
+| **Private browsing** | Aerogel tabs. Sites can be set to always open there, links from other apps can open there, extensions are allowed one by one | Private tabs | Private tabs | Incognito, with an option to always use it | Incognito |
+
 ## Features
 
 **Extensions.** Install from the Chrome Web Store, or a `.crx` from GitHub. Open any extension from the toolbar, choose which ones also run in Aerogel, and their popups fit the screen.
