@@ -43,14 +43,7 @@ Follow [Announcements](https://github.com/aerium-browser/aerium-browser-core/dis
 
 ## Why Aerium
 
-Most Android browsers can't run extensions. The few that could stopped following Chromium updates. Aerium does both.
-
-|  | Most browsers | Older extension browsers | **Aerium** |
-|---|:---:|:---:|:---:|
-| Chrome Web Store extensions | ✗ | ✓ | **✓** |
-| Up to date Chromium | ✓ | ✗ | **✓** |
-| Built straight on Chromium, no fork in between | ✓ | ✗ | **✓** |
-| Aerium Guard privacy presets | ✗ | ✗ | **✓** |
+Aerium is built straight from Chromium's own source, not on top of another browser or fork. Nothing sits in between, so when a new Chromium version comes out, Aerium moves to it right away instead of waiting for another project to catch up first. That keeps Aerium on the same Chromium version as Chrome itself.
 
 ## Compared with other browsers
 
