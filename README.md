@@ -92,7 +92,7 @@ How Aerium differs from other Chromium based browsers on Android, as of November
 
 **Extensions.** Install from the Chrome Web Store, or a `.crx` from GitHub. Open any extension from the toolbar, choose which ones also run in Aerogel, and their popups fit the screen.
 
-**Privacy.** Aerium Guard modes in one tap, fingerprinting noise on canvas and layout reads, Global Privacy Control on every request, tracking parameters stripped from links, redirect trackers and AMP skipped, cookie banners rejected when you ask, stricter site isolation, and Google's background services switched off.
+**Privacy.** Aerium Guard modes in one tap, a different fingerprint every session in Privacy mode, Global Privacy Control on every request, tracking parameters stripped from links, redirect trackers and AMP skipped, cookie banners rejected when you ask, stricter site isolation, and Google's background services switched off.
 
 **Aerogel.** Private tabs with their own window, per site rules for what gets deleted, and links from other apps can open there by default.
 
