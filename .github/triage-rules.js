@@ -19,6 +19,60 @@ const FEATURE_HEADINGS = [
 
 const FEATURE_LABELS = ['enhancement', 'documentation'];
 
+const CRASH_WORDS = new RegExp(
+  [
+    String.raw`\bcrash(?:es|ed|ing)?\b`,
+    String.raw`\bforce[- ]?clos(?:e|es|ed|ing)\b`,
+    String.raw`\bkeeps? stopping\b`,
+    String.raw`\b(?:has|keeps|kept) stopped\b`,
+    String.raw`\bclos(?:es|ed|ing) (?:by )?itself\b`,
+    'クラッシュ',
+    '強制終了',
+    '闪退',
+    '崩溃',
+    'çök',
+    'abstürz',
+    'stürzt ab',
+    'вылет',
+  ].join('|'),
+  'i',
+);
+
+const NEGATED_CRASH = new RegExp(
+  String.raw`\b(?:no|not|never|without|nor|doesn['’]?t|does not|don['’]?t|didn['’]?t|won['’]?t|isn['’]?t|wasn['’]?t)\s+(?:\w+\s+){0,2}crash\w*`,
+  'gi',
+);
+
+const STACK_TRACE = new RegExp(
+  [
+    'FATAL EXCEPTION',
+    'AndroidRuntime',
+    String.raw`Fatal signal \d+`,
+    String.raw`signal \d+ \(SIG[A-Z]+\)`,
+    'Abort message',
+    String.raw`\*\*\* \*\*\* \*\*\*`,
+    String.raw`^\s*#\d{2,} pc [0-9a-f]+`,
+    String.raw`^\s*at [\w$.<>]+\([^)]*\)`,
+    String.raw`Caused by: [\w$.]+`,
+    'beginning of crash',
+  ].join('|'),
+  'im',
+);
+
+const ATTACHED_LOG = new RegExp(
+  String.raw`https://github\.com/(?:user-attachments/files|[\w.-]+/[\w.-]+/files)/\d+/\S+\.(?:txt|log|zip|gz)\b`,
+  'i',
+);
+
+function claimsCrash(title, body) {
+  const text = `${title} ${strip(body)}`.replace(NEGATED_CRASH, ' ');
+  return CRASH_WORDS.test(text);
+}
+
+function hasCrashLog(body) {
+  return STACK_TRACE.test(String(body)) || ATTACHED_LOG.test(String(body));
+}
+
 function parseSections(body) {
   const sections = new Map();
   let heading = null;
@@ -60,7 +114,7 @@ function codeVolume(body) {
   return (String(body).match(/```[\s\S]*?```/g) || []).join(' ').trim().length;
 }
 
-function evaluate({ body = '', labels = [], strict = false } = {}) {
+function evaluate({ title = '', body = '', labels = [], strict = false } = {}) {
   const sections = parseSections(body);
   const names = new Set(sections.keys());
 
@@ -77,6 +131,10 @@ function evaluate({ body = '', labels = [], strict = false } = {}) {
   );
   if (blank.length > 0) {
     return { sufficient: false, reason: 'blank-required-field', blank };
+  }
+
+  if (!isFeature && claimsCrash(title, body) && !hasCrashLog(body)) {
+    return { sufficient: false, reason: 'crash-without-log', blank: [] };
   }
 
   const prose = strip(body).length;
@@ -97,4 +155,4 @@ function evaluate({ body = '', labels = [], strict = false } = {}) {
   return { sufficient: false, reason: 'too-thin', blank: [] };
 }
 
-module.exports = { evaluate, parseSections, strip, codeVolume };
+module.exports = { evaluate, parseSections, strip, codeVolume, claimsCrash, hasCrashLog };

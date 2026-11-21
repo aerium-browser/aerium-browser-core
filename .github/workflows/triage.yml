@@ -46,7 +46,49 @@ jobs:
                 'This was closed automatically because it was not filed through an issue form. Open a new report and fill the form in.',
               'too-thin': () =>
                 'This was closed automatically because it does not contain enough to act on. A screenshot or a one-line description is not a bug report.',
+              'crash-without-log': () =>
+                'This was closed automatically because it reports a crash without a crash log. A crash is fixed from its stack trace. A description or a screenshot does not show where it happened.',
             };
+
+            const marker = reason => `<!-- triage:${reason} -->`;
+
+            function explanation(verdict) {
+              const lines = [CLOSING_NOTE[verdict.reason](verdict.blank), ''];
+              if (verdict.reason === 'crash-without-log') {
+                lines.push(
+                  'To reopen this, **edit the issue** and put the log under **Crash log**:',
+                  '',
+                  '1. Turn on USB debugging (or Wireless debugging) in Developer options and connect adb',
+                  '2. Run `adb logcat -c`',
+                  '3. Make Aerium crash again',
+                  '4. Run `adb logcat -d > crash.txt`',
+                  '5. Paste the `FATAL EXCEPTION` block from crash.txt, or attach the whole file',
+                  '',
+                  'It reopens by itself once the log is there.',
+                );
+              } else {
+                lines.push(
+                  'To reopen this, **edit the issue** and include:',
+                  '',
+                  '- the Aerium version from Settings > About Aerium',
+                  '- your device and Android version',
+                  '- numbered steps to reproduce, from a fresh launch',
+                  '- what you expected, and what happened instead',
+                  '- for a crash, the `FATAL EXCEPTION` block from `adb logcat -d`',
+                  '',
+                  'It reopens by itself once the description is filled in.',
+                );
+              }
+              lines.push('', marker(verdict.reason));
+              return lines.join('\n');
+            }
+
+            async function explained(issue, reason) {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                ...context.repo, issue_number: issue.number, per_page: 100,
+              });
+              return comments.some(c => (c.body || '').includes(marker(reason)));
+            }
 
             async function judge(issue) {
               if (EXEMPT.includes(issue.author_association)) return null;
@@ -55,40 +97,35 @@ jobs:
               const labels = (issue.labels || []).map(l => (typeof l === 'string' ? l : l.name));
               const flagged = labels.includes(LABEL);
               const verdict = rules.evaluate({
+                title: issue.title || '',
                 body: issue.body || '',
                 labels,
                 strict: !sweep,
               });
 
-              if (!verdict.sufficient && issue.state === 'open') {
-                const note = CLOSING_NOTE[verdict.reason](verdict.blank);
-                if (dryRun) return `would close #${issue.number} (${verdict.reason}${verdict.blank.length ? ': ' + verdict.blank.join(', ') : ''})`;
-                if (!flagged) {
+              if (!verdict.sufficient && (issue.state === 'open' || flagged)) {
+                const open = issue.state === 'open';
+                if (dryRun) return `would ${open ? 'close' : 'explain'} #${issue.number} (${verdict.reason}${verdict.blank.length ? ': ' + verdict.blank.join(', ') : ''})`;
+                const commented = !flagged || !(await explained(issue, verdict.reason));
+                if (!open && !commented) return null;
+                if (commented) {
                   await github.rest.issues.createComment({
                     ...context.repo, issue_number: issue.number,
-                    body: [
-                      note,
-                      '',
-                      'To reopen this, **edit the issue** and include:',
-                      '',
-                      '- the Aerium version from Settings > About Aerium',
-                      '- your device and Android version',
-                      '- numbered steps to reproduce, from a fresh launch',
-                      '- what you expected, and what happened instead',
-                      '- for a crash, the `FATAL EXCEPTION` block from `adb logcat -d`',
-                      '',
-                      'It reopens by itself once the description is filled in.',
-                    ].join('\n'),
+                    body: explanation(verdict),
                   });
+                }
+                if (!flagged) {
                   await github.rest.issues.addLabels({
                     ...context.repo, issue_number: issue.number, labels: [LABEL],
                   });
                 }
-                await github.rest.issues.update({
-                  ...context.repo, issue_number: issue.number,
-                  state: 'closed', state_reason: 'not_planned',
-                });
-                return `closed #${issue.number} (${verdict.reason})`;
+                if (open) {
+                  await github.rest.issues.update({
+                    ...context.repo, issue_number: issue.number,
+                    state: 'closed', state_reason: 'not_planned',
+                  });
+                }
+                return `${open ? 'closed' : 'explained'} #${issue.number} (${verdict.reason})`;
               }
 
               if (verdict.sufficient && flagged) {
