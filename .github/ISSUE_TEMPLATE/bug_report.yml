@@ -74,7 +74,8 @@ body:
       description: |
         With USB debugging on: `adb logcat -c`, reproduce the crash, then `adb logcat -d > crash.txt`.
         Paste the FATAL EXCEPTION block, or attach crash.txt. A screenshot of a crash is not usable; the stack trace is.
-        Crash reports without a log are closed automatically.
+        Aerium sends no crash reports and no analytics, so this log is the only way anyone can see a crash.
+        Crash reports without it are closed automatically.
       render: text
     validations:
       required: false

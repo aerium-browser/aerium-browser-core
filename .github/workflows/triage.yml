@@ -3,6 +3,8 @@ name: triage
 on:
   issues:
     types: [opened, edited, reopened]
+  schedule:
+    - cron: '37 3 * * *'
   workflow_dispatch:
     inputs:
       sweep:
@@ -36,7 +38,7 @@ jobs:
 
             const LABEL = 'needs-info';
             const EXEMPT = ['OWNER', 'MEMBER', 'COLLABORATOR'];
-            const sweep = context.eventName === 'workflow_dispatch';
+            const sweep = ['workflow_dispatch', 'schedule'].includes(context.eventName);
             const dryRun = process.env.DRY_RUN === 'true';
 
             const CLOSING_NOTE = {
@@ -47,7 +49,10 @@ jobs:
               'too-thin': () =>
                 'This was closed automatically because it does not contain enough to act on. A screenshot or a one-line description is not a bug report.',
               'crash-without-log': () =>
-                'This was closed automatically because it reports a crash without a crash log. A crash is fixed from its stack trace. A description or a screenshot does not show where it happened.',
+                'This was closed automatically because it reports a crash without a crash log.\n\n' +
+                'Aerium has no crash reporting and no analytics. Nothing about a crash ever leaves your phone, so nobody here can see it unless you send the log. ' +
+                'That is the price of a browser that sends nothing home: the logcat you provide is the only crash report there is. ' +
+                'A description or a screenshot does not show where it crashed.',
             };
 
             const marker = reason => `<!-- triage:${reason} -->`;
