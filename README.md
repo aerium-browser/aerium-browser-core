@@ -59,7 +59,7 @@ How Aerium differs from other Chromium based browsers on Android, as of November
 |  | Aerium | Brave | Vivaldi | Cromite | Chrome |
 |---|---|---|---|---|---|
 | **Desktop extensions** | Chrome Web Store and `.crx` | Not supported | Chrome Web Store, not every extension works | Experimental, behind a flag | Not supported |
-| **Fingerprinting** | Sites see a different fingerprint every session | Randomized per site, new seed every session | No randomization | Noise on several APIs | None |
+| **Fingerprinting** | Sites see a different fingerprint every session | Randomized per site, new seed every session, same fingerprint in private and regular tabs | No randomization | Noise on several APIs | None |
 | **Source and Google services** | Engine patches under GPLv3, app layer closed source. Google services removed, no telemetry | Open source. Google services removed, privacy preserving usage stats (P3A) | Vivaldi account and sync services | Open source. Google services removed, no telemetry | Chromium is open source, Chrome is not. Full Google integration |
 | **Bundled extras** | None | Crypto wallet, Leo AI, VPN, News, Rewards | Partner speed dials, Vivaldi Translate | None | Gemini, Discover feed, Google Lens |
 | **Private browsing** | Aerogel tabs. Sites can be set to always open there, links from other apps can open there, extensions are allowed one by one | Private tabs | Private tabs | Incognito, with an option to always use it | Incognito |
