@@ -23,10 +23,10 @@ uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 
 <br>
 
-<img src="screenshots/extensions.webp" width="23%" alt="Desktop extensions on your phone">&nbsp;
-<img src="screenshots/tabs.webp" width="23%" alt="Tabs on top, like on a computer">&nbsp;
-<img src="screenshots/toolbar.webp" width="23%" alt="Build your own toolbar">&nbsp;
-<img src="screenshots/settings-guard.webp" width="23%" alt="Privacy in one tap with Aerium Guard">
+<img src="screenshots/extensions.webp" width="160" alt="Desktop extensions on your phone">&nbsp;
+<img src="screenshots/tabs.webp" width="160" alt="Tabs on top, like on a computer">&nbsp;
+<img src="screenshots/toolbar.webp" width="160" alt="Build your own toolbar">&nbsp;
+<img src="screenshots/settings-guard.webp" width="160" alt="Privacy in one tap with Aerium Guard">
 
 </div>
 
@@ -48,13 +48,45 @@ Aerium is built straight from Chromium's own source, not on top of another brows
 
 How Aerium differs from other Chromium based browsers on Android, as of November 2026. These browsers change often, so check their own documentation for the current state.
 
-|  | Aerium | Brave | Vivaldi | Cromite | Chrome |
-|---|---|---|---|---|---|
-| **Desktop extensions** | Chrome Web Store and `.crx` | Not supported | Chrome Web Store, not every extension works | Experimental, behind a flag | Not supported |
-| **Fingerprinting** | In Aerium Guard's Privacy mode, sites see a different fingerprint every session | Randomized per site, new seed every session, same fingerprint in private and regular tabs | No randomization | Noise on several APIs | None |
-| **Source and Google services** | Engine patches under GPLv3, app layer closed source. Google services removed, no telemetry | Open source. Google services removed, privacy preserving usage stats (P3A) | Vivaldi account and sync services | Open source. Google services removed, no telemetry | Chromium is open source, Chrome is not. Full Google integration |
-| **Bundled extras** | None | Crypto wallet, Leo AI, VPN, News, Rewards | Partner speed dials, Vivaldi Translate | None | Gemini, Discover feed, Google Lens |
-| **Private browsing** | Aerogel tabs. Sites can be set to always open there, links from other apps can open there, extensions are allowed one by one | Private tabs | Private tabs | Incognito, with an option to always use it | Incognito |
+| Browser | Desktop extensions |
+|---|---|
+| **Aerium** | Chrome Web Store and `.crx` |
+| Brave | Not supported |
+| Vivaldi | Chrome Web Store, not every extension works |
+| Cromite | Experimental, behind a flag |
+| Chrome | Not supported |
+
+| Browser | Fingerprinting |
+|---|---|
+| **Aerium** | In Aerium Guard's Privacy mode, sites see a different fingerprint every session |
+| Brave | Randomized per site, new seed every session, same fingerprint in private and regular tabs |
+| Vivaldi | No randomization |
+| Cromite | Noise on several APIs |
+| Chrome | None |
+
+| Browser | Source and Google services |
+|---|---|
+| **Aerium** | Engine patches under GPLv3, app layer closed source. Google services removed, no telemetry |
+| Brave | Open source. Google services removed, privacy preserving usage stats (P3A) |
+| Vivaldi | Vivaldi account and sync services |
+| Cromite | Open source. Google services removed, no telemetry |
+| Chrome | Chromium is open source, Chrome is not. Full Google integration |
+
+| Browser | Bundled extras |
+|---|---|
+| **Aerium** | None |
+| Brave | Crypto wallet, Leo AI, VPN, News, Rewards |
+| Vivaldi | Partner speed dials, Vivaldi Translate |
+| Cromite | None |
+| Chrome | Gemini, Discover feed, Google Lens |
+
+| Browser | Private browsing |
+|---|---|
+| **Aerium** | Aerogel tabs. Sites can be set to always open there, links from other apps can open there, extensions are allowed one by one |
+| Brave | Private tabs |
+| Vivaldi | Private tabs |
+| Cromite | Incognito, with an option to always use it |
+| Chrome | Incognito |
 
 ## Features
 
