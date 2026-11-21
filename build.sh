@@ -561,6 +561,23 @@ else
     sign_apk "$UNSIGNED_APK" "$SCRIPT_DIR/release/$FINAL_NAME"
 fi
 rm -rf $SCRIPT_DIR/keys
+if [ -n "$aerium_version_arg" ]; then
+    aerium_expected_code=$(tr -d '"' <<<"${aerium_version_arg##* = }")
+    if [ "$AERIUM_PACKAGE" = aab ]; then
+        aerium_built_code=$(java -jar third_party/android_build_tools/bundletool/cipd/bundletool.jar \
+            dump manifest --bundle "$SCRIPT_DIR/release/$FINAL_NAME" \
+            --xpath /manifest/@android:versionCode 2>/dev/null | tr -d '[:space:]' || true)
+    else
+        aerium_aapt2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 2>/dev/null | sort -V | tail -n1 || true)
+        aerium_built_code=$("$aerium_aapt2" dump badging "$SCRIPT_DIR/release/$FINAL_NAME" 2>/dev/null \
+            | sed -n "s/^package: .* versionCode='\([0-9]*\)'.*/\1/p" || true)
+    fi
+    [ "$aerium_built_code" = "$aerium_expected_code" ] || {
+        echo "[aerium] FATAL: the build has version code ${aerium_built_code:-unknown}, expected $aerium_expected_code" >&2
+        exit 1
+    }
+    echo "[aerium] version code check: $aerium_built_code"
+fi
 if [ -n "${AERIUM_UI_DIR:-}" ] && [ "$AERIUM_PACKAGE" = aab ]; then
     bundletool=third_party/android_build_tools/bundletool/cipd/bundletool.jar
     bundle_package=$(java -jar "$bundletool" dump manifest --bundle "$SCRIPT_DIR/release/$FINAL_NAME" \
