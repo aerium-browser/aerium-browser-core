@@ -4,12 +4,12 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Open external links in Aerogel and close tabs on exit
 
 ---
- .../chrome/browser/ChromeTabbedActivity.java   |  5 ++++-
+ .../chrome/browser/ChromeTabbedActivity.java   |  6 +++++-
  .../chrome/browser/LaunchIntentDispatcher.java | 18 ++++++++++++++++++
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 44e33fe8aa4c8a87528330553ea11f776823912a..aff846c2f46de970e2f698230702487b4521ff94 100644
+index 44e33fe8aa4c8a87528330553ea11f776823912a..36abe5f6a5a5b3a94fa271134e810c9f9252b87d 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -53,6 +53,8 @@ import androidx.lifecycle.Lifecycle;
@@ -21,7 +21,7 @@ index 44e33fe8aa4c8a87528330553ea11f776823912a..aff846c2f46de970e2f698230702487b
  import org.chromium.base.ActivityState;
  import org.chromium.base.ApkInfo;
  import org.chromium.base.ApplicationStatus;
-@@ -2623,7 +2625,8 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -2623,12 +2625,14 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
              }
  
              boolean noRestoreState =
@@ -31,6 +31,12 @@ index 44e33fe8aa4c8a87528330553ea11f776823912a..aff846c2f46de970e2f698230702487b
              boolean shouldShowNtpAsHomeSurfaceAtStartup = false;
              final AtomicBoolean isActiveUrlNtp = new AtomicBoolean(false);
              if (noRestoreState) {
+                 // Clear the state files because they are inconsistent and useless from now on.
+                 mTabModelOrchestrator.clearState();
++                mHomeSurfaceTracker = new HomeSurfaceTracker();
+             } else {
+                 // State should be clear when we start first run and hence we do not need to load
+                 // a previous state. This may change the current Model, watch out for initialization
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java b/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java
 index d4da611bc9f521093e4336e31cc4a61429cfe112..87f1bf996311dc33f8d73a68611b4b734d9acc46 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/LaunchIntentDispatcher.java

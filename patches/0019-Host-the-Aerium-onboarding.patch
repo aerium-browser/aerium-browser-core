@@ -8,7 +8,7 @@ Subject: [PATCH] Host the Aerium onboarding
  1 file changed, 4 insertions(+)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 4bb8cf21c56a1582808b45fe4360429a0b498bfc..e4b7fcdcb5f04c7a03bbc13bbf00db3bbe8f0647 100644
+index a71280cbc04a43a3de1458639f368314930a4e4d..bb324cbd7f8e85d4de77715da45c94da265a9a7d 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -1702,6 +1702,10 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
