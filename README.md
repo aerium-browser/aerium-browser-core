@@ -112,6 +112,22 @@ Aerium is in closed testing and anyone can join. Use the same Google account for
 
 Google Play can take a few minutes to show the app after you join.
 
+### GitHub releases
+
+The APKs on the [releases page](https://github.com/aerium-browser/aerium-browser-core/releases) are the same ones Google Play delivers, so the two can update each other. New versions reach Google Play first.
+
+Check the signing certificate's SHA-256 fingerprint, for example with [AppVerifier](https://github.com/soupslurpr/AppVerifier):
+
+```
+FC:20:0D:57:1C:59:12:E3:8D:02:A2:CB:82:21:F3:2C:F4:79:34:20:2E:61:2D:CA:76:B5:1E:07:3C:FB:27:4B
+```
+
+On Android 12 and older:
+
+```
+BD:ED:28:12:DF:1D:31:54:C0:1A:E7:13:89:D4:52:D9:21:00:02:00:D4:66:C1:90:4D:9A:DF:A8:45:68:5D:D4
+```
+
 ### First start
 
 Pick uBlock Origin Lite during setup, or add any extension from the Chrome Web Store. The store opens in its desktop layout by itself.
