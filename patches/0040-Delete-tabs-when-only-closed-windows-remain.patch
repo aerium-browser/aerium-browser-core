@@ -1,0 +1,70 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Delete tabs when only closed windows remain
+
+---
+ .../chrome/browser/ChromeTabbedActivity.java  |  4 ++++
+ .../ClearBrowsingDataFragment.java            | 19 ++++++++++++++++++-
+ 2 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
+index bb324cbd7f8e85d4de77715da45c94da265a9a7d..7a1344cfcc76bc5789ee778633066aba33e08c49 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
+@@ -6112,6 +6112,10 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+         return mMultiInstanceManager;
+     }
+ 
++    public @Nullable MultiInstanceManager getAeriumMultiInstanceManager() {
++        return mMultiInstanceManager;
++    }
++
+     public MismatchedIndicesHandler getMismatchedIndicesHandlerForTesting() {
+         return mMismatchedIndicesHandler;
+     }
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
+index 2c9b5e8b19709189cdc4e19b54d5585e70f8eade..56471c2f0693d9509411fc20bb9c681794e42d30 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
+@@ -49,7 +49,9 @@ import org.chromium.chrome.R;
+ import org.chromium.chrome.browser.browsing_data.BrowsingDataCounterBridge.BrowsingDataCounterCallback;
+ import org.chromium.chrome.browser.browsing_data.TimePeriodUtils.TimePeriodSpinnerOption;
+ import org.chromium.chrome.browser.feedback.HelpAndFeedbackLauncherFactory;
++import org.chromium.chrome.browser.ChromeTabbedActivity;
+ import org.chromium.chrome.browser.flags.ChromeFeatureList;
++import org.chromium.chrome.browser.multiwindow.MultiInstanceManager;
+ import org.chromium.chrome.browser.multiwindow.MultiInstanceManager.PersistedInstanceType;
+ import org.chromium.chrome.browser.multiwindow.MultiWindowUtils;
+ import org.chromium.chrome.browser.password_manager.ManagePasswordsReferrer;
+@@ -415,6 +417,7 @@ public class ClearBrowsingDataFragment extends ChromeBaseSettingsFragment
+                         ? navigation.getPreviousSettingsPageUrl()
+                         : null;
+         onClearBrowsingData();
++        if (options.contains(DialogOption.CLEAR_TABS)) closeInactiveWindows();
+         showProgressDialog();
+         Set<Integer> dataTypes = new ArraySet<>();
+         for (@DialogOption Integer option : options) {
+@@ -1132,7 +1135,21 @@ public class ClearBrowsingDataFragment extends ChromeBaseSettingsFragment
+     }
+ 
+     private boolean isInMultiWindowMode() {
+-        return MultiWindowUtils.getInstanceCount(PersistedInstanceType.ANY) > 1;
++        return MultiWindowUtils.getInstanceCount(PersistedInstanceType.ACTIVE) > 1;
++    }
++
++    private static void closeInactiveWindows() {
++        List<Integer> inactive =
++                new ArrayList<>(
++                        MultiWindowUtils.getUsableInstanceIds(PersistedInstanceType.INACTIVE));
++        if (inactive.isEmpty()) return;
++        for (Activity activity : ApplicationStatus.getRunningActivities()) {
++            if (!(activity instanceof ChromeTabbedActivity tabbed)) continue;
++            MultiInstanceManager manager = tabbed.getAeriumMultiInstanceManager();
++            if (manager == null) continue;
++            manager.closeWindows(inactive, MultiInstanceManager.CloseWindowAppSource.OTHER);
++            return;
++        }
+     }
+ 
+     @Override
