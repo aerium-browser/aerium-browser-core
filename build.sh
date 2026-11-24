@@ -90,8 +90,21 @@ export TMPDIR="$SCRIPT_DIR/chromium/.tmp"
 export XDG_CACHE_HOME="$SCRIPT_DIR/chromium/.cache"
 
 # --- system dependencies: needed on every (fresh) CI runner -----------------
-sudo apt-get update
-sudo apt-get install -y sudo lsb-release file nano git curl python3 python3-pillow imagemagick librsvg2-bin zstd
+aerium_apt_ok=0
+for attempt in 1 2 3 4 5; do
+    if sudo apt-get update && sudo apt-get install -y sudo lsb-release file nano git curl python3 python3-pillow imagemagick librsvg2-bin zstd; then
+        aerium_apt_ok=1
+        break
+    fi
+    echo "[aerium] apt-get failed (attempt $attempt), retrying in $((attempt * 30))s"
+    sleep $((attempt * 30))
+done
+if [ "$aerium_apt_ok" != 1 ]; then
+    for tool in git curl python3 zstd file convert rsvg-convert; do
+        command -v "$tool" >/dev/null 2>&1 || { echo "[aerium] FATAL: apt-get kept failing and $tool is missing" >&2; exit 1; }
+    done
+    echo "[aerium] apt-get kept failing, but every tool the build needs is already installed"
+fi
 # Every stage runs on a fresh runner, so this install repeats each time and
 # each time it leaves the downloaded .debs and package lists on the ROOT
 # filesystem - which maximize-build-space has already shrunk to a ~10 GB
