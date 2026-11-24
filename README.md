@@ -8,11 +8,11 @@
 
 uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 
-[![Version](https://img.shields.io/github/v/release/aerium-browser/aerium-browser-core?style=for-the-badge&labelColor=1B2C5E&color=2A4485&logoColor=white&label=version&logo=android)](https://github.com/aerium-browser/aerium-browser-core/releases/latest)
-[![Downloads](https://img.shields.io/badge/downloads-20k%2B-2A4485?style=for-the-badge&labelColor=1B2C5E&color=2A4485&logoColor=white&logo=github)](https://github.com/aerium-browser/aerium-browser-core/releases)
-[![Latest Chromium](https://img.shields.io/badge/dynamic/json?style=for-the-badge&labelColor=1B2C5E&color=2A4485&logoColor=white&logo=googlechrome&label=latest%20Chromium&query=%24.versions%5B0%5D.version&url=https%3A%2F%2Fversionhistory.googleapis.com%2Fv1%2Fchrome%2Fplatforms%2Fandroid%2Fchannels%2Fstable%2Fversions%3Forder_by%3Dversion%2520desc%26pageSize%3D1)](https://chromiumdash.appspot.com/releases?platform=Android)
-[![Stars](https://img.shields.io/github/stars/aerium-browser/aerium-browser-core?style=for-the-badge&labelColor=1B2C5E&color=2A4485&logoColor=white&logo=github&label=stars)](https://github.com/aerium-browser/aerium-browser-core/stargazers)
-[![License](https://img.shields.io/badge/license-GPLv3-2A4485?style=for-the-badge&labelColor=1B2C5E&color=2A4485&logoColor=white&logo=gnu)](LICENSE)
+<a href="https://github.com/aerium-browser/aerium-browser-core/releases/latest"><img src="badges/aerium.svg" height="22" alt="Aerium version"></a>
+<a href="https://github.com/aerium-browser/aerium-browser-core/releases"><img src="badges/downloads.svg" height="22" alt="Downloads"></a>
+<a href="https://chromiumdash.appspot.com/releases?platform=Android"><img src="badges/chromium.svg" height="22" alt="Latest Chromium"></a>
+<a href="https://github.com/aerium-browser/aerium-browser-core/stargazers"><img src="badges/stars.svg" height="22" alt="Stars"></a>
+<a href="LICENSE"><img src="badges/license.svg" height="22" alt="License"></a>
 
 [**Join the closed test**](#google-play) &nbsp;&nbsp;|&nbsp;&nbsp; [Download the APK](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com)
 
