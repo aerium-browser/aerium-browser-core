@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Make Wi-Fi optional
+
+---
+ chrome/android/java/AndroidManifest.xml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+index 1b0f03709993882777c96dcea43f43005b6ededc..d3f548b6e5a8f9a9f940dbc887a395037e71d22f 100644
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -194,6 +194,7 @@ by a child template that "extends" this file.
+       all applications and needs to be disabled manually.
+     -->
+     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
++    <uses-feature android:name="android.hardware.wifi" android:required="false" />
+ 
+     {% block extra_keyset_definitions %}
+     {% endblock %}
