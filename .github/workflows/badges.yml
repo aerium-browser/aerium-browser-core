@@ -18,7 +18,9 @@ jobs:
   draw:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -34,7 +36,8 @@ jobs:
             echo "Badges are up to date."
             exit 0
           fi
-          git -c user.name='github-actions[bot]' \
-              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
-              commit -q -m "badges: update" -m "[skip ci]"
-          git push
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -q -m "badges: update" -m "[skip ci]"
+          git pull -q --rebase origin main
+          git push origin HEAD:main
