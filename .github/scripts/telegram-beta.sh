@@ -21,8 +21,8 @@ release="$GITHUB_WORKSPACE/release"
 docker run -d --name tgapi -p 127.0.0.1:8081:8081 \
   -e TELEGRAM_API_ID -e TELEGRAM_API_HASH -e TELEGRAM_LOCAL=1 \
   -v "$release:/release:ro" \
-  aiogram/telegram-bot-api:latest > /dev/null
-docker image inspect --format 'Telegram Bot API image {{index .RepoDigests 0}}' aiogram/telegram-bot-api:latest || true
+  aiogram/telegram-bot-api@sha256:e71b78c32ac7d6a56a127f8bb432aaa9cb0055fda37c3ef79d2b1b0723eadf70 > /dev/null
+echo "Telegram Bot API image pinned to e71b78c3"
 
 api="http://127.0.0.1:8081/bot$TELEGRAM_BOT_TOKEN"
 ready=0
