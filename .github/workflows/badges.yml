@@ -28,16 +28,22 @@ jobs:
       - name: Draw the badges
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 tools/badges.py
-      - name: Commit changed badges
+        run: python3 tools/badges.py --out "$RUNNER_TEMP/badges"
+      - name: Publish to the badges branch
         run: |
-          git add badges/*.svg
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git fetch -q origin badges; then
+            git switch -q -c badges FETCH_HEAD
+          else
+            git switch -q --orphan badges
+            git rm -rf -q --ignore-unmatch .
+          fi
+          cp "$RUNNER_TEMP"/badges/*.svg .
+          git add ./*.svg
           if git diff --cached --quiet; then
             echo "Badges are up to date."
             exit 0
           fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -q -m "badges: update" -m "[skip ci]"
-          git pull -q --rebase origin main
-          git push origin HEAD:main
+          git push origin badges

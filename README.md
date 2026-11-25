@@ -8,11 +8,11 @@
 
 uBlock Origin Lite and Chrome Web Store extensions, on current Chromium.
 
-<a href="https://github.com/aerium-browser/aerium-browser-core/releases/latest"><img src="badges/aerium.svg" height="22" alt="Aerium version"></a>
-<a href="https://github.com/aerium-browser/aerium-browser-core/releases"><img src="badges/downloads.svg" height="22" alt="Downloads"></a>
-<a href="https://chromiumdash.appspot.com/releases?platform=Android"><img src="badges/chromium.svg" height="22" alt="Latest Chromium"></a>
-<a href="https://github.com/aerium-browser/aerium-browser-core/stargazers"><img src="badges/stars.svg" height="22" alt="Stars"></a>
-<a href="LICENSE"><img src="badges/license.svg" height="22" alt="License"></a>
+<a href="https://github.com/aerium-browser/aerium-browser-core/releases/latest"><img src="https://raw.githubusercontent.com/aerium-browser/aerium-browser-core/badges/aerium.svg" height="22" alt="Aerium version"></a>
+<a href="https://github.com/aerium-browser/aerium-browser-core/releases"><img src="https://raw.githubusercontent.com/aerium-browser/aerium-browser-core/badges/downloads.svg" height="22" alt="Downloads"></a>
+<a href="https://chromiumdash.appspot.com/releases?platform=Android"><img src="https://raw.githubusercontent.com/aerium-browser/aerium-browser-core/badges/chromium.svg" height="22" alt="Latest Chromium"></a>
+<a href="https://github.com/aerium-browser/aerium-browser-core/stargazers"><img src="https://raw.githubusercontent.com/aerium-browser/aerium-browser-core/badges/stars.svg" height="22" alt="Stars"></a>
+<a href="LICENSE"><img src="https://raw.githubusercontent.com/aerium-browser/aerium-browser-core/badges/license.svg" height="22" alt="License"></a>
 
 [**Join the closed test**](#google-play) &nbsp;&nbsp;|&nbsp;&nbsp; [Download the APK](https://github.com/aerium-browser/aerium-browser-core/releases/latest) &nbsp;&nbsp;|&nbsp;&nbsp; [Website](https://aeriumbrowser.com)
 
