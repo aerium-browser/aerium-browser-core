@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Keep Vulkan behind its device checks
+
+---
+ chrome/browser/chrome_browser_field_trials.cc | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/chrome/browser/chrome_browser_field_trials.cc b/chrome/browser/chrome_browser_field_trials.cc
+index ab68f2b16cb667a2ae4cf30d350677f708117517..c18b999e9b09c75e24d46f085dd8627a89196a5f 100644
+--- a/chrome/browser/chrome_browser_field_trials.cc
++++ b/chrome/browser/chrome_browser_field_trials.cc
+@@ -220,12 +220,6 @@ void ChromeBrowserFieldTrials::RegisterFeatureOverrides(
+   // on desktop Android as a native workaround for Intel hardware scalers.
+   feature_overrides.EnableFeature(features::kAndroidYuvOverlayEvenAlignment);
+ 
+-  // Enable ANGLE/Vulkan features.
+-  // TODO (crbug.com//376280554): Enable these features with runtime checks
+-  // instead.
+-  feature_overrides.EnableFeature(::features::kSkipVulkanBlocklist);
+-  feature_overrides.EnableFeature(::features::kDefaultANGLEVulkan);
+-  feature_overrides.EnableFeature(::features::kVulkanFromANGLE);
+   feature_overrides.EnableFeature(
+       ::features::kDefaultPassthroughCommandDecoder);
+ 
