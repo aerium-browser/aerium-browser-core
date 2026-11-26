@@ -13,6 +13,11 @@ elif [ -f chromium/src/BUILD.gn ] && [ -f chromium/src/out/Default/args.gn ] && 
   # previous GOOD checkpoint (the artifact name is shared across
   # runs with overwrite: true), destroying resumable progress in
   # exchange for a tree that can't be resumed anyway.
+  if [ -n "${AERIUM_UI_DIR:-}" ] && [ -z "${AERIUM_CHECKPOINT_KEY:-}" ]; then
+    echo "AERIUM_CHECKPOINT_KEY is not set; refusing to upload a full build tree unencrypted"
+    echo "packed=none" >> "$GITHUB_OUTPUT"
+    exit 1
+  fi
   EXTRA=""
   for f in chromium/.gclient_entries chromium/.gclient_previous_sync_commits; do
     [ -f "$f" ] && EXTRA="$EXTRA $f"
