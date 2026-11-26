@@ -67,7 +67,7 @@ constexpr const char* kFeaturesOff[] = {
 constexpr const char* kFeaturesOn[] = {
     "AndroidDevToolsFrontend",
     "CertificateTransparencyAskBeforeEnabling",
-    "GlobalPrivacyControlTest",
+    "GlobalPrivacyControlApi",
     "HstsTopLevelNavigationsOnly",
     "LocalNetworkAccessChecksWebRTC",
     "LocalNetworkAccessChecksWebSockets",
