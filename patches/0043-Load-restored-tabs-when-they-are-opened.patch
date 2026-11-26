@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Load restored tabs when they are opened
+
+---
+ chrome/browser/chrome_browser_field_trials.cc | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/chrome/browser/chrome_browser_field_trials.cc b/chrome/browser/chrome_browser_field_trials.cc
+index c18b999e9b09c75e24d46f085dd8627a89196a5f..e69a0869fef9ab99efda0f268f916d2363165f64 100644
+--- a/chrome/browser/chrome_browser_field_trials.cc
++++ b/chrome/browser/chrome_browser_field_trials.cc
+@@ -251,13 +251,6 @@ void ChromeBrowserFieldTrials::RegisterFeatureOverrides(
+   feature_overrides.EnableFeature(features::kLazyBrowserInterfaceBroker);
+   feature_overrides.EnableFeature(chrome::android::kLoadAllTabsAtStartup);
+ 
+-  // Enable desktop tab restore logic, where some background tabs get
+-  // reloaded. This requires kLoadAllTabsAtStartup above to be enabled as well.
+-  // This is not enabled elsewhere because the desktop behavior is not desirable
+-  // on mobile Android.
+-  feature_overrides.EnableFeature(
+-      chrome::android::kDesktopAndroidBackgroundTabLoading);
+-
+   // Enable the ability for extensions to override chrome pages.
+   // TODO(crbug.com/404069963): Remove flag when the feature is verified to be
+   // stable on desktop Android.
