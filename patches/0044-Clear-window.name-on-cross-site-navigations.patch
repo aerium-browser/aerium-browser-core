@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Clear window.name on cross-site navigations
+
+---
+ .../renderer_host/render_frame_host_manager.cc      | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/content/browser/renderer_host/render_frame_host_manager.cc b/content/browser/renderer_host/render_frame_host_manager.cc
+index 993e59d60058f1093a356e9a739fa5da5ebc515d..1f0e8568728d14b3c699b79c6a878df07c669048 100644
+--- a/content/browser/renderer_host/render_frame_host_manager.cc
++++ b/content/browser/renderer_host/render_frame_host_manager.cc
+@@ -2978,9 +2978,17 @@ RenderFrameHostManager::ShouldProactivelySwapBrowsingInstance(
+     return BrowsingContextGroupSwap::CreateNoSwap(
+         ShouldSwapBrowsingInstance::kNo_ProactiveSwapDisabled);
+   }
++  const bool swap_to_clear_window_name =
++      base::FeatureList::IsEnabled(
++          features::kClearCrossSiteCrossBrowsingContextGroupWindowName) &&
++      GetContentClient()
++          ->browser()
++          ->IsClearWindowNameForNewBrowsingContextGroupAllowed(
++              GetNavigationController().GetBrowserContext());
++
+   // We should only do proactive swap if it's needed for
+   // the back-forward cache (and the bfcache flag is enabled).
+-  if (!IsBackForwardCacheEnabled()) {
++  if (!IsBackForwardCacheEnabled() && !swap_to_clear_window_name) {
+     return BrowsingContextGroupSwap::CreateNoSwap(
+         ShouldSwapBrowsingInstance::kNo_ProactiveSwapDisabled);
+   }
+@@ -3081,7 +3089,8 @@ RenderFrameHostManager::ShouldProactivelySwapBrowsingInstance(
+                                  .GetBackForwardCache()
+                                  .GetFutureBackForwardCacheEligibilityPotential(
+                                      render_frame_host_.get());
+-  if (bfcache_eligibility.CanStore()) {
++  if (bfcache_eligibility.CanStore() ||
++      (swap_to_clear_window_name && !same_site)) {
+     return BrowsingContextGroupSwap::CreateProactiveSwap(
+         same_site ? ShouldSwapBrowsingInstance::kYes_SameSiteProactiveSwap
+                   : ShouldSwapBrowsingInstance::kYes_CrossSiteProactiveSwap);
