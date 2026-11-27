@@ -18,16 +18,19 @@ Subject: [PATCH] Add noise to canvas readback and layout measurements
  .../core/workers/worker_global_scope.h        |   3 +
  .../canvas2d/base_rendering_context_2d.cc     |   4 +
  .../service_worker_global_scope.h             |   4 +
- .../webgl/webgl_rendering_context_base.cc     |  17 ++
+ .../webgl/webgl2_rendering_context_base.cc    |  20 +++
+ .../webgl/webgl_rendering_context_base.cc     |  44 +++++
+ .../webgl/webgl_rendering_context_base.h      |   8 +
  third_party/blink/renderer/platform/BUILD.gn  |   2 +
  .../blink/renderer/platform/fonts/font.cc     |  14 +-
+ .../renderer/platform/fonts/font_cache_key.h  |   4 +-
  .../platform/fonts/font_description.cc        |   8 +-
  .../platform/fonts/font_description.h         |   2 +
  .../platform/graphics/fingerprint_noise.cc    | 152 ++++++++++++++++++
  .../platform/graphics/fingerprint_noise.h     |  42 +++++
  .../platform/graphics/image_data_buffer.cc    |  15 +-
  .../platform/graphics/image_data_buffer.h     |  10 ++
- 23 files changed, 377 insertions(+), 19 deletions(-)
+ 26 files changed, 434 insertions(+), 21 deletions(-)
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 
@@ -430,8 +433,46 @@ index 6feef9cdc9ae56ee9db7d1995f9e98998b325bd9..4294351822975339f4bf6068afac2b2f
    // Manages popup capability delegation from notification clicks.
    // See crbug.com/542314185 for architectural details.
    void AllowPopupCapabilityDelegation();
+diff --git a/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc
+index 9eb36fe26cc59e1d248b41b1f02adff133585474..ee8d782c8ad41794bad579fc729d475f5b0af283 100644
+--- a/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl2_rendering_context_base.cc
+@@ -36,6 +36,7 @@
+ #include "third_party/blink/renderer/modules/webgl/webgl_transform_feedback.h"
+ #include "third_party/blink/renderer/modules/webgl/webgl_uniform_location.h"
+ #include "third_party/blink/renderer/modules/webgl/webgl_vertex_array_object.h"
++#include "third_party/blink/renderer/platform/graphics/fingerprint_noise.h"
+ #include "third_party/blink/renderer/platform/heap/garbage_collected.h"
+ #include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
+ 
+@@ -922,6 +923,25 @@ void WebGL2RenderingContextBase::readPixels(GLint x,
+     ContextGL()->ReadPixels(x, y, width, height, format, type,
+                             reinterpret_cast<void*>(offset));
+   }
++  size_t start = 0;
++  size_t stride = 0;
++  if (!framebuffer && format == GL_RGBA && type == GL_UNSIGNED_BYTE &&
++      width > 0 && height > 0 && GetDrawingBuffer() &&
++      FingerprintNoise::IsEnabled() &&
++      AeriumReadPixelsLayout(width, &start, &stride)) {
++    const size_t length = start + stride * (height - 1) +
++                          static_cast<size_t>(width) * 4;
++    Vector<uint8_t> pixels(base::checked_cast<wtf_size_t>(length));
++    ContextGL()->GetBufferSubDataCHROMIUM(
++        GL_PIXEL_PACK_BUFFER, static_cast<GLintptr>(offset),
++        static_cast<GLsizeiptr>(length), pixels.data());
++    AeriumAddReadPixelsNoise(pixels.data(), start, stride, x, y, width,
++                             height);
++    ContextGL()->BufferSubData(GL_PIXEL_PACK_BUFFER,
++                               static_cast<GLintptr>(offset),
++                               static_cast<GLsizeiptr>(length),
++                               pixels.data());
++  }
+ }
+ 
+ void WebGL2RenderingContextBase::RenderbufferStorageHelper(
 diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
-index 44aa417551fd45617f3e6edbea354b63de371a50..954226b3ff259b8ae0f3829bdbc473b88778057d 100644
+index 44aa417551fd45617f3e6edbea354b63de371a50..df265f6f78cdc7d072d00af5f4d834c6ec0cd4bd 100644
 --- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 +++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
 @@ -143,6 +143,7 @@
@@ -442,29 +483,82 @@ index 44aa417551fd45617f3e6edbea354b63de371a50..954226b3ff259b8ae0f3829bdbc473b8
  #include "third_party/blink/renderer/platform/graphics/gpu/canvas_utils.h"
  #include "third_party/blink/renderer/platform/graphics/gpu/image_extractor.h"
  #include "third_party/blink/renderer/platform/graphics/gpu/shared_gpu_context.h"
-@@ -5516,6 +5517,22 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
+@@ -5386,6 +5387,41 @@ WebGLRenderingContextBase::GetPackPixelStoreParams() {
+   return params;
+ }
+ 
++bool WebGLRenderingContextBase::AeriumReadPixelsLayout(GLsizei width,
++                                                       size_t* start,
++                                                       size_t* stride) {
++  const WebGLImageConversion::PixelStoreParams pack =
++      GetPackPixelStoreParams();
++  if (pack.row_length > 0 && pack.row_length < width) {
++    return false;
++  }
++  const size_t row_pixels =
++      static_cast<size_t>(pack.row_length > 0 ? pack.row_length : width);
++  const size_t alignment =
++      static_cast<size_t>(pack.alignment > 0 ? pack.alignment : 1);
++  *stride = (row_pixels * 4 + alignment - 1) / alignment * alignment;
++  *start = static_cast<size_t>(pack.skip_rows) * *stride +
++           static_cast<size_t>(pack.skip_pixels) * 4;
++  return true;
++}
++
++void WebGLRenderingContextBase::AeriumAddReadPixelsNoise(uint8_t* data,
++                                                         size_t start,
++                                                         size_t stride,
++                                                         GLint x,
++                                                         GLint y,
++                                                         GLsizei width,
++                                                         GLsizei height) {
++  const int buffer_height = GetDrawingBuffer()->Size().height();
++  const SkImageInfo row_info = SkImageInfo::Make(
++      width, 1, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType);
++  for (GLsizei row = 0; row < height; ++row) {
++    const SkPixmap line(
++        row_info, UNSAFE_TODO(data + start + stride * row), stride);
++    FingerprintNoise::AddToPixels(line, x, buffer_height - 1 - (y + row));
++  }
++}
++
+ WebGLImageConversion::PixelStoreParams
+ WebGLRenderingContextBase::GetUnpackPixelStoreParams(TexImageDimension) {
+   WebGLImageConversion::PixelStoreParams params;
+@@ -5516,6 +5552,14 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
      }
      ContextGL()->ReadPixels(x, y, width, height, format, type, data);
    }
 +  if (!framebuffer && format == GL_RGBA && type == GL_UNSIGNED_BYTE &&
 +      !buffer.has_value() && width > 0 && height > 0) {
-+    const WebGLImageConversion::PixelStoreParams pack =
-+        GetPackPixelStoreParams();
-+    if (!pack.row_length && !pack.skip_pixels && !pack.skip_rows) {
-+      const int buffer_height = GetDrawingBuffer()->Size().height();
-+      const size_t row_bytes = static_cast<size_t>(width) * 4;
-+      const SkImageInfo row_info = SkImageInfo::Make(
-+          width, 1, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType);
-+      for (GLsizei row = 0; row < height; ++row) {
-+        const SkPixmap line(row_info, UNSAFE_TODO(data + row_bytes * row),
-+                            row_bytes);
-+        FingerprintNoise::AddToPixels(line, x, buffer_height - 1 - (y + row));
-+      }
++    size_t start = 0;
++    size_t stride = 0;
++    if (AeriumReadPixelsLayout(width, &start, &stride)) {
++      AeriumAddReadPixelsNoise(data, start, stride, x, y, width, height);
 +    }
 +  }
  }
  
  void WebGLRenderingContextBase::RenderbufferStorageImpl(
+diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h
+index bcd1dae95779091d3f49763211faf0e22ae0512b..500c8d73f7189a07281396beb908a78d87ab2733 100644
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.h
+@@ -1393,6 +1393,14 @@ class MODULES_EXPORT WebGLRenderingContextBase
+   }
+ 
+   virtual WebGLImageConversion::PixelStoreParams GetPackPixelStoreParams();
++  bool AeriumReadPixelsLayout(GLsizei width, size_t* start, size_t* stride);
++  void AeriumAddReadPixelsNoise(uint8_t* data,
++                                size_t start,
++                                size_t stride,
++                                GLint x,
++                                GLint y,
++                                GLsizei width,
++                                GLsizei height);
+   virtual WebGLImageConversion::PixelStoreParams GetUnpackPixelStoreParams(
+       TexImageDimension);
+ 
 diff --git a/third_party/blink/renderer/platform/BUILD.gn b/third_party/blink/renderer/platform/BUILD.gn
 index cab74e32a43477babaca1d7f99e5f81709537443..22626c094e644548366ead2f8b5e765df8d65465 100644
 --- a/third_party/blink/renderer/platform/BUILD.gn
@@ -510,6 +604,22 @@ index db0b6f1f23a3fd1afaefa633f94eecb3e69ca206..148e6ab33ffb70dcebcc0d748a033fdf
  
  FontFallbackList* Font::EnsureFontFallbackList() const {
    if (!font_fallback_list_ || !font_fallback_list_->IsValid()) {
+diff --git a/third_party/blink/renderer/platform/fonts/font_cache_key.h b/third_party/blink/renderer/platform/fonts/font_cache_key.h
+index 00b7b409ae3bc423e107dd58dc3d26ac46adad77..2411e9a923c0f2924f6490551d9922d07e915768 100644
+--- a/third_party/blink/renderer/platform/fonts/font_cache_key.h
++++ b/third_party/blink/renderer/platform/fonts/font_cache_key.h
+@@ -49,9 +49,9 @@
+ 
+ namespace blink {
+ 
+-// Multiplying the floating point size by 100 gives two decimal point
++// Multiplying the floating point size by 10000 gives four decimal point
+ // precision which should be sufficient.
+-static constexpr wtf_size_t kFontSizePrecisionMultiplier = 100;
++static constexpr wtf_size_t kFontSizePrecisionMultiplier = 10000;
+ 
+ struct FontCacheKey {
+   DISALLOW_NEW();
 diff --git a/third_party/blink/renderer/platform/fonts/font_description.cc b/third_party/blink/renderer/platform/fonts/font_description.cc
 index 0b9b719bd1b1f8926884a019b87a1b3525da32a6..5321173baa0e8b2bfde7c6777e99bc4292399e10 100644
 --- a/third_party/blink/renderer/platform/fonts/font_description.cc
