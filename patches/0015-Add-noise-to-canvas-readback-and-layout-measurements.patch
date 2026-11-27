@@ -4,21 +4,30 @@ Date: Thu, 1 Jan 2026 00:00:00 +0000
 Subject: [PATCH] Add noise to canvas readback and layout measurements
 
 ---
- .../renderer_host/render_process_host_impl.cc |   9 +
- .../blink/renderer/core/core_initializer.cc   |  25 +++
- .../blink/renderer/core/dom/element.cc        |   7 +-
- third_party/blink/renderer/core/dom/range.cc  |   6 +-
- .../execution_context/execution_context.cc    |  25 +++
- .../execution_context/execution_context.h     |   3 +
+ .../renderer_host/render_process_host_impl.cc |   9 ++
+ .../worker/embedded_shared_worker_stub.cc     |   3 +-
+ .../blink/public/web/web_shared_worker.h      |   3 +-
+ .../blink/renderer/core/core_initializer.cc   |  27 ++++
+ .../execution_context/execution_context.cc    |  29 ++++
+ .../execution_context/execution_context.h     |   4 +
+ .../core/exported/web_shared_worker_impl.cc   |   6 +-
+ .../core/exported/web_shared_worker_impl.h    |   2 +
  .../html/canvas/canvas_async_blob_creator.cc  |  34 +++-
- .../renderer/core/html/canvas/text_metrics.cc |  11 ++
+ .../workers/global_scope_creation_params.h    |   2 +
+ .../core/workers/worker_global_scope.cc       |   4 +-
+ .../core/workers/worker_global_scope.h        |   3 +
  .../canvas2d/base_rendering_context_2d.cc     |   4 +
+ .../service_worker_global_scope.h             |   4 +
+ .../webgl/webgl_rendering_context_base.cc     |  17 ++
  third_party/blink/renderer/platform/BUILD.gn  |   2 +
- .../platform/graphics/fingerprint_noise.cc    | 164 ++++++++++++++++++
- .../platform/graphics/fingerprint_noise.h     |  44 +++++
+ .../blink/renderer/platform/fonts/font.cc     |  14 +-
+ .../platform/fonts/font_description.cc        |   8 +-
+ .../platform/fonts/font_description.h         |   2 +
+ .../platform/graphics/fingerprint_noise.cc    | 152 ++++++++++++++++++
+ .../platform/graphics/fingerprint_noise.h     |  42 +++++
  .../platform/graphics/image_data_buffer.cc    |  15 +-
  .../platform/graphics/image_data_buffer.h     |  10 ++
- 14 files changed, 349 insertions(+), 10 deletions(-)
+ 23 files changed, 377 insertions(+), 19 deletions(-)
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 
@@ -49,8 +58,36 @@ index ca7a5e6f1aeed3b4399c3f1227f44dabbfc2feb1..e9900f20e634915a982547f9bd29843b
    // A non-empty RendererCmdPrefix implies that Zygote is disabled.
    if (!base::CommandLine::ForCurrentProcess()
             ->GetSwitchValueNative(switches::kRendererCmdPrefix)
+diff --git a/content/renderer/worker/embedded_shared_worker_stub.cc b/content/renderer/worker/embedded_shared_worker_stub.cc
+index 3ee2556c064b6e77bdeabd9638bff52c890119a5..537b00fcea84602cb3fbc8aa6b42a9eefadb3ac5 100644
+--- a/content/renderer/worker/embedded_shared_worker_stub.cc
++++ b/content/renderer/worker/embedded_shared_worker_stub.cc
+@@ -142,7 +142,8 @@ EmbeddedSharedWorkerStub::EmbeddedSharedWorkerStub(
+       std::move(web_worker_fetch_context), std::move(host), this, ukm_source_id,
+       require_cross_site_request_for_cookies,
+       std::move(coep_reporting_observer), std::move(dip_reporting_observer),
+-      cross_origin_isolated, info->permissions_policy);
++      cross_origin_isolated, info->permissions_policy,
++      blink::WebString::FromUtf8(constructor_key.top_level_site().Serialize()));
+ 
+   // If the host drops its connection, then self-destruct.
+   receiver_.set_disconnect_handler(base::BindOnce(
+diff --git a/third_party/blink/public/web/web_shared_worker.h b/third_party/blink/public/web/web_shared_worker.h
+index 31ed8a6aaa9b50fa3797dd1f57ada9558935662b..40d69e6a254374a9d642c8003e685f0ef29405d5 100644
+--- a/third_party/blink/public/web/web_shared_worker.h
++++ b/third_party/blink/public/web/web_shared_worker.h
+@@ -108,7 +108,8 @@ class BLINK_EXPORT WebSharedWorker {
+       CrossVariantMojoReceiver<mojom::ReportingObserverInterfaceBase>
+           dip_reporting_observer,
+       bool cross_origin_isolated,
+-      const network::PermissionsPolicyFeaturesBitset& permissions_policy);
++      const network::PermissionsPolicyFeaturesBitset& permissions_policy,
++      const WebString& aerium_top_level_site = WebString());
+ 
+   // Sends a connect event to the SharedWorker context.
+   virtual void Connect(int connection_request_id,
 diff --git a/third_party/blink/renderer/core/core_initializer.cc b/third_party/blink/renderer/core/core_initializer.cc
-index 2e293d4b493fe17f209fedb6b6133bfb68889b15..f4529e5b2dc4f6e7408756810b16a2481d103a9e 100644
+index 2e293d4b493fe17f209fedb6b6133bfb68889b15..6ed140faa703ecbe0540d4e060220b80036a7b9a 100644
 --- a/third_party/blink/renderer/core/core_initializer.cc
 +++ b/third_party/blink/renderer/core/core_initializer.cc
 @@ -33,6 +33,7 @@
@@ -69,7 +106,7 @@ index 2e293d4b493fe17f209fedb6b6133bfb68889b15..f4529e5b2dc4f6e7408756810b16a248
  #include "third_party/blink/renderer/core/html/canvas/canvas_rendering_context_factory.h"
  #include "third_party/blink/renderer/core/html/shadow/shadow_element_names.h"
  #include "third_party/blink/renderer/core/html_names.h"
-@@ -66,15 +68,36 @@
+@@ -66,15 +68,38 @@
  #include "third_party/blink/renderer/core/xml_names.h"
  #include "third_party/blink/renderer/core/xmlns_names.h"
  #include "third_party/blink/renderer/platform/fonts/font_global_context.h"
@@ -87,15 +124,17 @@ index 2e293d4b493fe17f209fedb6b6133bfb68889b15..f4529e5b2dc4f6e7408756810b16a248
  
 +namespace {
 +
-+bool CurrentNoiseKey(uint64_t* key) {
-+  v8::Isolate* isolate = v8::Isolate::TryGetCurrent();
-+  if (!isolate || !isolate->InContext()) {
-+    return false;
-+  }
-+  v8::HandleScope handle_scope(isolate);
-+  ExecutionContext* context = CurrentExecutionContext(isolate);
++bool NoiseKeyFor(ExecutionContext* context, uint64_t* key) {
 +  if (!context) {
-+    return false;
++    v8::Isolate* isolate = v8::Isolate::TryGetCurrent();
++    if (!isolate || !isolate->InContext()) {
++      return false;
++    }
++    v8::HandleScope handle_scope(isolate);
++    context = CurrentExecutionContext(isolate);
++    if (!context) {
++      return false;
++    }
 +  }
 +  *key = context->AeriumNoiseKey();
 +  return true;
@@ -106,80 +145,17 @@ index 2e293d4b493fe17f209fedb6b6133bfb68889b15..f4529e5b2dc4f6e7408756810b16a248
  CoreInitializer* CoreInitializer::instance_ = nullptr;
  
  // Function defined in third_party/blink/public/web/blink.h.
-@@ -170,6 +193,8 @@ void CoreInitializer::Initialize() {
+@@ -170,6 +195,8 @@ void CoreInitializer::Initialize() {
  
    BindingSecurity::Init();
  
-+  FingerprintNoise::SetKeyProvider(&CurrentNoiseKey);
++  FingerprintNoise::SetKeyProvider(&NoiseKeyFor);
 +
    TimeZoneController::Init();
  
    FontGlobalContext::Init();
-diff --git a/third_party/blink/renderer/core/dom/element.cc b/third_party/blink/renderer/core/dom/element.cc
-index 1a2dc9d32d28679b3ab1678ca94a76504765c3c9..c7350bc003887c560789c982c726684b5fe45de3 100644
---- a/third_party/blink/renderer/core/dom/element.cc
-+++ b/third_party/blink/renderer/core/dom/element.cc
-@@ -309,6 +309,7 @@
- #include "third_party/blink/renderer/platform/bindings/v8_per_context_data.h"
- #include "third_party/blink/renderer/platform/geometry/calculation_value.h"
- #include "third_party/blink/renderer/platform/graphics/compositing/paint_artifact_compositor.h"
-+#include "third_party/blink/renderer/platform/graphics/fingerprint_noise.h"
- #include "third_party/blink/renderer/platform/graphics/paint/float_clip_rect.h"
- #include "third_party/blink/renderer/platform/graphics/paint/tracked_element_data.h"
- #include "third_party/blink/renderer/platform/heap/collection_support/heap_hash_set.h"
-@@ -3488,6 +3489,7 @@ DOMRectList* Element::getClientRects() {
-   for (auto& rect : rects) {
-     GetDocument().AdjustRectForScrollAndAbsoluteZoom(rect,
-                                                      *element_layout_object);
-+    rect = FingerprintNoise::Scale(rect);
-   }
-   return MakeGarbageCollected<DOMRectList>(rects);
- }
-@@ -3585,7 +3587,10 @@ DOMRect* Element::GetBoundingClientRectForBinding() {
-   // TODO(crbug.com/1499981): This should be removed once synchronized scrolling
-   // impact is understood.
-   SyncScrollAttemptHeuristic::DidAccessScrollOffset();
--  return GetBoundingClientRect();
-+  GetDocument().UpdateStyleAndLayoutForNode(this,
-+                                            DocumentUpdateReason::kJavaScript);
-+  return DOMRect::FromRectF(
-+      FingerprintNoise::Scale(GetBoundingClientRectNoLifecycleUpdate()));
- }
- 
- ContainerQueryList* Element::matchContainer(const String& query,
-diff --git a/third_party/blink/renderer/core/dom/range.cc b/third_party/blink/renderer/core/dom/range.cc
-index 4b6baabc2af84ed69ff782818ab805118c2bb212..d865e6c906c61f4c669f424018364408c0f88f7d 100644
---- a/third_party/blink/renderer/core/dom/range.cc
-+++ b/third_party/blink/renderer/core/dom/range.cc
-@@ -67,6 +67,7 @@
- #include "third_party/blink/renderer/core/trustedtypes/trusted_types_names.h"
- #include "third_party/blink/renderer/core/trustedtypes/trusted_types_util.h"
- #include "third_party/blink/renderer/platform/bindings/exception_state.h"
-+#include "third_party/blink/renderer/platform/graphics/fingerprint_noise.h"
- #include "third_party/blink/renderer/platform/heap/garbage_collected.h"
- #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
- #include "third_party/blink/renderer/platform/wtf/text/format.h"
-@@ -1667,6 +1668,9 @@ DOMRectList* Range::getClientRects() const {
- 
-   Vector<gfx::QuadF> quads;
-   GetBorderAndTextQuads(quads);
-+  for (gfx::QuadF& quad : quads) {
-+    quad = FingerprintNoise::Scale(quad);
-+  }
- 
-   return MakeGarbageCollected<DOMRectList>(quads);
- }
-@@ -1675,7 +1679,7 @@ DOMRect* Range::getBoundingClientRect() const {
-   // TODO(crbug.com/1499981): This should be removed once synchronized scrolling
-   // impact is understood.
-   SyncScrollAttemptHeuristic::DidAccessScrollOffset();
--  return DOMRect::FromRectF(BoundingRect());
-+  return DOMRect::FromRectF(FingerprintNoise::Scale(BoundingRect()));
- }
- 
- // TODO(editing-dev): We should make
 diff --git a/third_party/blink/renderer/core/execution_context/execution_context.cc b/third_party/blink/renderer/core/execution_context/execution_context.cc
-index 0f95cf17f4f4ea443fbff7f20224d07aebfba9b8..cb66b9de9b98538216a3b95b98bca1781824b36e 100644
+index 0f95cf17f4f4ea443fbff7f20224d07aebfba9b8..2ec8b3b8468bdd93eb5b72be38309810b9a2fd11 100644
 --- a/third_party/blink/renderer/core/execution_context/execution_context.cc
 +++ b/third_party/blink/renderer/core/execution_context/execution_context.cc
 @@ -49,6 +49,7 @@
@@ -203,28 +179,32 @@ index 0f95cf17f4f4ea443fbff7f20224d07aebfba9b8..cb66b9de9b98538216a3b95b98bca178
  #include "third_party/blink/renderer/platform/runtime_feature_state/runtime_feature_state_override_context.h"
  #include "third_party/blink/renderer/platform/scheduler/public/event_loop.h"
  #include "third_party/blink/renderer/platform/weborigin/scheme_registry.h"
-@@ -393,6 +396,28 @@ const SecurityOrigin* ExecutionContext::GetSecurityOrigin() const {
+@@ -393,6 +396,32 @@ const SecurityOrigin* ExecutionContext::GetSecurityOrigin() const {
    return security_context_.GetSecurityOrigin();
  }
  
 +uint64_t ExecutionContext::AeriumNoiseKey() {
 +  if (!aerium_noise_key_) {
-+    const SecurityOrigin* origin = GetSecurityOrigin();
-+    if (auto* window = DynamicTo<LocalDOMWindow>(this)) {
-+      if (LocalFrame* frame = window->GetFrame()) {
-+        if (const SecurityOrigin* top =
-+                frame->Top()->GetSecurityContext()->GetSecurityOrigin()) {
-+          origin = top;
++    String site = AeriumTopLevelSite();
++    if (site.empty()) {
++      const SecurityOrigin* origin = GetSecurityOrigin();
++      if (auto* window = DynamicTo<LocalDOMWindow>(this)) {
++        if (LocalFrame* frame = window->GetFrame()) {
++          if (const SecurityOrigin* top =
++                  frame->Top()->GetSecurityContext()->GetSecurityOrigin()) {
++            origin = top;
++          }
++        }
++      } else if (auto* worker = DynamicTo<WorkerGlobalScope>(this)) {
++        if (worker->top_level_frame_security_origin()) {
++          origin = worker->top_level_frame_security_origin();
 +        }
 +      }
-+    } else if (auto* worker = DynamicTo<WorkerGlobalScope>(this)) {
-+      if (worker->top_level_frame_security_origin()) {
-+        origin = worker->top_level_frame_security_origin();
++      if (origin) {
++        site = BlinkSchemefulSite(base::WrapRefCounted(origin)).Serialize();
 +      }
 +    }
-+    aerium_noise_key_ = FingerprintNoise::KeyForSite(
-+        origin ? BlinkSchemefulSite(base::WrapRefCounted(origin)).Serialize()
-+               : String());
++    aerium_noise_key_ = FingerprintNoise::KeyForSite(site);
 +  }
 +  return *aerium_noise_key_;
 +}
@@ -233,19 +213,20 @@ index 0f95cf17f4f4ea443fbff7f20224d07aebfba9b8..cb66b9de9b98538216a3b95b98bca178
    return security_context_.GetMutableSecurityOrigin();
  }
 diff --git a/third_party/blink/renderer/core/execution_context/execution_context.h b/third_party/blink/renderer/core/execution_context/execution_context.h
-index 7361d1e456fb1b333044d2812f05b56bbce272b4..b009d3a81300bcd8e805c21d83325e566dc3bf3e 100644
+index 7361d1e456fb1b333044d2812f05b56bbce272b4..4f651199fdcc2b9d2201e1edfe0609fc824e6bec 100644
 --- a/third_party/blink/renderer/core/execution_context/execution_context.h
 +++ b/third_party/blink/renderer/core/execution_context/execution_context.h
-@@ -506,6 +506,8 @@ class CORE_EXPORT ExecutionContext : public Supplementable<ExecutionContext>,
+@@ -506,6 +506,9 @@ class CORE_EXPORT ExecutionContext : public Supplementable<ExecutionContext>,
      canvas_noise_token_ = token;
    }
  
 +  uint64_t AeriumNoiseKey();
++  virtual String AeriumTopLevelSite() const { return String(); }
 +
    // Returns the policy state for network-efficiency-guardrails in this
    // document.
    virtual std::optional<mojom::blink::PolicyDisposition>
-@@ -589,6 +591,7 @@ class CORE_EXPORT ExecutionContext : public Supplementable<ExecutionContext>,
+@@ -589,6 +592,7 @@ class CORE_EXPORT ExecutionContext : public Supplementable<ExecutionContext>,
    bool require_trusted_types_ = false;
  
    std::optional<NoiseToken> canvas_noise_token_;
@@ -253,6 +234,45 @@ index 7361d1e456fb1b333044d2812f05b56bbce272b4..b009d3a81300bcd8e805c21d83325e56
  };
  
  }  // namespace blink
+diff --git a/third_party/blink/renderer/core/exported/web_shared_worker_impl.cc b/third_party/blink/renderer/core/exported/web_shared_worker_impl.cc
+index b49336b0e1f68527e45bcbb494e0750c4786c658..81bedfbf0448b738e99e579656315a15120f41e7 100644
+--- a/third_party/blink/renderer/core/exported/web_shared_worker_impl.cc
++++ b/third_party/blink/renderer/core/exported/web_shared_worker_impl.cc
+@@ -308,6 +308,8 @@ void WebSharedWorkerImpl::StartWorkerContext(
+           url::Origin(origin_from_browser)),
+       std::move(coep_reporting_observer), std::move(dip_reporting_observer));
+ 
++  creation_params->aerium_top_level_site = aerium_top_level_site_.IsolatedCopy();
++
+   if (RuntimeEnabledFeatures::PermissionsPolicyForSharedWorkersEnabled()) {
+     const url::Origin worker_origin =
+         (creation_params->origin_to_use
+@@ -410,9 +412,11 @@ std::unique_ptr<WebSharedWorker> WebSharedWorker::CreateAndStart(
+     CrossVariantMojoReceiver<mojom::blink::ReportingObserverInterfaceBase>
+         dip_reporting_observer,
+     bool is_cross_origin_isolated,
+-    const network::PermissionsPolicyFeaturesBitset& permissions_policy) {
++    const network::PermissionsPolicyFeaturesBitset& permissions_policy,
++    const WebString& aerium_top_level_site) {
+   auto worker =
+       base::WrapUnique(new WebSharedWorkerImpl(token, std::move(host), client));
++  worker->aerium_top_level_site_ = aerium_top_level_site;
+   worker->StartWorkerContext(
+       script_request_url, script_type, credentials_mode, name,
+       constructor_origin, origin_from_browser, is_constructor_secure_context,
+diff --git a/third_party/blink/renderer/core/exported/web_shared_worker_impl.h b/third_party/blink/renderer/core/exported/web_shared_worker_impl.h
+index c833ef3329ea46ae466de0c98b3319609dea0362..62ed8df06d421401840fdeb94bdbb547a678d235 100644
+--- a/third_party/blink/renderer/core/exported/web_shared_worker_impl.h
++++ b/third_party/blink/renderer/core/exported/web_shared_worker_impl.h
+@@ -170,6 +170,8 @@ class CORE_EXPORT WebSharedWorkerImpl final : public WebSharedWorker {
+   bool running_ = false;
+   bool asked_to_terminate_ = false;
+ 
++  String aerium_top_level_site_;
++
+   base::WeakPtrFactory<WebSharedWorkerImpl> weak_ptr_factory_{this};
+ };
+ 
 diff --git a/third_party/blink/renderer/core/html/canvas/canvas_async_blob_creator.cc b/third_party/blink/renderer/core/html/canvas/canvas_async_blob_creator.cc
 index b291deceaaf98045cb6206a4f10ea1cc0f583d93..9794b2ca79f176650b61bd6e000c381576c16e4c 100644
 --- a/third_party/blink/renderer/core/html/canvas/canvas_async_blob_creator.cc
@@ -324,42 +344,55 @@ index b291deceaaf98045cb6206a4f10ea1cc0f583d93..9794b2ca79f176650b61bd6e000c3815
      }
    } else {
      // Progressive encoding case, see (1) in function comment.
-diff --git a/third_party/blink/renderer/core/html/canvas/text_metrics.cc b/third_party/blink/renderer/core/html/canvas/text_metrics.cc
-index 83a423242bac45ee613ab4e1f336118f72ba84ea..7006af290c8645f8a32e361ac2720e5a1876ad40 100644
---- a/third_party/blink/renderer/core/html/canvas/text_metrics.cc
-+++ b/third_party/blink/renderer/core/html/canvas/text_metrics.cc
-@@ -12,6 +12,7 @@
- #include "third_party/blink/renderer/platform/fonts/font.h"
- #include "third_party/blink/renderer/platform/fonts/font_metrics.h"
- #include "third_party/blink/renderer/platform/fonts/simple_font_data.h"
-+#include "third_party/blink/renderer/platform/graphics/fingerprint_noise.h"
- #include "third_party/blink/renderer/platform/text/text_direction.h"
+diff --git a/third_party/blink/renderer/core/workers/global_scope_creation_params.h b/third_party/blink/renderer/core/workers/global_scope_creation_params.h
+index 676e95ed3fc6f783a8518e4bc677d2ee4523133a..e011b84bf3485f14999b33a75b0acd2d263de545 100644
+--- a/third_party/blink/renderer/core/workers/global_scope_creation_params.h
++++ b/third_party/blink/renderer/core/workers/global_scope_creation_params.h
+@@ -262,6 +262,8 @@ struct CORE_EXPORT GlobalScopeCreationParams final {
+   // origin.
+   scoped_refptr<const SecurityOrigin> top_level_frame_security_origin;
  
- namespace blink {
-@@ -93,6 +94,11 @@ TextMetrics::TextMetrics(ShapedText& shaped_text,
++  String aerium_top_level_site;
++
+   // Timestamp of the dedicated worker start.
+   // i.e. when DedicatedWorkerStart() was called.
+   std::optional<base::TimeTicks> dedicated_worker_start_time;
+diff --git a/third_party/blink/renderer/core/workers/worker_global_scope.cc b/third_party/blink/renderer/core/workers/worker_global_scope.cc
+index 87fab3e38097e8e3c99b3066857c8858bf65e362..d72a1fc93a525c70eb834b49ac96eb20b2fb4ad6 100644
+--- a/third_party/blink/renderer/core/workers/worker_global_scope.cc
++++ b/third_party/blink/renderer/core/workers/worker_global_scope.cc
+@@ -940,7 +940,9 @@ WorkerGlobalScope::WorkerGlobalScope(
+       script_eval_state_(ScriptEvalState::kPauseAfterFetch),
+       ukm_source_id_(creation_params->ukm_source_id),
+       top_level_frame_security_origin_(
+-          std::move(creation_params->top_level_frame_security_origin)) {
++          std::move(creation_params->top_level_frame_security_origin)),
++      aerium_top_level_site_(
++          std::move(creation_params->aerium_top_level_site)) {
+   // Workers should always maintain the default world of an isolate.
+   CHECK(creation_params->is_default_world_of_isolate);
+   TRACE_EVENT("blink.worker", "WorkerGlobalScope::WorkerGlobalScope");
+diff --git a/third_party/blink/renderer/core/workers/worker_global_scope.h b/third_party/blink/renderer/core/workers/worker_global_scope.h
+index ec5b41f1a3ac7680edda1b9bf28135d6b8e6cb89..478bb6a241b02efb93bb5ceefe36407ad542d51f 100644
+--- a/third_party/blink/renderer/core/workers/worker_global_scope.h
++++ b/third_party/blink/renderer/core/workers/worker_global_scope.h
+@@ -295,6 +295,8 @@ class CORE_EXPORT WorkerGlobalScope
+     return top_level_frame_security_origin_.get();
+   }
  
-   actual_bounding_box_left_ = -glyph_bounds.x();
-   actual_bounding_box_right_ = glyph_bounds.right();
-+  width_ = FingerprintNoise::Scale(width_);
-+  actual_bounding_box_left_ =
-+      FingerprintNoise::Scale(actual_bounding_box_left_);
-+  actual_bounding_box_right_ =
-+      FingerprintNoise::Scale(actual_bounding_box_right_);
++  String AeriumTopLevelSite() const override { return aerium_top_level_site_; }
++
+  protected:
+   WorkerGlobalScope(std::unique_ptr<GlobalScopeCreationParams>,
+                     WorkerThread*,
+@@ -451,6 +453,7 @@ class CORE_EXPORT WorkerGlobalScope
+   // can be used, for instance, to check if the top level frame has an opaque
+   // origin.
+   scoped_refptr<const SecurityOrigin> top_level_frame_security_origin_;
++  String aerium_top_level_site_;
+ };
  
-   PopulateVerticalMetrics(*effective_font_data, glyph_bounds);
- }
-@@ -112,6 +118,11 @@ void TextMetrics::InitFromShapedText() {
- 
-   actual_bounding_box_left_ = -glyph_bounds.x() + text_align_dx;
-   actual_bounding_box_right_ = glyph_bounds.right() - text_align_dx;
-+  width_ = FingerprintNoise::Scale(width_);
-+  actual_bounding_box_left_ =
-+      FingerprintNoise::Scale(actual_bounding_box_left_);
-+  actual_bounding_box_right_ =
-+      FingerprintNoise::Scale(actual_bounding_box_right_);
- 
-   PopulateVerticalMetrics(*font_data, glyph_bounds);
- }
+ template <>
 diff --git a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc b/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
 index 95fa446219588ce7f39e0e14e85007d566c09362..6b8c06a7ecf669502033a0b477ff7087b984462f 100644
 --- a/third_party/blink/renderer/modules/canvas/canvas2d/base_rendering_context_2d.cc
@@ -382,6 +415,56 @@ index 95fa446219588ce7f39e0e14e85007d566c09362..6b8c06a7ecf669502033a0b477ff7087
      if (!read_pixels_successful) {
        SkIRect bounds =
            snapshot->PaintImageForCurrentFrame().GetSkImageInfo().bounds();
+diff --git a/third_party/blink/renderer/modules/service_worker/service_worker_global_scope.h b/third_party/blink/renderer/modules/service_worker/service_worker_global_scope.h
+index 6feef9cdc9ae56ee9db7d1995f9e98998b325bd9..4294351822975339f4bf6068afac2b2f7003e0a6 100644
+--- a/third_party/blink/renderer/modules/service_worker/service_worker_global_scope.h
++++ b/third_party/blink/renderer/modules/service_worker/service_worker_global_scope.h
+@@ -162,6 +162,10 @@ class MODULES_EXPORT ServiceWorkerGlobalScope final
+ 
+   const blink::BlinkStorageKey& storage_key() const { return storage_key_; }
+ 
++  String AeriumTopLevelSite() const override {
++    return storage_key_.GetTopLevelSite().Serialize();
++  }
++
+   // Manages popup capability delegation from notification clicks.
+   // See crbug.com/542314185 for architectural details.
+   void AllowPopupCapabilityDelegation();
+diff --git a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+index 44aa417551fd45617f3e6edbea354b63de371a50..954226b3ff259b8ae0f3829bdbc473b88778057d 100644
+--- a/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
++++ b/third_party/blink/renderer/modules/webgl/webgl_rendering_context_base.cc
+@@ -143,6 +143,7 @@
+ #include "third_party/blink/renderer/platform/graphics/canvas_2d_resource_provider.h"
+ #include "third_party/blink/renderer/platform/graphics/canvas_non_2d_resource_provider.h"
+ #include "third_party/blink/renderer/platform/graphics/canvas_resource.h"
++#include "third_party/blink/renderer/platform/graphics/fingerprint_noise.h"
+ #include "third_party/blink/renderer/platform/graphics/gpu/canvas_utils.h"
+ #include "third_party/blink/renderer/platform/graphics/gpu/image_extractor.h"
+ #include "third_party/blink/renderer/platform/graphics/gpu/shared_gpu_context.h"
+@@ -5516,6 +5517,22 @@ void WebGLRenderingContextBase::ReadPixelsHelper(GLint x,
+     }
+     ContextGL()->ReadPixels(x, y, width, height, format, type, data);
+   }
++  if (!framebuffer && format == GL_RGBA && type == GL_UNSIGNED_BYTE &&
++      !buffer.has_value() && width > 0 && height > 0) {
++    const WebGLImageConversion::PixelStoreParams pack =
++        GetPackPixelStoreParams();
++    if (!pack.row_length && !pack.skip_pixels && !pack.skip_rows) {
++      const int buffer_height = GetDrawingBuffer()->Size().height();
++      const size_t row_bytes = static_cast<size_t>(width) * 4;
++      const SkImageInfo row_info = SkImageInfo::Make(
++          width, 1, kRGBA_8888_SkColorType, kUnpremul_SkAlphaType);
++      for (GLsizei row = 0; row < height; ++row) {
++        const SkPixmap line(row_info, UNSAFE_TODO(data + row_bytes * row),
++                            row_bytes);
++        FingerprintNoise::AddToPixels(line, x, buffer_height - 1 - (y + row));
++      }
++    }
++  }
+ }
+ 
+ void WebGLRenderingContextBase::RenderbufferStorageImpl(
 diff --git a/third_party/blink/renderer/platform/BUILD.gn b/third_party/blink/renderer/platform/BUILD.gn
 index cab74e32a43477babaca1d7f99e5f81709537443..22626c094e644548366ead2f8b5e765df8d65465 100644
 --- a/third_party/blink/renderer/platform/BUILD.gn
@@ -395,12 +478,97 @@ index cab74e32a43477babaca1d7f99e5f81709537443..22626c094e644548366ead2f8b5e765d
      "graphics/flush_for_image_listener.cc",
      "graphics/flush_for_image_listener.h",
      "graphics/flush_reason.h",
+diff --git a/third_party/blink/renderer/platform/fonts/font.cc b/third_party/blink/renderer/platform/fonts/font.cc
+index db0b6f1f23a3fd1afaefa633f94eecb3e69ca206..148e6ab33ffb70dcebcc0d748a033fdf276386ed 100644
+--- a/third_party/blink/renderer/platform/fonts/font.cc
++++ b/third_party/blink/renderer/platform/fonts/font.cc
+@@ -38,6 +38,7 @@
+ #include "third_party/blink/renderer/platform/fonts/simple_font_data.h"
+ #include "third_party/blink/renderer/platform/fonts/text_fragment_paint_info.h"
+ #include "third_party/blink/renderer/platform/geometry/layout_unit.h"
++#include "third_party/blink/renderer/platform/graphics/fingerprint_noise.h"
+ #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
+ #include "third_party/blink/renderer/platform/text/character.h"
+ #include "third_party/blink/renderer/platform/text/text_run.h"
+@@ -66,11 +67,14 @@ Font::Font() = default;
+ Font::Font(const FontDescription& fd) : font_description_(fd) {}
+ 
+ Font::Font(const FontDescription& font_description, FontSelector* font_selector)
+-    : font_description_(font_description),
+-      font_fallback_list_(
+-          font_selector
+-              ? GetOrCreateFontFallbackList(font_description, font_selector)
+-              : nullptr) {}
++    : font_description_(font_description) {
++  if (font_selector) {
++    font_description_.SetAeriumSizeFactor(
++        FingerprintNoise::FontScale(font_selector->GetExecutionContext()));
++    font_fallback_list_ =
++        GetOrCreateFontFallbackList(font_description_, font_selector);
++  }
++}
+ 
+ FontFallbackList* Font::EnsureFontFallbackList() const {
+   if (!font_fallback_list_ || !font_fallback_list_->IsValid()) {
+diff --git a/third_party/blink/renderer/platform/fonts/font_description.cc b/third_party/blink/renderer/platform/fonts/font_description.cc
+index 0b9b719bd1b1f8926884a019b87a1b3525da32a6..5321173baa0e8b2bfde7c6777e99bc4292399e10 100644
+--- a/third_party/blink/renderer/platform/fonts/font_description.cc
++++ b/third_party/blink/renderer/platform/fonts/font_description.cc
+@@ -130,6 +130,7 @@ bool FontDescription::operator==(const FontDescription& other) const {
+          specified_size_ == other.specified_size_ &&
+          computed_size_ == other.computed_size_ &&
+          adjusted_size_ == other.adjusted_size_ &&
++         aerium_size_factor_ == other.aerium_size_factor_ &&
+          size_adjust_ == other.size_adjust_ &&
+          letter_spacing_ == other.letter_spacing_ &&
+          word_spacing_ == other.word_spacing_ &&
+@@ -266,8 +267,10 @@ float FontDescription::EffectiveFontSize() const {
+   // Note: HasSizeAdjust() is for the font-size-adjust property, not for the
+   // size-adjust descriptor.
+   float computed_or_adjusted_size =
+-      HasSizeAdjust() || fields_.has_size_adjust_descriptor_ ? AdjustedSize()
+-                                                             : ComputedSize();
++      (HasSizeAdjust() || fields_.has_size_adjust_descriptor_
++           ? AdjustedSize()
++           : ComputedSize()) *
++      aerium_size_factor_;
+   return floorf(computed_or_adjusted_size *
+                 FontCacheKey::PrecisionMultiplier()) /
+          FontCacheKey::PrecisionMultiplier();
+@@ -413,6 +416,7 @@ uint32_t FontDescription::StyleHashWithoutFamilyList() const {
+   AddFloatToHash(hash, specified_size_);
+   AddFloatToHash(hash, computed_size_);
+   AddFloatToHash(hash, adjusted_size_);
++  AddFloatToHash(hash, aerium_size_factor_);
+   AddIntToHash(hash, letter_spacing_.GetHash());
+   AddIntToHash(hash, word_spacing_.GetHash());
+   AddIntToHash(hash, fields_as_unsigned_.parts[0]);
+diff --git a/third_party/blink/renderer/platform/fonts/font_description.h b/third_party/blink/renderer/platform/fonts/font_description.h
+index 8b51d357de87021b525fa9f48696df8ee4a3bb0b..f38ca6b9e1d3c9ed5f59d21b14fa43b2dac52acb 100644
+--- a/third_party/blink/renderer/platform/fonts/font_description.h
++++ b/third_party/blink/renderer/platform/fonts/font_description.h
+@@ -375,6 +375,7 @@ class PLATFORM_EXPORT FontDescription {
+   void SetComputedSize(float s) { computed_size_ = ClampTo<float>(s); }
+   void SetSpecifiedSize(float s) { specified_size_ = ClampTo<float>(s); }
+   void SetAdjustedSize(float s) { adjusted_size_ = ClampTo<float>(s); }
++  void SetAeriumSizeFactor(float factor) { aerium_size_factor_ = factor; }
+   void SetSizeAdjust(const FontSizeAdjust& size_adjust) {
+     size_adjust_ = size_adjust;
+   }
+@@ -534,6 +535,7 @@ class PLATFORM_EXPORT FontDescription {
+   // This value is adjusted for the minimum font size and the zoom factor
+   // as well as a computed size is.
+   float adjusted_size_ = 0;
++  float aerium_size_factor_ = 1.0f;
+ 
+   Length letter_spacing_{0, Length::kFixed};
+   Length word_spacing_{0, Length::kFixed};
 diff --git a/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc b/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
 new file mode 100644
-index 0000000000000000000000000000000000000000..ad0b5d1835de813883318f1747a88876cc7e8c52
+index 0000000000000000000000000000000000000000..6ac315756fc56f3cdfbecf2758d7fb4c3f62a17f
 --- /dev/null
 +++ b/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
-@@ -0,0 +1,164 @@
+@@ -0,0 +1,152 @@
 +// Copyright 2026 Aerium Browser
 +// SPDX-License-Identifier: GPL-3.0-only
 +
@@ -448,11 +616,15 @@ index 0000000000000000000000000000000000000000..ad0b5d1835de813883318f1747a88876
 +  return secret;
 +}
 +
-+double Factor(uint64_t key) {
-+  const uint64_t step = Mix(key) % 2000;
-+  const double offset = step < 1000 ? static_cast<double>(step) - 1000.0
-+                                    : static_cast<double>(step) - 999.0;
-+  return 1.0 + offset * 1e-7;
++uint64_t KeyFor(ExecutionContext* context) {
++  uint64_t key = 0;
++  const FingerprintNoise::KeyProvider provider =
++      g_key_provider.load(std::memory_order_acquire);
++  if (provider && provider(context, &key)) {
++    return key;
++  }
++  static const uint64_t fallback = FingerprintNoise::KeyForSite(String());
++  return fallback;
 +}
 +
 +bool HasByteChannels(const SkPixmap& pixmap) {
@@ -483,13 +655,16 @@ index 0000000000000000000000000000000000000000..ad0b5d1835de813883318f1747a88876
 +}
 +
 +uint64_t FingerprintNoise::CurrentKey() {
-+  uint64_t key = 0;
-+  const KeyProvider provider = g_key_provider.load(std::memory_order_acquire);
-+  if (provider && provider(&key)) {
-+    return key;
++  return KeyFor(nullptr);
++}
++
++float FingerprintNoise::FontScale(ExecutionContext* context) {
++  if (!IsEnabled()) {
++    return 1.0f;
 +  }
-+  static const uint64_t fallback = KeyForSite(String());
-+  return fallback;
++  const uint64_t mixed = Mix(KeyFor(context) ^ 0x5bd1e9955bd1e995ull);
++  return static_cast<float>(1.0 - 0.0012 -
++                            static_cast<double>(mixed % 3301) * 1e-6);
 +}
 +
 +void FingerprintNoise::AddToPixels(const SkPixmap& pixmap,
@@ -545,32 +720,13 @@ index 0000000000000000000000000000000000000000..ad0b5d1835de813883318f1747a88876
 +  return copy;
 +}
 +
-+double FingerprintNoise::Scale(double value) {
-+  return IsEnabled() ? value * Factor(CurrentKey()) : value;
-+}
-+
-+gfx::RectF FingerprintNoise::Scale(const gfx::RectF& rect) {
-+  if (!IsEnabled()) {
-+    return rect;
-+  }
-+  return gfx::ScaleRect(rect, static_cast<float>(Factor(CurrentKey())));
-+}
-+
-+gfx::QuadF FingerprintNoise::Scale(const gfx::QuadF& quad) {
-+  gfx::QuadF scaled = quad;
-+  if (IsEnabled()) {
-+    scaled.Scale(static_cast<float>(Factor(CurrentKey())));
-+  }
-+  return scaled;
-+}
-+
 +}  // namespace blink
 diff --git a/third_party/blink/renderer/platform/graphics/fingerprint_noise.h b/third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..32f0955b1193c20418c2b41ddd1a439f985a9fc0
+index 0000000000000000000000000000000000000000..3819f2d663e38ebc1ca66fa7c4262f506d8c0e7d
 --- /dev/null
 +++ b/third_party/blink/renderer/platform/graphics/fingerprint_noise.h
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,42 @@
 +// Copyright 2026 Aerium Browser
 +// SPDX-License-Identifier: GPL-3.0-only
 +
@@ -584,21 +740,22 @@ index 0000000000000000000000000000000000000000..32f0955b1193c20418c2b41ddd1a439f
 +#include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
 +#include "third_party/blink/renderer/platform/wtf/vector.h"
 +#include "third_party/skia/include/core/SkPixmap.h"
-+#include "ui/gfx/geometry/quad_f.h"
-+#include "ui/gfx/geometry/rect_f.h"
 +
 +namespace blink {
++
++class ExecutionContext;
 +
 +class PLATFORM_EXPORT FingerprintNoise {
 +  STATIC_ONLY(FingerprintNoise);
 +
 + public:
-+  using KeyProvider = bool (*)(uint64_t* key);
++  using KeyProvider = bool (*)(ExecutionContext* context, uint64_t* key);
 +
 +  static bool IsEnabled();
 +  static void SetKeyProvider(KeyProvider provider);
 +  static uint64_t KeyForSite(const String& site);
 +  static uint64_t CurrentKey();
++  static float FontScale(ExecutionContext* context);
 +  static void AddToPixels(const SkPixmap& pixmap, int origin_x, int origin_y);
 +  static void AddToPixels(const SkPixmap& pixmap,
 +                          int origin_x,
@@ -607,9 +764,6 @@ index 0000000000000000000000000000000000000000..32f0955b1193c20418c2b41ddd1a439f
 +  static SkPixmap ForEncoding(const SkPixmap& pixmap,
 +                              Vector<uint8_t>& storage,
 +                              uint64_t key);
-+  static double Scale(double value);
-+  static gfx::RectF Scale(const gfx::RectF& rect);
-+  static gfx::QuadF Scale(const gfx::QuadF& quad);
 +};
 +
 +}  // namespace blink
