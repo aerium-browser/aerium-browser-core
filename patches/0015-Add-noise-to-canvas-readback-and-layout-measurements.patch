@@ -14,11 +14,11 @@ Subject: [PATCH] Add noise to canvas readback and layout measurements
  .../renderer/core/html/canvas/text_metrics.cc |  11 ++
  .../canvas2d/base_rendering_context_2d.cc     |   4 +
  third_party/blink/renderer/platform/BUILD.gn  |   2 +
- .../platform/graphics/fingerprint_noise.cc    | 162 ++++++++++++++++++
+ .../platform/graphics/fingerprint_noise.cc    | 164 ++++++++++++++++++
  .../platform/graphics/fingerprint_noise.h     |  44 +++++
  .../platform/graphics/image_data_buffer.cc    |  15 +-
  .../platform/graphics/image_data_buffer.h     |  10 ++
- 14 files changed, 347 insertions(+), 10 deletions(-)
+ 14 files changed, 349 insertions(+), 10 deletions(-)
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 
@@ -397,10 +397,10 @@ index cab74e32a43477babaca1d7f99e5f81709537443..22626c094e644548366ead2f8b5e765d
      "graphics/flush_reason.h",
 diff --git a/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc b/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
 new file mode 100644
-index 0000000000000000000000000000000000000000..96893b1a562838966c85962e3dc04dbd73e904e9
+index 0000000000000000000000000000000000000000..ad0b5d1835de813883318f1747a88876cc7e8c52
 --- /dev/null
 +++ b/third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
-@@ -0,0 +1,162 @@
+@@ -0,0 +1,164 @@
 +// Copyright 2026 Aerium Browser
 +// SPDX-License-Identifier: GPL-3.0-only
 +
@@ -510,6 +510,7 @@ index 0000000000000000000000000000000000000000..96893b1a562838966c85962e3dc04dbd
 +  }
 +  base::span<uint8_t> bytes = gfx::SkPixmapToWritableSpan(pixmap);
 +  const size_t row_bytes = pixmap.rowBytes();
++  const bool bgra = pixmap.colorType() == kBGRA_8888_SkColorType;
 +  for (int y = 0; y < pixmap.height(); ++y) {
 +    for (int x = 0; x < pixmap.width(); ++x) {
 +      const size_t offset =
@@ -524,7 +525,8 @@ index 0000000000000000000000000000000000000000..96893b1a562838966c85962e3dc04dbd
 +      if ((hash & 31) != 0) {
 +        continue;
 +      }
-+      bytes[offset + (hash >> 5) % 3] ^= 1;
++      const size_t channel = (hash >> 5) % 3;
++      bytes[offset + (bgra ? 2 - channel : channel)] ^= 1;
 +    }
 +  }
 +}
