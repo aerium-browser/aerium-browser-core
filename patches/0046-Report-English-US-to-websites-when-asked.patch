@@ -1,0 +1,101 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Report English (US) to websites when asked
+
+---
+ .../browser/net/profile_network_context_service.cc   |  4 ++++
+ chrome/browser/renderer_preferences_util.cc          |  9 +++++++--
+ .../browser/reduce_accept_language_service.cc        | 12 ++++++++----
+ .../renderer_host/render_process_host_impl.cc        |  6 +++++-
+ 4 files changed, 24 insertions(+), 7 deletions(-)
+
+diff --git a/chrome/browser/net/profile_network_context_service.cc b/chrome/browser/net/profile_network_context_service.cc
+index 31b1f2b2b066498293da5e3e2d59acfa7710a580..539e3d461cdacb98cea83984b9e1bb4e3e78696e 100644
+--- a/chrome/browser/net/profile_network_context_service.cc
++++ b/chrome/browser/net/profile_network_context_service.cc
+@@ -710,6 +710,10 @@ void ProfileNetworkContextService::OnThirdPartyCookieBlockingChanged(
+ }
+ 
+ std::string ProfileNetworkContextService::ComputeAcceptLanguage() const {
++  if (base::CommandLine::ForCurrentProcess()->HasSwitch(
++          "aerium-report-english")) {
++    return ComputeAcceptLanguageFromPref("en-US,en");
++  }
+   return ComputeAcceptLanguageFromPref(language::GetLanguagesWithMaxCount(
+       profile_->IsOffTheRecord()
+           ? language::GetIncognitoLanguageList(pref_accept_language_.GetValue())
+diff --git a/chrome/browser/renderer_preferences_util.cc b/chrome/browser/renderer_preferences_util.cc
+index 8a64a3bcb6a1bfbaa9428af8fafb28435901ea4b..efd8086a327974874484c81f3295145e93373493 100644
+--- a/chrome/browser/renderer_preferences_util.cc
++++ b/chrome/browser/renderer_preferences_util.cc
+@@ -9,6 +9,7 @@
+ #include <string>
+ #include <vector>
+ 
++#include "base/command_line.h"
+ #include "base/logging.h"
+ #include "base/strings/string_number_conversions.h"
+ #include "base/strings/string_util.h"
+@@ -205,8 +206,12 @@ void UpdateFromSystemSettings(blink::RendererPreferences* prefs,
+                  &prefs->webrtc_udp_min_port, &prefs->webrtc_udp_max_port);
+   prefs->webrtc_local_ips_allowed_urls = GetLocalIpsAllowedUrls(
+       pref_service->GetList(prefs::kWebRtcLocalIpsAllowedUrls));
+-  prefs->accept_languages = GetLanguageListForProfile(
+-      profile, pref_service->GetString(language::prefs::kAcceptLanguages));
++  prefs->accept_languages =
++      base::CommandLine::ForCurrentProcess()->HasSwitch("aerium-report-english")
++          ? std::string("en-US,en")
++          : GetLanguageListForProfile(
++                profile,
++                pref_service->GetString(language::prefs::kAcceptLanguages));
+ #if !BUILDFLAG(IS_MAC)
+   prefs->plugin_fullscreen_allowed =
+       pref_service->GetBoolean(prefs::kFullscreenAllowed);
+diff --git a/components/reduce_accept_language/browser/reduce_accept_language_service.cc b/components/reduce_accept_language/browser/reduce_accept_language_service.cc
+index b5fcd4ac8e4b4db9d05141b485deb9eda958eba1..d004224ebe79042c687bfaed490ad277cf788f8a 100644
+--- a/components/reduce_accept_language/browser/reduce_accept_language_service.cc
++++ b/components/reduce_accept_language/browser/reduce_accept_language_service.cc
+@@ -6,6 +6,7 @@
+ 
+ #include <string>
+ 
++#include "base/command_line.h"
+ #include "base/json/json_reader.h"
+ #include "base/metrics/histogram_functions.h"
+ #include "base/metrics/histogram_macros.h"
+@@ -146,10 +147,13 @@ void ReduceAcceptLanguageService::ClearReducedLanguage(
+ 
+ void ReduceAcceptLanguageService::UpdateAcceptLanguage() {
+   // In incognito mode return a genericized language list.
+-  std::string accept_languages_str = net::HttpUtil::ExpandLanguageList(
+-      is_incognito_
+-          ? language::GetIncognitoLanguageList(pref_accept_language_.GetValue())
+-          : pref_accept_language_.GetValue());
++  std::string accept_languages_str =
++      base::CommandLine::ForCurrentProcess()->HasSwitch("aerium-report-english")
++          ? std::string("en-US,en")
++          : net::HttpUtil::ExpandLanguageList(
++                is_incognito_ ? language::GetIncognitoLanguageList(
++                                    pref_accept_language_.GetValue())
++                              : pref_accept_language_.GetValue());
+   user_accept_languages_ = base::SplitString(
+       accept_languages_str, ",", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
+ 
+diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
+index ca7a5e6f1aeed3b4399c3f1227f44dabbfc2feb1..078f2d6477f7f8c3ba3ed19f75697baf11de3a94 100644
+--- a/content/browser/renderer_host/render_process_host_impl.cc
++++ b/content/browser/renderer_host/render_process_host_impl.cc
+@@ -3866,7 +3866,11 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
+   // Pass on the browser locale.
+   const base::i18n::LanguageTag locale =
+       GetContentClient()->browser()->GetApplicationLocale();
+-  command_line->AppendSwitchASCII(switches::kLang, locale.tag_string());
++  command_line->AppendSwitchASCII(
++      switches::kLang,
++      browser_command_line.HasSwitch("aerium-report-english")
++          ? std::string("en-US")
++          : std::string(locale.tag_string()));
+ 
+   // A non-empty RendererCmdPrefix implies that Zygote is disabled.
+   if (!base::CommandLine::ForCurrentProcess()

@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: fatih-gh <me@mehmetfatihyaman.me>
+Date: Thu, 1 Jan 2026 00:00:00 +0000
+Subject: [PATCH] Trim the language list pages can read
+
+---
+ third_party/blink/renderer/core/frame/navigator_language.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/third_party/blink/renderer/core/frame/navigator_language.cc b/third_party/blink/renderer/core/frame/navigator_language.cc
+index a333624eaee89ea77da398bb4ef27059a05df9f0..0f9cc76b01979a04b3e094ed056a6def09cb9575 100644
+--- a/third_party/blink/renderer/core/frame/navigator_language.cc
++++ b/third_party/blink/renderer/core/frame/navigator_language.cc
+@@ -77,6 +77,7 @@ void NavigatorLanguage::EnsureUpdatedLanguage() {
+ 
+   if (languages_dirty_) {
+     languages_ = ParseAndSanitize(GetAcceptLanguages());
++    languages_.Shrink(1);
+     languages_dirty_ = false;
+   }
+ }
