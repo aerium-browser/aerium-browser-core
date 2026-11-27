@@ -83,10 +83,10 @@ index b5fcd4ac8e4b4db9d05141b485deb9eda958eba1..d004224ebe79042c687bfaed490ad277
        accept_languages_str, ",", base::TRIM_WHITESPACE, base::SPLIT_WANT_ALL);
  
 diff --git a/content/browser/renderer_host/render_process_host_impl.cc b/content/browser/renderer_host/render_process_host_impl.cc
-index ca7a5e6f1aeed3b4399c3f1227f44dabbfc2feb1..078f2d6477f7f8c3ba3ed19f75697baf11de3a94 100644
+index e9900f20e634915a982547f9bd29843b9ad7f0a2..b7dfbd7192c3f02e05b212b23fa3df67f7b7cb6b 100644
 --- a/content/browser/renderer_host/render_process_host_impl.cc
 +++ b/content/browser/renderer_host/render_process_host_impl.cc
-@@ -3866,7 +3866,11 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
+@@ -3867,7 +3867,11 @@ void RenderProcessHostImpl::AppendRendererCommandLine(
    // Pass on the browser locale.
    const base::i18n::LanguageTag locale =
        GetContentClient()->browser()->GetApplicationLocale();
@@ -97,5 +97,5 @@ index ca7a5e6f1aeed3b4399c3f1227f44dabbfc2feb1..078f2d6477f7f8c3ba3ed19f75697baf
 +          ? std::string("en-US")
 +          : std::string(locale.tag_string()));
  
-   // A non-empty RendererCmdPrefix implies that Zygote is disabled.
-   if (!base::CommandLine::ForCurrentProcess()
+   static const uint64_t fingerprint_session = base::RandUint64();
+   command_line->AppendSwitchASCII(
