@@ -24,13 +24,13 @@ Subject: [PATCH] Add noise to canvas readback and layout measurements
  third_party/blink/renderer/platform/BUILD.gn  |   2 +
  .../blink/renderer/platform/fonts/font.cc     |  14 +-
  .../renderer/platform/fonts/font_cache_key.h  |   4 +-
- .../platform/fonts/font_description.cc        |   8 +-
+ .../platform/fonts/font_description.cc        |  10 +-
  .../platform/fonts/font_description.h         |   2 +
  .../platform/graphics/fingerprint_noise.cc    | 152 ++++++++++++++++++
  .../platform/graphics/fingerprint_noise.h     |  42 +++++
  .../platform/graphics/image_data_buffer.cc    |  15 +-
  .../platform/graphics/image_data_buffer.h     |  10 ++
- 26 files changed, 434 insertions(+), 21 deletions(-)
+ 26 files changed, 435 insertions(+), 22 deletions(-)
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.cc
  create mode 100644 third_party/blink/renderer/platform/graphics/fingerprint_noise.h
 
@@ -238,14 +238,14 @@ index 7361d1e456fb1b333044d2812f05b56bbce272b4..4f651199fdcc2b9d2201e1edfe0609fc
  
  }  // namespace blink
 diff --git a/third_party/blink/renderer/core/exported/web_shared_worker_impl.cc b/third_party/blink/renderer/core/exported/web_shared_worker_impl.cc
-index b49336b0e1f68527e45bcbb494e0750c4786c658..81bedfbf0448b738e99e579656315a15120f41e7 100644
+index b49336b0e1f68527e45bcbb494e0750c4786c658..69d2d4762f9ff574c6ed4cd8edd4f9ec1624a5b9 100644
 --- a/third_party/blink/renderer/core/exported/web_shared_worker_impl.cc
 +++ b/third_party/blink/renderer/core/exported/web_shared_worker_impl.cc
 @@ -308,6 +308,8 @@ void WebSharedWorkerImpl::StartWorkerContext(
            url::Origin(origin_from_browser)),
        std::move(coep_reporting_observer), std::move(dip_reporting_observer));
  
-+  creation_params->aerium_top_level_site = aerium_top_level_site_.IsolatedCopy();
++  creation_params->aerium_top_level_site = std::move(aerium_top_level_site_);
 +
    if (RuntimeEnabledFeatures::PermissionsPolicyForSharedWorkersEnabled()) {
      const url::Origin worker_origin =
@@ -621,9 +621,18 @@ index 00b7b409ae3bc423e107dd58dc3d26ac46adad77..2411e9a923c0f2924f6490551d9922d0
  struct FontCacheKey {
    DISALLOW_NEW();
 diff --git a/third_party/blink/renderer/platform/fonts/font_description.cc b/third_party/blink/renderer/platform/fonts/font_description.cc
-index 0b9b719bd1b1f8926884a019b87a1b3525da32a6..5321173baa0e8b2bfde7c6777e99bc4292399e10 100644
+index 0b9b719bd1b1f8926884a019b87a1b3525da32a6..952b243f1e8bece44ce6a8788e92d3fb0c3fc7bb 100644
 --- a/third_party/blink/renderer/platform/fonts/font_description.cc
 +++ b/third_party/blink/renderer/platform/fonts/font_description.cc
+@@ -59,7 +59,7 @@ struct SameSizeAsFontDescription {
+   scoped_refptr<FontPalette> palette_;
+   scoped_refptr<FontVariantAlternates> font_variant_alternates_;
+   AtomicString locale;
+-  float sizes[3];
++  float sizes[4];
+   Length letter_spacing;
+   Length word_spacing;
+   FontSizeAdjust size_adjust_;
 @@ -130,6 +130,7 @@ bool FontDescription::operator==(const FontDescription& other) const {
           specified_size_ == other.specified_size_ &&
           computed_size_ == other.computed_size_ &&

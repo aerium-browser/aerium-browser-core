@@ -214,6 +214,19 @@ def refresh(args):
                 put(new, cur)
                 n += 1
         print(f'[aerium] patched files refreshed: {n} of {len(work)}')
+        current = set(seen)
+        restored = 0
+        for root, _, names in os.walk(args.cache):
+            for name in names:
+                cached = os.path.join(root, name)
+                path = os.path.relpath(cached, args.cache)
+                if path in current or skipped(path, extra):
+                    continue
+                cur = os.path.join(args.src, path)
+                if os.path.isfile(cur) and not same(cached, cur):
+                    put(cached, cur)
+                    restored += 1
+        print(f'[aerium] files no longer patched restored: {restored}')
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
