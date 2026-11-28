@@ -68,3 +68,36 @@ jobs:
             | while read -r old; do
                 gh release delete-asset "$tag" "$old" -R "$GITHUB_REPOSITORY" -y
               done
+      - name: Tell the Telegram group
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.run_id || github.event.workflow_run.id }}
+          FOUND: ${{ steps.fetch.outputs.found }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram is not set up, nothing sent"
+            exit 0
+          fi
+          run=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID")
+          title=$(jq -r '.display_title' <<<"$run")
+          url=$(jq -r '.html_url' <<<"$run")
+          sha=$(jq -r '.head_sha[0:7]' <<<"$run")
+          subject=$(jq -r '(.head_commit.message // "") | split("\n")[0]' <<<"$run")
+          text=$(printf '%s failed\n%s %s\n%s' "$title" "$sha" "$subject" "$url")
+          api="https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN"
+          if [ "$FOUND" = true ]; then
+            zip -j -q "build-error-$RUN_ID.zip" marker/*
+            curl -sS --fail -o /dev/null "$api/sendDocument" \
+              --form-string chat_id="$TELEGRAM_CHAT_ID" \
+              --form-string caption="$text" \
+              -F document=@"build-error-$RUN_ID.zip"
+          else
+            curl -sS --fail -o /dev/null "$api/sendMessage" \
+              --form-string chat_id="$TELEGRAM_CHAT_ID" \
+              --form-string text="$text"
+          fi
+          echo "Sent the failure of run $RUN_ID to Telegram"
